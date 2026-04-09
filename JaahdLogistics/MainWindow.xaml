@@ -1,0 +1,33 @@
+<Window x:Class="JaahdLogistics.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:JaahdLogistics.ViewModels"
+        xmlns:views="clr-namespace:JaahdLogistics.Views"
+        mc:Ignorable="d"
+        Title="Jaahd Logistics Management System" Height="600" Width="1000"
+        FlowDirection="{DynamicResource FlowDirection}">
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:LoginViewModel}">
+            <views:LoginView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ProjectViewModel}">
+            <TextBlock Text="Project Management Dashboard placeholder"/>
+        </DataTemplate>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Background="#F0F0F0">
+            <Button Content="English" Command="{Binding SwitchLanguageCommand}" CommandParameter="en"/>
+            <Button Content="العربية" Command="{Binding SwitchLanguageCommand}" CommandParameter="ar"/>
+            <TextBlock Text="{Binding CurrentUser.FullName}" Margin="20,0" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <ContentControl Grid.Row="1" Content="{Binding CurrentViewModel}"/>
+    </Grid>
+</Window>

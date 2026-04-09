@@ -1,0 +1,8 @@
+<UserControl x:Class="JaahdLogistics.Views.ReportView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             FlowDirection="{DynamicResource FlowDirection}">
+    <Grid>
+        <DataGrid x:Name="ReportGrid" AutoGenerateColumns="True" />
+    </Grid>
+</UserControl>
