@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Windows;
 
 namespace JaahdLogistics.Services
@@ -7,23 +9,16 @@ namespace JaahdLogistics.Services
         public void SetLanguage(string langCode)
         {
             var dict = new ResourceDictionary();
-            switch (langCode)
-            {
-                case "ar":
-                    dict.Source = new Uri("Resources/Strings.ar.xaml", UriKind.Relative);
-                    break;
-                default:
-                    dict.Source = new Uri("Resources/Strings.en.xaml", UriKind.Relative);
-                    break;
-            }
+            string source = langCode == "ar" ? "Resources/Strings.ar.xaml" : "Resources/Strings.en.xaml";
+            dict.Source = new Uri(source, UriKind.RelativeOrAbsolute);
 
-            var oldDict = Application.Current.Resources.MergedDictionaries
-                .FirstOrDefault(d => d.Source != null && d.Source.OriginalString.Contains("Strings."));
+            var mergedDicts = Application.Current.Resources.MergedDictionaries;
+            var oldDict = mergedDicts.FirstOrDefault(d => d.Source != null && d.Source.OriginalString.Contains("Strings."));
 
             if (oldDict != null)
-                Application.Current.Resources.MergedDictionaries.Remove(oldDict);
+                mergedDicts.Remove(oldDict);
 
-            Application.Current.Resources.MergedDictionaries.Add(dict);
+            mergedDicts.Add(dict);
         }
     }
 }

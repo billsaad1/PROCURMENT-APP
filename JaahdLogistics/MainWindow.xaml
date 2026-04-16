@@ -6,14 +6,15 @@
         xmlns:vm="clr-namespace:JaahdLogistics.ViewModels"
         xmlns:views="clr-namespace:JaahdLogistics.Views"
         mc:Ignorable="d"
-        Title="Jaahd Logistics Management System" Height="600" Width="1000"
-        FlowDirection="{DynamicResource FlowDirection}">
+        Title="Jaahd Logistics Management System" Height="600" Width="1000">
     <Window.Resources>
         <DataTemplate DataType="{x:Type vm:LoginViewModel}">
             <views:LoginView/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:ProjectViewModel}">
-            <TextBlock Text="Project Management Dashboard placeholder"/>
+            <Grid>
+                <TextBlock Text="Project Management Dashboard placeholder" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
+            </Grid>
         </DataTemplate>
     </Window.Resources>
     <Grid>
@@ -22,11 +23,13 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Background="#F0F0F0">
-            <Button Content="English" Command="{Binding SwitchLanguageCommand}" CommandParameter="en"/>
-            <Button Content="العربية" Command="{Binding SwitchLanguageCommand}" CommandParameter="ar"/>
-            <TextBlock Text="{Binding CurrentUser.FullName}" Margin="20,0" VerticalAlignment="Center"/>
-        </StackPanel>
+        <Border Grid.Row="0" Background="#F0F0F0" Padding="5">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="English" Command="{Binding SwitchLanguageCommand}" CommandParameter="en" Width="80"/>
+                <Button Content="العربية" Command="{Binding SwitchLanguageCommand}" CommandParameter="ar" Width="80"/>
+                <TextBlock Text="{Binding CurrentUser.FullName}" Margin="20,0" VerticalAlignment="Center" FontWeight="Bold"/>
+            </StackPanel>
+        </Border>
 
         <ContentControl Grid.Row="1" Content="{Binding CurrentViewModel}"/>
     </Grid>

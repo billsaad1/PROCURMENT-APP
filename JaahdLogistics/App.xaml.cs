@@ -1,3 +1,4 @@
+using System;
 using System.Windows;
 using JaahdLogistics.Services;
 using JaahdLogistics.Data;
@@ -9,19 +10,31 @@ namespace JaahdLogistics
     {
         protected override void OnStartup(StartupEventArgs e)
         {
-            base.OnStartup(e);
+            try
+            {
+                base.OnStartup(e);
 
-            string connectionString = "Data Source=jaahd.db";
-            var bootstrap = new DatabaseBootstrap(connectionString);
-            // bootstrap.Setup(); // Commented out because schema.sql is not in the build output yet
+                string connectionString = "Data Source=jaahd.db";
+                var bootstrap = new DatabaseBootstrap(connectionString);
+                bootstrap.Setup();
 
-            var dataService = new DataService(connectionString);
-            var langService = new LanguageService();
-            var mainVM = new MainViewModel(dataService, langService);
+                var dataService = new DataService(connectionString);
+                var langService = new LanguageService();
+                var mainVM = new MainViewModel(dataService, langService);
 
-            var mainWindow = new MainWindow();
-            mainWindow.DataContext = mainVM;
-            mainWindow.Show();
+                var mainWindow = new MainWindow();
+                mainWindow.DataContext = mainVM;
+
+                // Set initial flow direction
+                mainWindow.FlowDirection = FlowDirection.LeftToRight;
+
+                mainWindow.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Critical error during startup: {ex.Message}\n\n{ex.StackTrace}", "Startup Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Shutdown();
+            }
         }
     }
 }

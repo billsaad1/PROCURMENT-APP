@@ -56,3 +56,4 @@
 /app/JaahdLogistics/obj/Debug/net8.0-windows/JaahdLogistics.pdb
 /app/JaahdLogistics/obj/Debug/net8.0-windows/JaahdLogistics.genruntimeconfig.cache
 /app/JaahdLogistics/obj/Debug/net8.0-windows/ref/JaahdLogistics.dll
+/app/JaahdLogistics/bin/Debug/net8.0-windows/schema.sql

@@ -1,14 +1,13 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
-    <sys:String x:Key="Login">تسجيل الدخول</sys:String>
-    <sys:String x:Key="Username">اسم المستخدم</sys:String>
-    <sys:String x:Key="Password">كلمة المرور</sys:String>
-    <sys:String x:Key="PR">طلب شراء</sys:String>
-    <sys:String x:Key="RFQ">طلب عروض أسعار</sys:String>
-    <sys:String x:Key="PO">أمر شراء</sys:String>
-    <sys:String x:Key="Project">المشروع</sys:String>
-    <sys:String x:Key="Budget">الميزانية</sys:String>
-    <sys:String x:Key="Settings">الإعدادات</sys:String>
-    <sys:String x:Key="FlowDirection">RightToLeft</sys:String>
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <x:String x:Key="Login">تسجيل الدخول</x:String>
+    <x:String x:Key="Username">اسم المستخدم</x:String>
+    <x:String x:Key="Password">كلمة المرور</x:String>
+    <x:String x:Key="PR">طلب شراء</x:String>
+    <x:String x:Key="RFQ">طلب عروض أسعار</x:String>
+    <x:String x:Key="PO">أمر شراء</x:String>
+    <x:String x:Key="Project">المشروع</x:String>
+    <x:String x:Key="Budget">الميزانية</x:String>
+    <x:String x:Key="Settings">الإعدادات</x:String>
+    <x:String x:Key="FlowDirection">RightToLeft</x:String>
 </ResourceDictionary>

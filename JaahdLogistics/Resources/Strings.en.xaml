@@ -1,14 +1,13 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
-    <sys:String x:Key="Login">Login</sys:String>
-    <sys:String x:Key="Username">Username</sys:String>
-    <sys:String x:Key="Password">Password</sys:String>
-    <sys:String x:Key="PR">Purchase Requisition</sys:String>
-    <sys:String x:Key="RFQ">Request for Quotation</sys:String>
-    <sys:String x:Key="PO">Purchase Order</sys:String>
-    <sys:String x:Key="Project">Project</sys:String>
-    <sys:String x:Key="Budget">Budget</sys:String>
-    <sys:String x:Key="Settings">Settings</sys:String>
-    <sys:String x:Key="FlowDirection">LeftToRight</sys:String>
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <x:String x:Key="Login">Login</x:String>
+    <x:String x:Key="Username">Username</x:String>
+    <x:String x:Key="Password">Password</x:String>
+    <x:String x:Key="PR">Purchase Requisition</x:String>
+    <x:String x:Key="RFQ">Request for Quotation</x:String>
+    <x:String x:Key="PO">Purchase Order</x:String>
+    <x:String x:Key="Project">Project</x:String>
+    <x:String x:Key="Budget">Budget</x:String>
+    <x:String x:Key="Settings">Settings</x:String>
+    <x:String x:Key="FlowDirection">LeftToRight</x:String>
 </ResourceDictionary>
