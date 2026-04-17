@@ -5,16 +5,33 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:JaahdLogistics.ViewModels"
         xmlns:views="clr-namespace:JaahdLogistics.Views"
+        xmlns:helpers="clr-namespace:JaahdLogistics.Helpers"
         mc:Ignorable="d"
+        FlowDirection="{DynamicResource FlowDirection}"
         Title="Jaahd Logistics Management System" Height="600" Width="1000">
     <Window.Resources>
+        <helpers:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+
         <DataTemplate DataType="{x:Type vm:LoginViewModel}">
             <views:LoginView/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:ProjectViewModel}">
-            <Grid>
-                <TextBlock Text="Project Management Dashboard placeholder" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
-            </Grid>
+            <views:ProjectView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:PurchaseRequisitionViewModel}">
+            <views:PurchaseRequisitionView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ProcurementViewModel}">
+            <views:ProcurementView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:WarehouseViewModel}">
+            <views:WarehouseView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+            <views:SettingsView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ReportViewModel}">
+            <views:ReportView/>
         </DataTemplate>
     </Window.Resources>
     <Grid>
@@ -24,11 +41,23 @@
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" Background="#F0F0F0" Padding="5">
-            <StackPanel Orientation="Horizontal">
-                <Button Content="English" Command="{Binding SwitchLanguageCommand}" CommandParameter="en" Width="80"/>
-                <Button Content="العربية" Command="{Binding SwitchLanguageCommand}" CommandParameter="ar" Width="80"/>
-                <TextBlock Text="{Binding CurrentUser.FullName}" Margin="20,0" VerticalAlignment="Center" FontWeight="Bold"/>
-            </StackPanel>
+            <Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Button Content="English" Command="{Binding SwitchLanguageCommand}" CommandParameter="en" Width="80" Margin="5"/>
+                    <Button Content="العربية" Command="{Binding SwitchLanguageCommand}" CommandParameter="ar" Width="80" Margin="5"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="{DynamicResource Projects}" Command="{Binding ShowViewCommand}" CommandParameter="Projects" Margin="5"/>
+                    <Button Content="{DynamicResource PR}" Command="{Binding ShowViewCommand}" CommandParameter="PR" Margin="5"/>
+                    <Button Content="{DynamicResource RFQ}" Command="{Binding ShowViewCommand}" CommandParameter="Procurement" Margin="5"/>
+                    <Button Content="{DynamicResource GRN}" Command="{Binding ShowViewCommand}" CommandParameter="Warehouse" Margin="5"/>
+                    <Button Content="{DynamicResource Settings}" Command="{Binding ShowViewCommand}" CommandParameter="Settings" Margin="5"/>
+                    <Button Content="{DynamicResource Reports}" Command="{Binding ShowViewCommand}" CommandParameter="Reports" Margin="5"/>
+                </StackPanel>
+
+                <TextBlock Text="{Binding CurrentUser.FullName}" HorizontalAlignment="Right" Margin="20,0" VerticalAlignment="Center" FontWeight="Bold"/>
+            </Grid>
         </Border>
 
         <ContentControl Grid.Row="1" Content="{Binding CurrentViewModel}"/>

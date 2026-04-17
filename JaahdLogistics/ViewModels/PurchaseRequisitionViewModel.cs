@@ -16,9 +16,30 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private string _budgetWarning = string.Empty;
 
+        [ObservableProperty]
+        private ObservableCollection<Project> _projects;
+
+        [ObservableProperty]
+        private Project? _selectedProject;
+
+        [ObservableProperty]
+        private ObservableCollection<BudgetLine> _budgetLines = new();
+
+        public string[] Currencies { get; } = { "USD", "YER" };
+
         public PurchaseRequisitionViewModel(IDataService dataService)
         {
             _dataService = dataService;
+            _projects = new ObservableCollection<Project>(_dataService.GetProjects());
+        }
+
+        partial void OnSelectedProjectChanged(Project? value)
+        {
+            if (value != null)
+            {
+                CurrentPR.ProjectId = value.Id;
+                BudgetLines = new ObservableCollection<BudgetLine>(_dataService.GetBudgetLines(value.Id));
+            }
         }
 
         [RelayCommand]

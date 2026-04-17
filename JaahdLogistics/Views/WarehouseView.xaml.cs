@@ -1,0 +1,12 @@
+using System.Windows.Controls;
+
+namespace JaahdLogistics.Views
+{
+    public partial class WarehouseView : UserControl
+    {
+        public WarehouseView()
+        {
+            InitializeComponent();
+        }
+    }
+}

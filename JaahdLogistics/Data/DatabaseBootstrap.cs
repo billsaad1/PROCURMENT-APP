@@ -27,13 +27,18 @@ namespace JaahdLogistics.Data
                 connection.Execute(schema);
             }
 
-            var adminExists = connection.ExecuteScalar<bool>("SELECT COUNT(1) FROM Users WHERE Username = 'admin'");
-            if (!adminExists)
+            var userCount = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Users");
+            if (userCount == 0)
             {
                 connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('admin', 'admin', 'Admin', 'System Administrator')");
+                connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('pm', 'pm', 'ProjectManager', 'Project Manager')");
+                connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('proc', 'proc', 'ProcurementManager', 'Procurement Manager')");
+                connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('fin', 'fin', 'FinanceManager', 'Finance Manager')");
+                connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('store', 'store', 'Storekeeper', 'Storekeeper')");
+                connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('head', 'head', 'HeadOfAssociation', 'Head of Association')");
             }
 
-            var settingsExists = connection.ExecuteScalar<bool>("SELECT COUNT(1) FROM Settings WHERE Id = 1");
+            var settingsExists = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Settings WHERE Id = 1");
             if (!settingsExists)
             {
                 connection.Execute("INSERT INTO Settings (Id, AssociationName) VALUES (1, 'Jaahd Association')");

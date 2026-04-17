@@ -27,16 +27,19 @@ namespace JaahdLogistics.ViewModels
         }
 
         [RelayCommand]
-        private void Login()
+        private void Login(object parameter)
         {
-            var user = _dataService.Authenticate(Username, Password);
-            if (user != null)
+            if (parameter is System.Windows.Controls.PasswordBox passwordBox)
             {
-                OnLoginSuccess?.Invoke(user);
-            }
-            else
-            {
-                ErrorMessage = "Invalid username or password";
+                var user = _dataService.Authenticate(Username, passwordBox.Password);
+                if (user != null)
+                {
+                    OnLoginSuccess?.Invoke(user);
+                }
+                else
+                {
+                    ErrorMessage = "Invalid username or password";
+                }
             }
         }
     }

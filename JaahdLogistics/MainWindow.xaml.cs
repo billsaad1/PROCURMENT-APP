@@ -8,5 +8,10 @@ namespace JaahdLogistics
         {
             InitializeComponent();
         }
+
+        private void OnFlowDirectionChanged(object sender, EventArgs e)
+        {
+            // Optional: Handle layout updates on direction change if needed
+        }
     }
 }

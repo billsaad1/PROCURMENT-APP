@@ -1,0 +1,42 @@
+<UserControl x:Class="JaahdLogistics.Views.ProcurementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:JaahdLogistics.Views"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="900">
+    <TabControl Margin="10">
+        <TabItem Header="{DynamicResource RFQ}">
+            <Grid Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="{DynamicResource CreateRFQ}" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBlock Text="{DynamicResource SelectPR}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <ComboBox ItemsSource="{Binding ApprovedPRs}" SelectedItem="{Binding SelectedPR}" DisplayMemberPath="PRNumber" Width="200"/>
+                    <Button Content="{DynamicResource Generate}" Command="{Binding CreateRFQCommand}" Margin="10,0,0,0"/>
+                </StackPanel>
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{DynamicResource RFQNumber}" Margin="5"/>
+                    <TextBox Grid.Column="1" Text="{Binding CurrentRFQ.RFQNumber}" Margin="5"/>
+                </Grid>
+                <TextBlock Grid.Row="3" Text="{DynamicResource RFQDetailsPlaceholder}" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.5"/>
+            </Grid>
+        </TabItem>
+        <TabItem Header="{DynamicResource BidAnalysis}">
+            <TextBlock Text="{DynamicResource BidAnalysisPlaceholder}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </TabItem>
+        <TabItem Header="{DynamicResource PO}">
+            <TextBlock Text="{DynamicResource POPlaceholder}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </TabItem>
+    </TabControl>
+</UserControl>

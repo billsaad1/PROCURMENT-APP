@@ -1,4 +1,10 @@
-**/bin/
-**/obj/
-*.db
 .vs/
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.db
+*.db-journal
+*.db-wal

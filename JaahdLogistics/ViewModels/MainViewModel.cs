@@ -45,5 +45,31 @@ namespace JaahdLogistics.ViewModels
         {
             _languageService.SetLanguage(lang);
         }
+
+        [RelayCommand]
+        private void ShowView(string viewName)
+        {
+            switch (viewName)
+            {
+                case "Projects":
+                    CurrentViewModel = new ProjectViewModel(_dataService);
+                    break;
+                case "PR":
+                    CurrentViewModel = new PurchaseRequisitionViewModel(_dataService);
+                    break;
+                case "Procurement":
+                    CurrentViewModel = new ProcurementViewModel(_dataService);
+                    break;
+                case "Warehouse":
+                    CurrentViewModel = new WarehouseViewModel(_dataService);
+                    break;
+                case "Settings":
+                    CurrentViewModel = new SettingsViewModel(_dataService);
+                    break;
+                case "Reports":
+                    CurrentViewModel = new ReportViewModel(new ReportService("Data Source=jaahd.db"));
+                    break;
+            }
+        }
     }
 }
