@@ -74,6 +74,50 @@ namespace JaahdLogistics.Services
             return connection.Query<PurchaseRequisition>("SELECT * FROM PurchaseRequisitions");
         }
 
+        public IEnumerable<PurchaseOrder> GetPOs()
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            return connection.Query<PurchaseOrder>("SELECT * FROM PurchaseOrders");
+        }
+
+        public void SaveRFQ(RFQ rfq)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            if (rfq.Id == 0)
+            {
+                connection.Execute(
+                    "INSERT INTO RFQs (RFQNumber, PRId, Date, ClosingDate, Terms) " +
+                    "VALUES (@RFQNumber, @PRId, @Date, @ClosingDate, @Terms)", rfq);
+            }
+            else
+            {
+                connection.Execute(
+                    "UPDATE RFQs SET RFQNumber=@RFQNumber, ClosingDate=@ClosingDate, Terms=@Terms WHERE Id=@Id", rfq);
+            }
+        }
+
+        public void SaveBidAnalysis(BidAnalysis analysis)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            // Implementation for complex BidAnalysis save with Bidders and Items
+        }
+
+        public void SavePO(PurchaseOrder po)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            if (po.Id == 0)
+            {
+                connection.Execute(
+                    "INSERT INTO PurchaseOrders (PONumber, PRId, BidAnalysisId, VendorId, Date, Terms, Status) " +
+                    "VALUES (@PONumber, @PRId, @BidAnalysisId, @VendorId, @Date, @Terms, @Status)", po);
+            }
+            else
+            {
+                connection.Execute(
+                    "UPDATE PurchaseOrders SET PONumber=@PONumber, Terms=@Terms, Status=@Status WHERE Id=@Id", po);
+            }
+        }
+
         public void SavePR(PurchaseRequisition pr)
         {
             using var connection = new SqliteConnection(_connectionString);

@@ -12,7 +12,7 @@
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
 
-        <DockPanel Grid.Column0 Margin="0,0,10,0">
+        <DockPanel Grid.Column="0" Margin="0,0,10,0">
             <TextBlock Text="{DynamicResource Projects}" DockPanel.Dock="Top" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
             <Button Content="{DynamicResource AddProject}" DockPanel.Dock="Bottom" Command="{Binding AddProjectCommand}" Margin="0,10,0,0"/>
             <ListBox ItemsSource="{Binding Projects}" SelectedItem="{Binding SelectedProject}">

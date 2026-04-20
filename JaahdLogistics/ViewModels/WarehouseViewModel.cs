@@ -25,8 +25,8 @@ namespace JaahdLogistics.ViewModels
         public WarehouseViewModel(IDataService dataService)
         {
             _dataService = dataService;
-            // In a real app, filter for approved POs
-            _pendingPOs = new ObservableCollection<PurchaseOrder>(_dataService.GetPRs().Select(pr => new PurchaseOrder { PONumber = "PO-" + pr.PRNumber, Id = pr.Id }));
+            // Filter for approved POs
+            _pendingPOs = new ObservableCollection<PurchaseOrder>(_dataService.GetPOs().Where(po => po.Status == "FinalApproved"));
         }
 
         [RelayCommand]

@@ -38,8 +38,8 @@ namespace JaahdLogistics.Data
                 connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('head', 'head', 'HeadOfAssociation', 'Head of Association')");
             }
 
-            var settingsExists = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Settings WHERE Id = 1");
-            if (!settingsExists)
+            var settingsCount = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Settings WHERE Id = 1");
+            if (settingsCount == 0)
             {
                 connection.Execute("INSERT INTO Settings (Id, AssociationName) VALUES (1, 'Jaahd Association')");
             }

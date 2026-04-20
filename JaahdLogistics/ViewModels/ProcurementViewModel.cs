@@ -41,13 +41,15 @@ namespace JaahdLogistics.ViewModels
                 PRId = SelectedPR.Id,
                 RFQNumber = $"RFQ-{SelectedPR.PRNumber}-{DateTime.Now:yyyyMMdd}"
             };
-            // In a real app, you'd save here: _dataService.SaveRFQ(CurrentRFQ);
+            _dataService.SaveRFQ(CurrentRFQ);
         }
 
         [RelayCommand]
         private void CreateBidAnalysis()
         {
-            // Logic to create bid analysis
+            if (CurrentRFQ.Id == 0) return;
+            CurrentBidAnalysis = new BidAnalysis { RFQId = CurrentRFQ.Id };
+            _dataService.SaveBidAnalysis(CurrentBidAnalysis);
         }
 
         [RelayCommand]
@@ -59,7 +61,7 @@ namespace JaahdLogistics.ViewModels
                 PRId = SelectedPR.Id,
                 PONumber = $"PO-{SelectedPR.PRNumber}-{DateTime.Now:yyyyMMdd}"
             };
-            // In a real app: _dataService.SavePO(CurrentPO);
+            _dataService.SavePO(CurrentPO);
         }
     }
 }
