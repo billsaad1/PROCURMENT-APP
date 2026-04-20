@@ -1,8 +1,10 @@
+using System.Windows;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using JaahdLogistics.Models;
 using JaahdLogistics.Services;
+using JaahdLogistics.Helpers;
 
 namespace JaahdLogistics.ViewModels
 {
@@ -39,6 +41,10 @@ namespace JaahdLogistics.ViewModels
             {
                 CurrentPR.ProjectId = value.Id;
                 BudgetLines = new ObservableCollection<BudgetLine>(_dataService.GetBudgetLines(value.Id));
+
+                // Automatic Numbering
+                var helper = new NumberingHelper("Data Source=jaahd.db");
+                CurrentPR.PRNumber = helper.GenerateNumber("PR", value.Id);
             }
         }
 
@@ -62,6 +68,19 @@ namespace JaahdLogistics.ViewModels
             }
 
             _dataService.SavePR(CurrentPR);
+        }
+
+        [RelayCommand]
+        private void Approve()
+        {
+            CurrentPR.Status = "FinalApproved";
+            _dataService.SavePR(CurrentPR);
+        }
+
+        [RelayCommand]
+        private void Print(FrameworkElement element)
+        {
+            new PrintService().Print(element);
         }
     }
 }

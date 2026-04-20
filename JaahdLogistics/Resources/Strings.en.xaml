@@ -30,6 +30,8 @@
     <s:String x:Key="Total">Total</s:String>
     <s:String x:Key="AddItem">Add Item</s:String>
     <s:String x:Key="Save">Save</s:String>
+    <s:String x:Key="Print">Print</s:String>
+    <s:String x:Key="Approve">Approve</s:String>
     <s:String x:Key="BidAnalysis">Bid Analysis</s:String>
     <s:String x:Key="CreateRFQ">Create RFQ</s:String>
     <s:String x:Key="SelectPR">Select PR</s:String>
@@ -38,6 +40,9 @@
     <s:String x:Key="RFQDetailsPlaceholder">RFQ details and items will be displayed here.</s:String>
     <s:String x:Key="BidAnalysisPlaceholder">Bid Analysis / Comparison logic.</s:String>
     <s:String x:Key="POPlaceholder">Purchase Order generation and details.</s:String>
+    <s:String x:Key="AddBidder">Add Bidder</s:String>
+    <s:String x:Key="RecommendedBidder">Recommended Bidder</s:String>
+    <s:String x:Key="CreatePO">Create PO</s:String>
     <s:String x:Key="GRN">Goods Receiving Note</s:String>
     <s:String x:Key="SelectPO">Select PO</s:String>
     <s:String x:Key="CreateGRN">Create GRN</s:String>
@@ -47,6 +52,9 @@
     <s:String x:Key="RejectedQty">Rejected Qty</s:String>
     <s:String x:Key="RejectReason">Reject Reason</s:String>
     <s:String x:Key="SaveGRN">Save GRN</s:String>
+    <s:String x:Key="ThreeWayMatch">Three-Way Match</s:String>
+    <s:String x:Key="Verify">Verify</s:String>
+    <s:String x:Key="MatchDetailsPlaceholder">Comparison between PR, PO and GRN is shown here.</s:String>
     <s:String x:Key="AssociationInfo">Association Information</s:String>
     <s:String x:Key="AssociationName">Association Name</s:String>
     <s:String x:Key="Logo">Logo</s:String>

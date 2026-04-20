@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -34,7 +36,16 @@ namespace JaahdLogistics.ViewModels
         {
             if (SelectedPO == null) return;
             CurrentGRN = new GoodsReceivingNotes { POId = SelectedPO.Id, GRNNumber = "GRN-" + SelectedPO.PONumber };
-            // Populate items from PO...
+            GrnItems.Clear();
+            foreach(var item in SelectedPO.Items)
+            {
+                GrnItems.Add(new GRNItems
+                {
+                    POItemId = item.Id,
+                    Description = item.Description,
+                    OrderedQuantity = item.Quantity
+                });
+            }
         }
 
         [RelayCommand]

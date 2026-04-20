@@ -1,3 +1,4 @@
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using JaahdLogistics.Models;
@@ -15,6 +16,9 @@ namespace JaahdLogistics.ViewModels
 
         [ObservableProperty]
         private User? _currentUser;
+
+        [ObservableProperty]
+        private FlowDirection _currentFlowDirection = FlowDirection.LeftToRight;
 
         public MainViewModel(IDataService dataService, LanguageService languageService)
         {
@@ -44,6 +48,7 @@ namespace JaahdLogistics.ViewModels
         private void SwitchLanguage(string lang)
         {
             _languageService.SetLanguage(lang);
+            CurrentFlowDirection = lang == "ar" ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
         }
 
         [RelayCommand]
@@ -62,6 +67,9 @@ namespace JaahdLogistics.ViewModels
                     break;
                 case "Warehouse":
                     CurrentViewModel = new WarehouseViewModel(_dataService);
+                    break;
+                case "Match":
+                    CurrentViewModel = new ThreeWayMatchViewModel(_dataService);
                     break;
                 case "Settings":
                     CurrentViewModel = new SettingsViewModel(_dataService);

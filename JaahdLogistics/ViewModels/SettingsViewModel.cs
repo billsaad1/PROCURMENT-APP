@@ -23,5 +23,16 @@ namespace JaahdLogistics.ViewModels
         {
             _dataService.SaveSettings(Settings);
         }
+
+        [RelayCommand]
+        private void UploadLogo()
+        {
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+            {
+                Settings.LogoImage = System.IO.File.ReadAllBytes(openFileDialog.FileName);
+                OnPropertyChanged(nameof(Settings));
+            }
+        }
     }
 }

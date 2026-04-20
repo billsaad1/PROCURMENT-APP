@@ -3,10 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:JaahdLogistics.Views"
+             xmlns:local="clr-namespace:JaahdLogistics.Helpers"
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="800">
-    <Grid Margin="15">
+    <Grid x:Name="PrintRoot" Margin="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -43,9 +43,12 @@
         </Grid>
 
         <DataGrid Grid.Row="2" ItemsSource="{Binding CurrentPR.Items}" AutoGenerateColumns="False" CanUserAddRows="False">
+            <DataGrid.Resources>
+                <local:BindingProxy x:Key="ViewProxy" Data="{Binding}"/>
+            </DataGrid.Resources>
             <DataGrid.Columns>
                 <DataGridComboBoxColumn Header="{DynamicResource BudgetLine}"
-                                        ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext.BudgetLines}"
+                                        ItemsSource="{Binding Source={StaticResource ViewProxy}, Path=Data.BudgetLines}"
                                         SelectedValueBinding="{Binding BudgetLineId}"
                                         SelectedValuePath="Id"
                                         DisplayMemberPath="Code"
@@ -64,7 +67,9 @@
         </StackPanel>
 
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="{DynamicResource Save}" Command="{Binding SavePRCommand}" Width="120" Height="35" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
+            <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" CommandParameter="{Binding ElementName=PrintRoot}" Width="120" Height="35" Margin="0,0,10,0"/>
+            <Button Content="{DynamicResource Approve}" Command="{Binding ApproveCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
+            <Button Content="{DynamicResource Save}" Command="{Binding SavePRCommand}" Width="120" Height="35"/>
         </StackPanel>
     </Grid>
 </UserControl>

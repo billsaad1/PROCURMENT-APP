@@ -25,9 +25,6 @@ namespace JaahdLogistics
                 var mainWindow = new MainWindow();
                 mainWindow.DataContext = mainVM;
 
-                // Set initial flow direction
-                mainWindow.FlowDirection = FlowDirection.LeftToRight;
-
                 mainWindow.Show();
             }
             catch (Exception ex)

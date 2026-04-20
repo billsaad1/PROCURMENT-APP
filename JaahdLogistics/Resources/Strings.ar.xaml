@@ -30,6 +30,8 @@
     <s:String x:Key="Total">الإجمالي</s:String>
     <s:String x:Key="AddItem">إضافة صنف</s:String>
     <s:String x:Key="Save">حفظ</s:String>
+    <s:String x:Key="Print">طباعة</s:String>
+    <s:String x:Key="Approve">اعتماد</s:String>
     <s:String x:Key="BidAnalysis">تحليل العروض</s:String>
     <s:String x:Key="CreateRFQ">إنشاء طلب عروض أسعار</s:String>
     <s:String x:Key="SelectPR">اختر طلب الشراء</s:String>
@@ -38,6 +40,9 @@
     <s:String x:Key="RFQDetailsPlaceholder">ستظهر تفاصيل طلب عروض الأسعار والأصناف هنا.</s:String>
     <s:String x:Key="BidAnalysisPlaceholder">منطق تحليل ومقارنة العروض.</s:String>
     <s:String x:Key="POPlaceholder">توليد وتفاصيل أمر الشراء.</s:String>
+    <s:String x:Key="AddBidder">إضافة مقدم عرض</s:String>
+    <s:String x:Key="RecommendedBidder">مقدم العرض الموصى به</s:String>
+    <s:String x:Key="CreatePO">إنشاء أمر شراء</s:String>
     <s:String x:Key="GRN">إشعار استلام بضائع</s:String>
     <s:String x:Key="SelectPO">اختر أمر الشراء</s:String>
     <s:String x:Key="CreateGRN">إنشاء إشعار استلام</s:String>
@@ -47,6 +52,9 @@
     <s:String x:Key="RejectedQty">الكمية المرفوضة</s:String>
     <s:String x:Key="RejectReason">سبب الرفض</s:String>
     <s:String x:Key="SaveGRN">حفظ إشعار الاستلام</s:String>
+    <s:String x:Key="ThreeWayMatch">المطابقة الثلاثية</s:String>
+    <s:String x:Key="Verify">تحقق</s:String>
+    <s:String x:Key="MatchDetailsPlaceholder">تظهر هنا المقارنة بين طلب الشراء وأمر الشراء وإشعار الاستلام.</s:String>
     <s:String x:Key="AssociationInfo">معلومات الجمعية</s:String>
     <s:String x:Key="AssociationName">اسم الجمعية</s:String>
     <s:String x:Key="Logo">الشعار</s:String>

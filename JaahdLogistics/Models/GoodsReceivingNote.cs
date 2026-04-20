@@ -18,6 +18,8 @@ namespace JaahdLogistics.Models
         public int Id { get; set; }
         public int GRNId { get; set; }
         public int POItemId { get; set; }
+        public string Description { get; set; } = string.Empty; // Added for UI
+        public decimal OrderedQuantity { get; set; } // Added for UI
         public decimal ReceivedQuantity { get; set; }
         public decimal AcceptedQuantity { get; set; }
         public decimal RejectedQuantity { get; set; }

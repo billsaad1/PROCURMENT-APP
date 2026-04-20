@@ -33,10 +33,46 @@
             </Grid>
         </TabItem>
         <TabItem Header="{DynamicResource BidAnalysis}">
-            <TextBlock Text="{DynamicResource BidAnalysisPlaceholder}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Grid Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <Button Content="{DynamicResource AddBidder}" Command="{Binding AddBidderCommand}"/>
+                    <Button Content="{DynamicResource Save}" Command="{Binding SaveBidAnalysisCommand}" Margin="10,0,0,0"/>
+                </StackPanel>
+                <ItemsControl Grid.Row="1" ItemsSource="{Binding Bidders}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <GroupBox Header="{Binding Name}" Margin="0,0,0,10">
+                                <StackPanel>
+                                    <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+                                    <DataGrid ItemsSource="{Binding Items}" AutoGenerateColumns="True" CanUserAddRows="False"/>
+                                </StackPanel>
+                            </GroupBox>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <StackPanel Grid.Row="2" Orientation="Horizontal">
+                    <TextBlock Text="{DynamicResource RecommendedBidder}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <ComboBox ItemsSource="{Binding Bidders}" SelectedValue="{Binding CurrentBidAnalysis.RecommendedBidderId}" SelectedValuePath="Id" DisplayMemberPath="Name" Width="200"/>
+                </StackPanel>
+            </Grid>
         </TabItem>
         <TabItem Header="{DynamicResource PO}">
-            <TextBlock Text="{DynamicResource POPlaceholder}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Grid Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Button Content="{DynamicResource CreatePO}" Command="{Binding CreatePOCommand}" Margin="0,0,0,10"/>
+                <StackPanel Grid.Row="1">
+                    <TextBlock Text="{Binding CurrentPO.PONumber}" FontSize="16" FontWeight="Bold"/>
+                    <DataGrid ItemsSource="{Binding CurrentPO.Items}" AutoGenerateColumns="True" IsReadOnly="True" Margin="0,10,0,0"/>
+                </StackPanel>
+            </Grid>
         </TabItem>
     </TabControl>
 </UserControl>

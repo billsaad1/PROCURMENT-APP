@@ -19,11 +19,15 @@ namespace JaahdLogistics.Services
         public User? Authenticate(string username, string password)
         {
             using var connection = new SqliteConnection(_connectionString);
-            // In a real app, use password hashing. For this project, we'll use a simple comparison
-            // but we'll assume it's hashed in a real scenario.
-            return connection.QuerySingleOrDefault<User>(
-                "SELECT * FROM Users WHERE Username = @username AND PasswordHash = @password",
-                new { username, password });
+            var user = connection.QuerySingleOrDefault<User>(
+                "SELECT * FROM Users WHERE Username = @username",
+                new { username });
+
+            if (user != null && JaahdLogistics.Helpers.SecurityHelper.VerifyPassword(password, user.PasswordHash))
+            {
+                return user;
+            }
+            return null;
         }
 
         public IEnumerable<User> GetUsers()
@@ -71,13 +75,23 @@ namespace JaahdLogistics.Services
         public IEnumerable<PurchaseRequisition> GetPRs()
         {
             using var connection = new SqliteConnection(_connectionString);
-            return connection.Query<PurchaseRequisition>("SELECT * FROM PurchaseRequisitions");
+            var prs = connection.Query<PurchaseRequisition>("SELECT * FROM PurchaseRequisitions").ToList();
+            foreach (var pr in prs)
+            {
+                pr.Items = connection.Query<PRItem>("SELECT * FROM PRItems WHERE PRId = @Id", new { pr.Id }).ToList();
+            }
+            return prs;
         }
 
         public IEnumerable<PurchaseOrder> GetPOs()
         {
             using var connection = new SqliteConnection(_connectionString);
-            return connection.Query<PurchaseOrder>("SELECT * FROM PurchaseOrders");
+            var pos = connection.Query<PurchaseOrder>("SELECT * FROM PurchaseOrders").ToList();
+            foreach (var po in pos)
+            {
+                po.Items = connection.Query<POItem>("SELECT * FROM POItems WHERE POId = @Id", new { po.Id }).ToList();
+            }
+            return pos;
         }
 
         public void SaveRFQ(RFQ rfq)
@@ -99,22 +113,85 @@ namespace JaahdLogistics.Services
         public void SaveBidAnalysis(BidAnalysis analysis)
         {
             using var connection = new SqliteConnection(_connectionString);
-            // Implementation for complex BidAnalysis save with Bidders and Items
+            connection.Open();
+            using var transaction = connection.BeginTransaction();
+            try
+            {
+                if (analysis.Id == 0)
+                {
+                    analysis.Id = connection.QuerySingle<int>(
+                        "INSERT INTO BidAnalyses (RFQId, Date, RecommendedBidderId, Justification, Status) " +
+                        "VALUES (@RFQId, @Date, @RecommendedBidderId, @Justification, @Status); SELECT last_insert_rowid();",
+                        analysis, transaction);
+                }
+                else
+                {
+                    connection.Execute(
+                        "UPDATE BidAnalyses SET RecommendedBidderId=@RecommendedBidderId, Justification=@Justification, Status=@Status WHERE Id=@Id",
+                        analysis, transaction);
+                    connection.Execute("DELETE FROM BidItems WHERE BidderId IN (SELECT Id FROM Bidders WHERE BidAnalysisId = @Id)", new { analysis.Id }, transaction);
+                    connection.Execute("DELETE FROM Bidders WHERE BidAnalysisId = @Id", new { analysis.Id }, transaction);
+                }
+
+                foreach (var bidder in analysis.Bidders)
+                {
+                    bidder.BidAnalysisId = analysis.Id;
+                    bidder.Id = connection.QuerySingle<int>(
+                        "INSERT INTO Bidders (BidAnalysisId, Name, Address, Contact) VALUES (@BidAnalysisId, @Name, @Address, @Contact); SELECT last_insert_rowid();",
+                        bidder, transaction);
+
+                    foreach (var item in bidder.Items)
+                    {
+                        item.BidderId = bidder.Id;
+                        connection.Execute(
+                            "INSERT INTO BidItems (BidderId, Description, Unit, Quantity, UnitPrice) VALUES (@BidderId, @Description, @Unit, @Quantity, @UnitPrice)",
+                            item, transaction);
+                    }
+                }
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
 
         public void SavePO(PurchaseOrder po)
         {
             using var connection = new SqliteConnection(_connectionString);
-            if (po.Id == 0)
+            connection.Open();
+            using var transaction = connection.BeginTransaction();
+            try
             {
-                connection.Execute(
-                    "INSERT INTO PurchaseOrders (PONumber, PRId, BidAnalysisId, VendorId, Date, Terms, Status) " +
-                    "VALUES (@PONumber, @PRId, @BidAnalysisId, @VendorId, @Date, @Terms, @Status)", po);
+                if (po.Id == 0)
+                {
+                    po.Id = connection.QuerySingle<int>(
+                        "INSERT INTO PurchaseOrders (PONumber, PRId, BidAnalysisId, VendorId, Date, Terms, Status) " +
+                        "VALUES (@PONumber, @PRId, @BidAnalysisId, @VendorId, @Date, @Terms, @Status); SELECT last_insert_rowid();",
+                        po, transaction);
+                }
+                else
+                {
+                    connection.Execute(
+                        "UPDATE PurchaseOrders SET PONumber=@PONumber, Terms=@Terms, Status=@Status WHERE Id=@Id",
+                        po, transaction);
+                    connection.Execute("DELETE FROM POItems WHERE POId = @Id", new { po.Id }, transaction);
+                }
+
+                foreach (var item in po.Items)
+                {
+                    item.POId = po.Id;
+                    connection.Execute(
+                        "INSERT INTO POItems (POId, Description, Unit, Quantity, UnitPrice) VALUES (@POId, @Description, @Unit, @Quantity, @UnitPrice)",
+                        item, transaction);
+                }
+                transaction.Commit();
             }
-            else
+            catch
             {
-                connection.Execute(
-                    "UPDATE PurchaseOrders SET PONumber=@PONumber, Terms=@Terms, Status=@Status WHERE Id=@Id", po);
+                transaction.Rollback();
+                throw;
             }
         }
 

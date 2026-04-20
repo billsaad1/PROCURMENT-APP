@@ -27,9 +27,9 @@
                     <TextBlock Grid.Row="1" Text="{DynamicResource Logo}" VerticalAlignment="Center" Margin="5"/>
                     <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
                         <Border Width="100" Height="100" BorderBrush="Gray" BorderThickness="1" Margin="5">
-                             <Image Source="{Binding Settings.LogoImage}" Stretch="Uniform"/>
+                             <Image Source="{Binding Settings.LogoImage, Converter={StaticResource ImageBytesConverter}}" Stretch="Uniform"/>
                         </Border>
-                        <Button Content="{DynamicResource UploadLogo}" VerticalAlignment="Bottom" Margin="5"/>
+                        <Button Content="{DynamicResource UploadLogo}" Command="{Binding UploadLogoCommand}" VerticalAlignment="Bottom" Margin="5"/>
                     </StackPanel>
                 </Grid>
             </GroupBox>
