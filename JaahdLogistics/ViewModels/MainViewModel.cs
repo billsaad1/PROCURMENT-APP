@@ -20,10 +20,13 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private FlowDirection _currentFlowDirection = FlowDirection.LeftToRight;
 
-        public MainViewModel(IDataService dataService, LanguageService languageService)
+        private readonly string _connectionString;
+
+        public MainViewModel(IDataService dataService, LanguageService languageService, string connectionString)
         {
             _dataService = dataService;
             _languageService = languageService;
+            _connectionString = connectionString;
             ShowLogin();
         }
 
@@ -75,7 +78,7 @@ namespace JaahdLogistics.ViewModels
                     CurrentViewModel = new SettingsViewModel(_dataService);
                     break;
                 case "Reports":
-                    CurrentViewModel = new ReportViewModel(new ReportService("Data Source=jaahd.db"));
+                    CurrentViewModel = new ReportViewModel(new ReportService(_connectionString));
                     break;
             }
         }

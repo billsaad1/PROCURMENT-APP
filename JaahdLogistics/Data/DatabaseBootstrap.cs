@@ -44,6 +44,16 @@ namespace JaahdLogistics.Data
                 connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('store', @storeHash, 'Storekeeper', 'Storekeeper')", new { storeHash });
                 connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('head', @headHash, 'HeadOfAssociation', 'Head of Association')", new { headHash });
             }
+            else
+            {
+                // Repair step: If the admin user exists with a plaintext password from a previous version, update it to a hash.
+                var adminUser = connection.QuerySingleOrDefault<dynamic>("SELECT * FROM Users WHERE Username = 'admin'");
+                if (adminUser != null && adminUser.PasswordHash == "admin")
+                {
+                    string adminHash = JaahdLogistics.Helpers.SecurityHelper.HashPassword("admin");
+                    connection.Execute("UPDATE Users SET PasswordHash = @adminHash WHERE Username = 'admin'", new { adminHash });
+                }
+            }
 
             var settingsCount = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Settings WHERE Id = 1");
             if (settingsCount == 0)

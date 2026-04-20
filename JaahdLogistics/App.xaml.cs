@@ -14,13 +14,16 @@ namespace JaahdLogistics
             {
                 base.OnStartup(e);
 
-                string connectionString = "Data Source=jaahd.db";
+                // Use a full path to ensure consistency across different startup methods
+                string dbPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "jaahd.db");
+                string connectionString = $"Data Source={dbPath}";
+
                 var bootstrap = new DatabaseBootstrap(connectionString);
                 bootstrap.Setup();
 
                 var dataService = new DataService(connectionString);
                 var langService = new LanguageService();
-                var mainVM = new MainViewModel(dataService, langService);
+                var mainVM = new MainViewModel(dataService, langService, connectionString);
 
                 var mainWindow = new MainWindow();
                 mainWindow.DataContext = mainVM;
