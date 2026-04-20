@@ -40,7 +40,7 @@ namespace JaahdLogistics.ViewModels
         [RelayCommand]
         private void AddProject()
         {
-            var newProject = new Project { Name = "New Project", Year = DateTime.Now.Year };
+            var newProject = new Project { Name = "New Project", Code = "PROJ-" + (Projects.Count + 1), Year = DateTime.Now.Year };
             _dataService.SaveProject(newProject);
             Projects.Add(newProject);
         }

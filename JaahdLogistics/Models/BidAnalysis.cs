@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace JaahdLogistics.Models
 {
@@ -11,7 +12,7 @@ namespace JaahdLogistics.Models
         public int? RecommendedBidderId { get; set; }
         public string? Justification { get; set; }
         public string Status { get; set; } = "Pending";
-        public List<Bidder> Bidders { get; set; } = new();
+        public ObservableCollection<Bidder> Bidders { get; set; } = new();
     }
 
     public class Bidder
@@ -21,7 +22,7 @@ namespace JaahdLogistics.Models
         public string Name { get; set; } = string.Empty;
         public string? Address { get; set; }
         public string? Contact { get; set; }
-        public List<BidItem> Items { get; set; } = new();
+        public ObservableCollection<BidItem> Items { get; set; } = new();
     }
 
     public class BidItem

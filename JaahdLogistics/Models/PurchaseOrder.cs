@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace JaahdLogistics.Models
 {
@@ -8,13 +9,13 @@ namespace JaahdLogistics.Models
         public int Id { get; set; }
         public string PONumber { get; set; } = string.Empty;
         public int PRId { get; set; }
-        public int ProjectId { get; set; } // Added ProjectId
-        public int BidAnalysisId { get; set; }
-        public int VendorId { get; set; }
+        public int ProjectId { get; set; }
+        public int? BidAnalysisId { get; set; }
+        public int? VendorId { get; set; }
         public DateTime Date { get; set; }
         public string? Terms { get; set; }
         public string Status { get; set; } = "Pending";
-        public List<POItem> Items { get; set; } = new();
+        public ObservableCollection<POItem> Items { get; set; } = new();
     }
 
     public class POItem

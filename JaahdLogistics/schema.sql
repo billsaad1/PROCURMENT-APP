@@ -35,6 +35,8 @@ CREATE TABLE IF NOT EXISTS PurchaseRequisitions (
     Currency TEXT NOT NULL,
     ExchangeRate DECIMAL(18, 4) DEFAULT 1.0,
     Status TEXT DEFAULT 'Pending', -- Pending, LogisticsApproved, FinanceApproved, FinalApproved, Rejected
+    Version INTEGER DEFAULT 1,
+    LastModified DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (ProjectId) REFERENCES Projects(Id),
     FOREIGN KEY (RequesterId) REFERENCES Users(Id)
 );
@@ -68,6 +70,8 @@ CREATE TABLE IF NOT EXISTS BidAnalyses (
     RecommendedBidderId INTEGER,
     Justification TEXT,
     Status TEXT DEFAULT 'Pending', -- Pending, LogisticsApproved, FinanceApproved, PMApproved, FinalApproved, Rejected
+    Version INTEGER DEFAULT 1,
+    LastModified DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (RFQId) REFERENCES RFQs(Id)
 );
 
@@ -95,11 +99,13 @@ CREATE TABLE IF NOT EXISTS PurchaseOrders (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
     PONumber TEXT UNIQUE NOT NULL,
     PRId INTEGER NOT NULL,
-    BidAnalysisId INTEGER NOT NULL,
-    VendorId INTEGER NOT NULL, -- Points to Bidders(Id)
+    BidAnalysisId INTEGER,
+    VendorId INTEGER, -- Points to Bidders(Id)
     Date DATETIME DEFAULT CURRENT_TIMESTAMP,
     Terms TEXT,
     Status TEXT DEFAULT 'Pending', -- Pending, LogisticsApproved, FinanceApproved, PMApproved, FinalApproved, Rejected
+    Version INTEGER DEFAULT 1,
+    LastModified DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (PRId) REFERENCES PurchaseRequisitions(Id),
     FOREIGN KEY (BidAnalysisId) REFERENCES BidAnalyses(Id),
     FOREIGN KEY (VendorId) REFERENCES Bidders(Id)

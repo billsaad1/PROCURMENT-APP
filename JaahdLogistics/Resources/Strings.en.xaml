@@ -63,7 +63,12 @@
     <s:String x:Key="PRTerms">PR Terms</s:String>
     <s:String x:Key="RFQTerms">RFQ Terms</s:String>
     <s:String x:Key="POTerms">PO Terms</s:String>
+    <s:String x:Key="Dashboard">Dashboard</s:String>
+    <s:String x:Key="MyPRStatus">My Requisitions Status</s:String>
     <s:String x:Key="Reports">Reports</s:String>
     <s:String x:Key="ProjectSpendingReport">Project Spending Report</s:String>
     <s:String x:Key="InventoryStatusReport">Inventory Status Report</s:String>
+    <s:String x:Key="VendorHistoryReport">Vendor History Report</s:String>
+    <s:String x:Key="OrderCount">Order Count</s:String>
+    <s:String x:Key="TotalValue">Total Value</s:String>
 </ResourceDictionary>

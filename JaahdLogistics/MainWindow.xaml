@@ -10,12 +10,13 @@
         FlowDirection="{Binding CurrentFlowDirection}"
         Title="Jaahd Logistics Management System" Height="600" Width="1000">
     <Window.Resources>
-        <helpers:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
-        <helpers:ImageBytesConverter x:Key="ImageBytesConverter"/>
         <helpers:BindingProxy x:Key="Proxy" Data="{Binding}"/>
 
         <DataTemplate DataType="{x:Type vm:LoginViewModel}">
             <views:LoginView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+            <views:DashboardView/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:ProjectViewModel}">
             <views:ProjectView/>
@@ -45,24 +46,25 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" Background="#F0F0F0" Padding="5">
+        <Border Grid.Row="0" Background="{StaticResource SecondaryBlueBrush}" Padding="5">
             <Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                    <Button Content="English" Command="{Binding SwitchLanguageCommand}" CommandParameter="en" Width="80" Margin="5"/>
-                    <Button Content="العربية" Command="{Binding SwitchLanguageCommand}" CommandParameter="ar" Width="80" Margin="5"/>
+                    <Button Content="English" Command="{Binding SwitchLanguageCommand}" CommandParameter="en" Width="80" Margin="5" Background="Transparent" BorderThickness="1" BorderBrush="White"/>
+                    <Button Content="العربية" Command="{Binding SwitchLanguageCommand}" CommandParameter="ar" Width="80" Margin="5" Background="Transparent" BorderThickness="1" BorderBrush="White"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Content="{DynamicResource Projects}" Command="{Binding ShowViewCommand}" CommandParameter="Projects" Margin="5"/>
-                    <Button Content="{DynamicResource PR}" Command="{Binding ShowViewCommand}" CommandParameter="PR" Margin="5"/>
-                    <Button Content="{DynamicResource RFQ}" Command="{Binding ShowViewCommand}" CommandParameter="Procurement" Margin="5"/>
-                    <Button Content="{DynamicResource GRN}" Command="{Binding ShowViewCommand}" CommandParameter="Warehouse" Margin="5"/>
-                    <Button Content="{DynamicResource ThreeWayMatch}" Command="{Binding ShowViewCommand}" CommandParameter="Match" Margin="5"/>
-                    <Button Content="{DynamicResource Settings}" Command="{Binding ShowViewCommand}" CommandParameter="Settings" Margin="5"/>
-                    <Button Content="{DynamicResource Reports}" Command="{Binding ShowViewCommand}" CommandParameter="Reports" Margin="5"/>
+                    <Button Content="{DynamicResource Dashboard}" Command="{Binding ShowViewCommand}" CommandParameter="Dashboard" Margin="5" Background="Transparent" FontWeight="SemiBold"/>
+                    <Button Content="{DynamicResource Projects}" Command="{Binding ShowViewCommand}" CommandParameter="Projects" Margin="5" Background="Transparent" FontWeight="SemiBold"/>
+                    <Button Content="{DynamicResource PR}" Command="{Binding ShowViewCommand}" CommandParameter="PR" Margin="5" Background="Transparent" FontWeight="SemiBold"/>
+                    <Button Content="{DynamicResource RFQ}" Command="{Binding ShowViewCommand}" CommandParameter="Procurement" Margin="5" Background="Transparent" FontWeight="SemiBold"/>
+                    <Button Content="{DynamicResource GRN}" Command="{Binding ShowViewCommand}" CommandParameter="Warehouse" Margin="5" Background="Transparent" FontWeight="SemiBold"/>
+                    <Button Content="{DynamicResource ThreeWayMatch}" Command="{Binding ShowViewCommand}" CommandParameter="Match" Margin="5" Background="Transparent" FontWeight="SemiBold"/>
+                    <Button Content="{DynamicResource Settings}" Command="{Binding ShowViewCommand}" CommandParameter="Settings" Margin="5" Background="Transparent" FontWeight="SemiBold"/>
+                    <Button Content="{DynamicResource Reports}" Command="{Binding ShowViewCommand}" CommandParameter="Reports" Margin="5" Background="Transparent" FontWeight="SemiBold"/>
                 </StackPanel>
 
-                <TextBlock Text="{Binding CurrentUser.FullName}" HorizontalAlignment="Right" Margin="20,0" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBlock Text="{Binding CurrentUser.FullName}" Foreground="White" HorizontalAlignment="Right" Margin="20,0" VerticalAlignment="Center" FontWeight="Bold"/>
             </Grid>
         </Border>
 

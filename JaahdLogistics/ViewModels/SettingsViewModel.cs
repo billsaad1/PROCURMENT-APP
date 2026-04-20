@@ -22,6 +22,8 @@ namespace JaahdLogistics.ViewModels
         private void Save()
         {
             _dataService.SaveSettings(Settings);
+            AuthService.CurrentUser.SignatureImage = Settings.LogoImage; // Placeholder for demo: user signature
+            _dataService.SaveUser(AuthService.CurrentUser);
         }
 
         [RelayCommand]

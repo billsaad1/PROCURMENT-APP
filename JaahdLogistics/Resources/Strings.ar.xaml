@@ -63,7 +63,12 @@
     <s:String x:Key="PRTerms">شروط طلب الشراء</s:String>
     <s:String x:Key="RFQTerms">شروط طلب عروض الأسعار</s:String>
     <s:String x:Key="POTerms">شروط أمر الشراء</s:String>
+    <s:String x:Key="Dashboard">لوحة التحكم</s:String>
+    <s:String x:Key="MyPRStatus">حالة طلباتي</s:String>
     <s:String x:Key="Reports">التقارير</s:String>
     <s:String x:Key="ProjectSpendingReport">تقرير إنفاق المشاريع</s:String>
     <s:String x:Key="InventoryStatusReport">تقرير حالة المخزون</s:String>
+    <s:String x:Key="VendorHistoryReport">تقرير تاريخ الموردين</s:String>
+    <s:String x:Key="OrderCount">عدد الطلبات</s:String>
+    <s:String x:Key="TotalValue">القيمة الإجمالية</s:String>
 </ResourceDictionary>

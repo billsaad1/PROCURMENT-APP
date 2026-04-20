@@ -23,5 +23,7 @@ namespace JaahdLogistics.Services
         decimal GetRemainingBudget(int budgetLineId);
         void ApproveEntity(string entityType, int entityId, int userId, string status);
         void SaveGRN(GoodsReceivingNotes grn, List<GRNItems> items);
+        IEnumerable<GoodsReceivingNotes> GetGRNs();
+        void SaveThreeWayMatch(ThreeWayMatch match);
     }
 }

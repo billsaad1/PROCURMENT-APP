@@ -53,5 +53,11 @@ namespace JaahdLogistics.ViewModels
         {
             _dataService.SaveGRN(CurrentGRN, GrnItems.ToList());
         }
+
+        [RelayCommand]
+        private void Print(System.Windows.FrameworkElement element)
+        {
+            new PrintService().ShowPreview(element);
+        }
     }
 }

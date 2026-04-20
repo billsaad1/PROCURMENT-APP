@@ -15,8 +15,10 @@ namespace JaahdLogistics
                 base.OnStartup(e);
 
                 // Use a full path to ensure consistency across different startup methods
+                // Cloud Ready: Load connection string from config or environment if available
                 string dbPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "jaahd.db");
-                string connectionString = $"Data Source={dbPath}";
+                string connectionString = System.Environment.GetEnvironmentVariable("JAAHD_CONNECTION_STRING")
+                                         ?? $"Data Source={dbPath}";
 
                 var bootstrap = new DatabaseBootstrap(connectionString);
                 bootstrap.Setup();

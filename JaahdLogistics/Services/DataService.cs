@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Data.Sqlite;
 using Dapper;
 using JaahdLogistics.Models;
+using System.Collections.ObjectModel;
 
 namespace JaahdLogistics.Services
 {
@@ -78,7 +79,8 @@ namespace JaahdLogistics.Services
             var prs = connection.Query<PurchaseRequisition>("SELECT * FROM PurchaseRequisitions").ToList();
             foreach (var pr in prs)
             {
-                pr.Items = connection.Query<PRItem>("SELECT * FROM PRItems WHERE PRId = @Id", new { pr.Id }).ToList();
+                var items = connection.Query<PRItem>("SELECT * FROM PRItems WHERE PRId = @Id", new { pr.Id }).ToList();
+                pr.Items = new ObservableCollection<PRItem>(items);
             }
             return prs;
         }
@@ -89,7 +91,8 @@ namespace JaahdLogistics.Services
             var pos = connection.Query<PurchaseOrder>("SELECT * FROM PurchaseOrders").ToList();
             foreach (var po in pos)
             {
-                po.Items = connection.Query<POItem>("SELECT * FROM POItems WHERE POId = @Id", new { po.Id }).ToList();
+                var items = connection.Query<POItem>("SELECT * FROM POItems WHERE POId = @Id", new { po.Id }).ToList();
+                po.Items = new ObservableCollection<POItem>(items);
             }
             return pos;
         }
@@ -273,10 +276,32 @@ namespace JaahdLogistics.Services
         public decimal GetRemainingBudget(int budgetLineId)
         {
             using var connection = new SqliteConnection(_connectionString);
-            var totalBudget = connection.ExecuteScalar<decimal>("SELECT TotalAmount FROM BudgetLines WHERE Id = @budgetLineId", new { budgetLineId });
-            var spent = connection.ExecuteScalar<decimal>(
-                "SELECT COALESCE(SUM(Quantity * UnitPrice), 0) FROM PRItems WHERE BudgetLineId = @budgetLineId", new { budgetLineId });
-            return totalBudget - spent;
+            var budgetLine = connection.QuerySingle<BudgetLine>("SELECT * FROM BudgetLines WHERE Id = @budgetLineId", new { budgetLineId });
+
+            var prItems = connection.Query<dynamic>(
+                "SELECT pi.Quantity, pi.UnitPrice, pr.Currency, pr.ExchangeRate " +
+                "FROM PRItems pi JOIN PurchaseRequisitions pr ON pi.PRId = pr.Id " +
+                "WHERE pi.BudgetLineId = @budgetLineId", new { budgetLineId });
+
+            decimal totalSpentInBudgetCurrency = 0;
+            foreach (var item in prItems)
+            {
+                decimal itemTotal = (decimal)item.Quantity * (decimal)item.UnitPrice;
+                if (item.Currency == budgetLine.Currency)
+                {
+                    totalSpentInBudgetCurrency += itemTotal;
+                }
+                else if (item.Currency == "YER" && budgetLine.Currency == "USD" && (decimal)item.ExchangeRate > 0)
+                {
+                    totalSpentInBudgetCurrency += itemTotal / (decimal)item.ExchangeRate;
+                }
+                else if (item.Currency == "USD" && budgetLine.Currency == "YER")
+                {
+                    totalSpentInBudgetCurrency += itemTotal * (decimal)item.ExchangeRate;
+                }
+            }
+
+            return budgetLine.TotalAmount - totalSpentInBudgetCurrency;
         }
 
         public void ApproveEntity(string entityType, int entityId, int userId, string status)
@@ -326,6 +351,28 @@ namespace JaahdLogistics.Services
             } catch {
                 transaction.Rollback();
                 throw;
+            }
+        }
+
+        public IEnumerable<GoodsReceivingNotes> GetGRNs()
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            return connection.Query<GoodsReceivingNotes>("SELECT * FROM GoodsReceivingNotes");
+        }
+
+        public void SaveThreeWayMatch(ThreeWayMatch match)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            if (match.Id == 0)
+            {
+                connection.Execute(
+                    "INSERT INTO ThreeWayMatch (POId, GRNId, InvoiceNumber, Date, Status) " +
+                    "VALUES (@POId, @GRNId, @InvoiceNumber, @Date, @Status)", match);
+            }
+            else
+            {
+                connection.Execute(
+                    "UPDATE ThreeWayMatch SET POId=@POId, GRNId=@GRNId, InvoiceNumber=@InvoiceNumber, Status=@Status WHERE Id=@Id", match);
             }
         }
     }

@@ -14,6 +14,9 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private ObservableCollection<dynamic> _inventoryReport = new();
 
+        [ObservableProperty]
+        private ObservableCollection<dynamic> _vendorReport = new();
+
         public ReportViewModel(ReportService reportService)
         {
             _reportService = reportService;
@@ -24,6 +27,7 @@ namespace JaahdLogistics.ViewModels
         {
             SpendingReport = new ObservableCollection<dynamic>(_reportService.GetSpendingPerProject());
             InventoryReport = new ObservableCollection<dynamic>(_reportService.GetInventoryStatus());
+            VendorReport = new ObservableCollection<dynamic>(_reportService.GetVendorHistory());
         }
     }
 }

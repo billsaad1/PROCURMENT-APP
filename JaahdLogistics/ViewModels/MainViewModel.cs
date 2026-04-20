@@ -20,13 +20,13 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private FlowDirection _currentFlowDirection = FlowDirection.LeftToRight;
 
-        private readonly string _connectionString;
+        public string ConnectionString { get; }
 
         public MainViewModel(IDataService dataService, LanguageService languageService, string connectionString)
         {
             _dataService = dataService;
             _languageService = languageService;
-            _connectionString = connectionString;
+            ConnectionString = connectionString;
             ShowLogin();
         }
 
@@ -43,8 +43,7 @@ namespace JaahdLogistics.ViewModels
 
         private void ShowDashboard()
         {
-            // Placeholder for dashboard view model
-            CurrentViewModel = new ProjectViewModel(_dataService);
+            CurrentViewModel = new DashboardViewModel(_dataService);
         }
 
         [RelayCommand]
@@ -59,6 +58,9 @@ namespace JaahdLogistics.ViewModels
         {
             switch (viewName)
             {
+                case "Dashboard":
+                    ShowDashboard();
+                    break;
                 case "Projects":
                     CurrentViewModel = new ProjectViewModel(_dataService);
                     break;
@@ -78,7 +80,7 @@ namespace JaahdLogistics.ViewModels
                     CurrentViewModel = new SettingsViewModel(_dataService);
                     break;
                 case "Reports":
-                    CurrentViewModel = new ReportViewModel(new ReportService(_connectionString));
+                    CurrentViewModel = new ReportViewModel(new ReportService(ConnectionString));
                     break;
             }
         }

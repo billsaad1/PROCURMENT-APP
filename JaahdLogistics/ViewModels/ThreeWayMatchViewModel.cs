@@ -30,8 +30,24 @@ namespace JaahdLogistics.ViewModels
         private void VerifyMatch()
         {
             if (SelectedPO == null) return;
-            // Logic to compare PO, GRN, and Invoice
-            CurrentMatch = new ThreeWayMatch { POId = SelectedPO.Id, Status = "Verified" };
+
+            var grn = _dataService.GetGRNs().FirstOrDefault(g => g.POId == SelectedPO.Id);
+            if (grn == null)
+            {
+                System.Windows.MessageBox.Show("No GRN found for this PO. Match cannot be verified.");
+                return;
+            }
+
+            CurrentMatch = new ThreeWayMatch
+            {
+                POId = SelectedPO.Id,
+                GRNId = grn.Id,
+                Date = System.DateTime.Now,
+                Status = "Verified"
+            };
+
+            _dataService.SaveThreeWayMatch(CurrentMatch);
+            System.Windows.MessageBox.Show("Three-Way Match Verified Successfully");
         }
     }
 }

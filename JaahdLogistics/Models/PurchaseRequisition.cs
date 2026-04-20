@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace JaahdLogistics.Models
 {
@@ -15,7 +16,7 @@ namespace JaahdLogistics.Models
         public decimal ExchangeRate { get; set; } = 1.0m;
         public string Status { get; set; } = "Pending";
 
-        public List<PRItem> Items { get; set; } = new();
+        public ObservableCollection<PRItem> Items { get; set; } = new();
     }
 
     public class PRItem
