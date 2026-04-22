@@ -9,7 +9,7 @@ namespace JaahdLogistics.Models
         public int Id { get; set; }
         public string PONumber { get; set; } = string.Empty;
         public int PRId { get; set; }
-        public int ProjectId { get; set; } 
+        public int ProjectId { get; set; }
         public int? BidAnalysisId { get; set; }
         public int? VendorId { get; set; }
         public DateTime Date { get; set; }

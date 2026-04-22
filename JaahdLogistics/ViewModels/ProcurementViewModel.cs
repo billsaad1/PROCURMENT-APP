@@ -48,10 +48,11 @@ namespace JaahdLogistics.ViewModels
             if (SelectedPR == null) return;
             var mainVM = Application.Current.MainWindow.DataContext as MainViewModel;
             var helper = new NumberingHelper(mainVM?.ConnectionString ?? "Data Source=jaahd.db");
-            CurrentRFQ = new RFQ 
-            { 
-                PRId = SelectedPR.Id, 
-                RFQNumber = helper.GenerateNumber("RFQ", SelectedPR.ProjectId) 
+            CurrentRFQ = new RFQ
+            {
+                PRId = SelectedPR.Id,
+                Date = DateTime.Now,
+                RFQNumber = helper.GenerateNumber("RFQ", SelectedPR.ProjectId)
             };
             _dataService.SaveRFQ(CurrentRFQ);
         }
@@ -62,7 +63,7 @@ namespace JaahdLogistics.ViewModels
             if (CurrentRFQ.Id == 0) return;
             CurrentBidAnalysis = new BidAnalysis { RFQId = CurrentRFQ.Id, Date = DateTime.Now };
             Bidders = new ObservableCollection<Bidder>();
-            
+
             // Suggesting bidders based on historical vendors or empty
             AddBidder();
         }
@@ -101,9 +102,9 @@ namespace JaahdLogistics.ViewModels
             var mainVM = Application.Current.MainWindow.DataContext as MainViewModel;
             var helper = new NumberingHelper(mainVM?.ConnectionString ?? "Data Source=jaahd.db");
 
-            CurrentPO = new PurchaseOrder 
-            { 
-                PRId = SelectedPR.Id, 
+            CurrentPO = new PurchaseOrder
+            {
+                PRId = SelectedPR.Id,
                 BidAnalysisId = SkipBidAnalysis ? (int?)null : CurrentBidAnalysis.Id,
                 Date = DateTime.Now,
                 PONumber = helper.GenerateNumber("PO", SelectedPR.ProjectId),
@@ -147,7 +148,7 @@ namespace JaahdLogistics.ViewModels
 
             _dataService.ApproveEntity("PO", CurrentPO.Id, user.Id, CurrentPO.Status);
             _dataService.SavePO(CurrentPO);
-            
+
             MessageBox.Show($"PO {CurrentPO.PONumber} status updated to: {CurrentPO.Status}");
         }
 
@@ -164,7 +165,7 @@ namespace JaahdLogistics.ViewModels
 
             _dataService.ApproveEntity("BidAnalysis", CurrentBidAnalysis.Id, user.Id, CurrentBidAnalysis.Status);
             _dataService.SaveBidAnalysis(CurrentBidAnalysis);
-            
+
             MessageBox.Show($"Bid Analysis status updated to: {CurrentBidAnalysis.Status}");
         }
 

@@ -10,9 +10,9 @@ namespace JaahdLogistics.Services
         public void ShowPreview(FrameworkElement element)
         {
             // Create a clone or deep copy of the element to avoid visual tree issues
-            // For simplicity in this demo, we use the element directly but ideally, 
+            // For simplicity in this demo, we use the element directly but ideally,
             // you should render it to a fixed document or a visual.
-            
+
             var preview = new PrintPreviewWindow(element);
             preview.ShowDialog();
         }

@@ -17,10 +17,10 @@ namespace JaahdLogistics.Helpers
         {
             using var connection = new SqliteConnection(_connectionString);
             var project = connection.QuerySingle<dynamic>("SELECT Code, Year FROM Projects WHERE Id = @projectId", new { projectId });
-            
+
             string projectCode = project.Code;
-            int year = project.Year;
-            
+            int year = (int)(long)project.Year;
+
             // Get current count for this type and project
             // Note: Since RFQ and PO are linked to PR, they inherit the project ID.
             string countQuery = prefix switch {
@@ -32,7 +32,7 @@ namespace JaahdLogistics.Helpers
             };
 
             var count = connection.ExecuteScalar<int>(countQuery, new { projectId });
-            
+
             // Requested Format: [ProjectCode]-[Year]-JAAHD-[Sequence]
             // For example: EDU-2024-JAAHD-001
             // Adding prefix (PR/PO) to differentiate document types within the same sequence or format

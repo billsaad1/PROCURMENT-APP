@@ -12,18 +12,26 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private Settings _settings;
 
+        [ObservableProperty]
+        private byte[]? _currentUserSignature;
+
         public SettingsViewModel(IDataService dataService)
         {
             _dataService = dataService;
             _settings = _dataService.GetSettings();
+            CurrentUserSignature = AuthService.CurrentUser?.SignatureImage;
         }
 
         [RelayCommand]
         private void Save()
         {
             _dataService.SaveSettings(Settings);
-            AuthService.CurrentUser.SignatureImage = Settings.LogoImage; // Placeholder for demo: user signature
-            _dataService.SaveUser(AuthService.CurrentUser);
+            var user = AuthService.CurrentUser;
+            if (user != null)
+            {
+                user.SignatureImage = CurrentUserSignature;
+                _dataService.SaveUser(user);
+            }
         }
 
         [RelayCommand]
@@ -34,6 +42,16 @@ namespace JaahdLogistics.ViewModels
             {
                 Settings.LogoImage = System.IO.File.ReadAllBytes(openFileDialog.FileName);
                 OnPropertyChanged(nameof(Settings));
+            }
+        }
+
+        [RelayCommand]
+        private void UploadSignature()
+        {
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+            {
+                CurrentUserSignature = System.IO.File.ReadAllBytes(openFileDialog.FileName);
             }
         }
     }

@@ -39,11 +39,11 @@ namespace JaahdLogistics.ViewModels
             GrnItems.Clear();
             foreach(var item in SelectedPO.Items)
             {
-                GrnItems.Add(new GRNItems 
-                { 
-                    POItemId = item.Id, 
-                    Description = item.Description, 
-                    OrderedQuantity = item.Quantity 
+                GrnItems.Add(new GRNItems
+                {
+                    POItemId = item.Id,
+                    Description = item.Description,
+                    OrderedQuantity = item.Quantity
                 });
             }
         }

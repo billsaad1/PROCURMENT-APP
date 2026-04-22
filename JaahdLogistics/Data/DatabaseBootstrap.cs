@@ -17,16 +17,16 @@ namespace JaahdLogistics.Data
         public void Setup()
         {
             using var connection = new SqliteConnection(_connectionString);
-            
+
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string schemaPath = Path.Combine(baseDir, "schema.sql");
-            
+
             if (File.Exists(schemaPath))
             {
                 string schema = File.ReadAllText(schemaPath);
                 connection.Execute(schema);
             }
-            
+
             var userCount = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Users");
             if (userCount == 0)
             {
@@ -47,7 +47,7 @@ namespace JaahdLogistics.Data
             else
             {
                 // Repair step: If the admin user exists with a plaintext password from a previous version, update it to a hash.
-                var adminUser = connection.QuerySingleOrDefault<dynamic>("SELECT * FROM Users WHERE Username = 'admin'");
+                var adminUser = connection.QuerySingleOrDefault<JaahdLogistics.Models.User>("SELECT * FROM Users WHERE Username = 'admin'");
                 if (adminUser != null && adminUser.PasswordHash == "admin")
                 {
                     string adminHash = JaahdLogistics.Helpers.SecurityHelper.HashPassword("admin");

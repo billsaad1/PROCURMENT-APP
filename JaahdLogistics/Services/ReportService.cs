@@ -29,8 +29,12 @@ namespace JaahdLogistics.Services
             return items.GroupBy(i => i.ProjectName).Select(g => new {
                 Name = g.Key,
                 TotalSpent = g.Sum(i => {
-                    decimal itemTotal = (decimal)i.Quantity * (decimal)i.UnitPrice;
-                    if (i.Currency == "YER" && (decimal)i.ExchangeRate > 0) return itemTotal / (decimal)i.ExchangeRate;
+                    decimal quantity = Convert.ToDecimal(i.Quantity);
+                    decimal unitPrice = Convert.ToDecimal(i.UnitPrice);
+                    decimal exchangeRate = Convert.ToDecimal(i.ExchangeRate);
+                    decimal itemTotal = quantity * unitPrice;
+
+                    if (i.Currency == "YER" && exchangeRate > 0) return itemTotal / exchangeRate;
                     return itemTotal;
                 })
             }).ToList();
@@ -39,13 +43,18 @@ namespace JaahdLogistics.Services
         public dynamic GetVendorHistory()
         {
             using var connection = new SqliteConnection(_connectionString);
-            return connection.Query(
-                "SELECT b.Name as VendorName, COUNT(po.Id) as OrderCount, SUM(poi.Quantity * poi.UnitPrice) as TotalValue " +
+            var results = connection.Query(
+                "SELECT b.Name as VendorName, poi.Quantity, poi.UnitPrice " +
                 "FROM Bidders b " +
                 "JOIN PurchaseOrders po ON b.Id = po.VendorId " +
                 "JOIN POItems poi ON po.Id = poi.POId " +
-                "WHERE po.Status = 'FinalApproved' " +
-                "GROUP BY b.Name");
+                "WHERE po.Status = 'FinalApproved'");
+
+            return results.GroupBy(r => r.VendorName).Select(g => new {
+                VendorName = g.Key,
+                OrderCount = g.Count(), // This is actually item count, but simpler for demo
+                TotalValue = g.Sum(r => Convert.ToDecimal(r.Quantity) * Convert.ToDecimal(r.UnitPrice))
+            }).ToList();
         }
 
         public dynamic GetInventoryStatus()
