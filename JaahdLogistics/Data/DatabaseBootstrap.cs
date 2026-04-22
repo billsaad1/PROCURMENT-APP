@@ -17,16 +17,16 @@ namespace JaahdLogistics.Data
         public void Setup()
         {
             using var connection = new SqliteConnection(_connectionString);
-
+            
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string schemaPath = Path.Combine(baseDir, "schema.sql");
-
+            
             if (File.Exists(schemaPath))
             {
                 string schema = File.ReadAllText(schemaPath);
                 connection.Execute(schema);
             }
-
+            
             var userCount = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Users");
             if (userCount == 0)
             {
