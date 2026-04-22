@@ -15,7 +15,7 @@ namespace JaahdLogistics.Models
         public string Currency { get; set; } = "USD";
         public decimal ExchangeRate { get; set; } = 1.0m;
         public string Status { get; set; } = "Pending";
-
+        
         public ObservableCollection<PRItem> Items { get; set; } = new();
     }
 
