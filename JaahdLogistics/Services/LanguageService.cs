@@ -14,10 +14,10 @@ namespace JaahdLogistics.Services
 
             var mergedDicts = Application.Current.Resources.MergedDictionaries;
             var oldDict = mergedDicts.FirstOrDefault(d => d.Source != null && d.Source.OriginalString.Contains("Strings."));
-
+            
             if (oldDict != null)
                 mergedDicts.Remove(oldDict);
-
+                
             mergedDicts.Add(dict);
         }
     }

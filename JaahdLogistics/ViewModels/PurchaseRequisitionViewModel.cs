@@ -41,7 +41,7 @@ namespace JaahdLogistics.ViewModels
             {
                 CurrentPR.ProjectId = value.Id;
                 BudgetLines = new ObservableCollection<BudgetLine>(_dataService.GetBudgetLines(value.Id));
-
+                
                 // Automatic Numbering
                 var mainVM = Application.Current.MainWindow.DataContext as MainViewModel;
                 var helper = new NumberingHelper(mainVM?.ConnectionString ?? "Data Source=jaahd.db");
@@ -66,9 +66,9 @@ namespace JaahdLogistics.ViewModels
 
                 var remaining = _dataService.GetRemainingBudget(item.BudgetLineId);
                 var budgetLine = BudgetLines.FirstOrDefault(b => b.Id == item.BudgetLineId);
-
+                
                 decimal itemPriceInBudgetCurrency = item.TotalPrice;
-
+                
                 // If PR is YER and Budget is USD
                 if (CurrentPR.Currency == "YER" && budgetLine?.Currency == "USD" && CurrentPR.ExchangeRate > 0)
                 {
@@ -85,7 +85,7 @@ namespace JaahdLogistics.ViewModels
                     BudgetWarning += $"Warning: Item {item.Description} exceeds remaining budget ({remaining:N2} {budgetLine?.Currency})! \n";
                 }
             }
-
+            
             _dataService.SavePR(CurrentPR);
             MessageBox.Show("PR Saved Successfully");
         }
@@ -103,7 +103,7 @@ namespace JaahdLogistics.ViewModels
 
             _dataService.ApproveEntity("PR", CurrentPR.Id, user.Id, CurrentPR.Status);
             _dataService.SavePR(CurrentPR);
-
+            
             MessageBox.Show($"PR {CurrentPR.PRNumber} status updated to: {CurrentPR.Status}");
         }
 

@@ -18,7 +18,7 @@
         </Border>
 
         <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <Border Background="White" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Top"
+            <Border Background="White" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Top" 
                     BorderBrush="Black" BorderThickness="1">
                 <Border.LayoutTransform>
                     <ScaleTransform ScaleX="{Binding ElementName=ZoomSlider, Path=Value}" ScaleY="{Binding ElementName=ZoomSlider, Path=Value}"/>
