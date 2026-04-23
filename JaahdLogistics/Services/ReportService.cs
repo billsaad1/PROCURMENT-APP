@@ -23,7 +23,7 @@ namespace JaahdLogistics.Services
                 "JOIN BudgetLines bl ON p.Id = bl.ProjectId " +
                 "JOIN PRItems pi ON bl.Id = pi.BudgetLineId " +
                 "JOIN PurchaseRequisitions pr ON pi.PRId = pr.Id " +
-                "WHERE pr.Status = 'FinalApproved'");
+                "WHERE pr.Status != 'Rejected'");
 
             // Group by project in memory to handle currency conversion accurately
             return items.GroupBy(i => i.ProjectName).Select(g => new {
@@ -31,9 +31,10 @@ namespace JaahdLogistics.Services
                 TotalSpent = g.Sum(i => {
                     decimal quantity = Convert.ToDecimal(i.Quantity);
                     decimal unitPrice = Convert.ToDecimal(i.UnitPrice);
-                    decimal exchangeRate = Convert.ToDecimal(i.ExchangeRate);
+                    decimal exchangeRate = Convert.ToDecimal(i.ExchangeRate ?? 1.0);
                     decimal itemTotal = quantity * unitPrice;
 
+                    // Standardize to USD for report comparison
                     if (i.Currency == "YER" && exchangeRate > 0) return itemTotal / exchangeRate;
                     return itemTotal;
                 })

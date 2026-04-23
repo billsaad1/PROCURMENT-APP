@@ -19,7 +19,11 @@ CREATE TABLE IF NOT EXISTS BudgetLines (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
     ProjectId INTEGER NOT NULL,
     Code TEXT NOT NULL, -- e.g., 1.1
+    Name TEXT NOT NULL DEFAULT '',
     Description TEXT,
+    Unit TEXT,
+    Quantity DECIMAL(18, 2) NOT NULL DEFAULT 0,
+    UnitPrice DECIMAL(18, 2) NOT NULL DEFAULT 0,
     TotalAmount DECIMAL(18, 2) NOT NULL,
     Currency TEXT NOT NULL, -- USD, YER
     FOREIGN KEY (ProjectId) REFERENCES Projects(Id)

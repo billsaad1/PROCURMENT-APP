@@ -308,22 +308,23 @@ namespace JaahdLogistics.Services
                 "PRTerms=@PRTerms, RFQTerms=@RFQTerms, POTerms=@POTerms WHERE Id=1", settings);
         }
 
-        public decimal GetRemainingBudget(int budgetLineId)
+        public decimal GetSpentBudget(int budgetLineId)
         {
             using var connection = new SqliteConnection(_connectionString);
-            var budgetLine = connection.QuerySingle<BudgetLine>("SELECT * FROM BudgetLines WHERE Id = @budgetLineId", new { budgetLineId });
+            var budgetLine = connection.QuerySingleOrDefault<BudgetLine>("SELECT * FROM BudgetLines WHERE Id = @budgetLineId", new { budgetLineId });
+            if (budgetLine == null) return 0;
 
             var prItems = connection.Query<dynamic>(
                 "SELECT pi.Quantity, pi.UnitPrice, pr.Currency, pr.ExchangeRate " +
                 "FROM PRItems pi JOIN PurchaseRequisitions pr ON pi.PRId = pr.Id " +
-                "WHERE pi.BudgetLineId = @budgetLineId", new { budgetLineId });
+                "WHERE pi.BudgetLineId = @budgetLineId AND pr.Status != 'Rejected'", new { budgetLineId });
 
             decimal totalSpentInBudgetCurrency = 0;
             foreach (var item in prItems)
             {
                 decimal quantity = Convert.ToDecimal(item.Quantity);
                 decimal unitPrice = Convert.ToDecimal(item.UnitPrice);
-                decimal exchangeRate = Convert.ToDecimal(item.ExchangeRate);
+                decimal exchangeRate = Convert.ToDecimal(item.ExchangeRate ?? 1.0);
                 decimal itemTotal = quantity * unitPrice;
 
                 if (item.Currency == budgetLine.Currency)
@@ -339,8 +340,24 @@ namespace JaahdLogistics.Services
                     totalSpentInBudgetCurrency += itemTotal * exchangeRate;
                 }
             }
+            return totalSpentInBudgetCurrency;
+        }
 
-            return budgetLine.TotalAmount - totalSpentInBudgetCurrency;
+        public decimal GetRemainingBudget(int budgetLineId)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            var budgetLine = connection.QuerySingleOrDefault<BudgetLine>("SELECT * FROM BudgetLines WHERE Id = @budgetLineId", new { budgetLineId });
+            if (budgetLine == null) return 0;
+
+            return budgetLine.TotalAmount - GetSpentBudget(budgetLineId);
+        }
+
+        public decimal GetLastExchangeRate(string currency)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            return connection.QueryFirstOrDefault<decimal>(
+                "SELECT ExchangeRate FROM PurchaseRequisitions WHERE Currency = @currency ORDER BY Date DESC LIMIT 1",
+                new { currency });
         }
 
         public void ApproveEntity(string entityType, int entityId, int userId, string status)

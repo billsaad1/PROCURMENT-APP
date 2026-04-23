@@ -25,6 +25,25 @@ namespace JaahdLogistics.Data
             {
                 string schema = File.ReadAllText(schemaPath);
                 connection.Execute(schema);
+
+                // Repair Projects table
+                try { connection.Execute("ALTER TABLE Projects ADD COLUMN Name TEXT NOT NULL DEFAULT ''"); } catch { }
+                try { connection.Execute("ALTER TABLE Projects ADD COLUMN Code TEXT NOT NULL DEFAULT ''"); } catch { }
+                try { connection.Execute("ALTER TABLE Projects ADD COLUMN Year INTEGER NOT NULL DEFAULT 0"); } catch { }
+
+                // Repair BudgetLines table
+                try { connection.Execute("ALTER TABLE BudgetLines ADD COLUMN Name TEXT NOT NULL DEFAULT ''"); } catch { }
+                try { connection.Execute("ALTER TABLE BudgetLines ADD COLUMN Unit TEXT"); } catch { }
+                try { connection.Execute("ALTER TABLE BudgetLines ADD COLUMN Quantity DECIMAL(18, 2) NOT NULL DEFAULT 0"); } catch { }
+                try { connection.Execute("ALTER TABLE BudgetLines ADD COLUMN UnitPrice DECIMAL(18, 2) NOT NULL DEFAULT 0"); } catch { }
+                try { connection.Execute("ALTER TABLE BudgetLines ADD COLUMN Currency TEXT NOT NULL DEFAULT 'USD'"); } catch { }
+
+                // Repair PurchaseRequisitions table
+                try { connection.Execute("ALTER TABLE PurchaseRequisitions ADD COLUMN Currency TEXT NOT NULL DEFAULT 'USD'"); } catch { }
+                try { connection.Execute("ALTER TABLE PurchaseRequisitions ADD COLUMN ExchangeRate DECIMAL(18, 4) DEFAULT 1.0"); } catch { }
+
+                // Add signature blob to Users if missing (though it should be there)
+                try { connection.Execute("ALTER TABLE Users ADD COLUMN SignatureImage BLOB"); } catch { }
             }
 
             var userCount = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Users");

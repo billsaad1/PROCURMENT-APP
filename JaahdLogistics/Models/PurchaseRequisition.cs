@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace JaahdLogistics.Models
 {
-    public class PurchaseRequisition
+    public class PurchaseRequisition : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
     {
         public int Id { get; set; }
         public string PRNumber { get; set; } = string.Empty;
@@ -12,11 +12,29 @@ namespace JaahdLogistics.Models
         public int RequesterId { get; set; }
         public DateTime Date { get; set; }
         public string? Justification { get; set; }
-        public string Currency { get; set; } = "USD";
-        public decimal ExchangeRate { get; set; } = 1.0m;
-        public string Status { get; set; } = "Pending";
+
+        private string _currency = "USD";
+        public string Currency { get => _currency; set => SetProperty(ref _currency, value); }
+
+        private decimal _exchangeRate = 1.0m;
+        public decimal ExchangeRate { get => _exchangeRate; set => SetProperty(ref _exchangeRate, value); }
+
+        private string _status = "Pending";
+        public string Status { get => _status; set => SetProperty(ref _status, value); }
 
         public ObservableCollection<PRItem> Items { get; set; } = new();
+
+        public decimal TotalAmount => Items.Sum(i => i.TotalPrice);
+
+        public PurchaseRequisition()
+        {
+            Items.CollectionChanged += (s, e) => {
+                OnPropertyChanged(nameof(TotalAmount));
+                if (e.NewItems != null) {
+                    foreach (PRItem item in e.NewItems) item.PropertyChanged += (s2, e2) => OnPropertyChanged(nameof(TotalAmount));
+                }
+            };
+        }
     }
 
     public class PRItem : CommunityToolkit.Mvvm.ComponentModel.ObservableObject

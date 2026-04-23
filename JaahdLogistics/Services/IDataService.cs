@@ -22,7 +22,9 @@ namespace JaahdLogistics.Services
         IEnumerable<BudgetLine> GetBudgetLines(int projectId);
         Settings GetSettings();
         void SaveSettings(Settings settings);
+        decimal GetSpentBudget(int budgetLineId);
         decimal GetRemainingBudget(int budgetLineId);
+        decimal GetLastExchangeRate(string currency);
         void ApproveEntity(string entityType, int entityId, int userId, string status);
         void SaveGRN(GoodsReceivingNotes grn, List<GRNItems> items);
         IEnumerable<GoodsReceivingNotes> GetGRNs();

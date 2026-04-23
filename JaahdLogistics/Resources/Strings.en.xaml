@@ -71,4 +71,7 @@
     <s:String x:Key="VendorHistoryReport">Vendor History Report</s:String>
     <s:String x:Key="OrderCount">Order Count</s:String>
     <s:String x:Key="TotalValue">Total Value</s:String>
+    <s:String x:Key="Date">Date</s:String>
+    <s:String x:Key="UserSignature">My Signature</s:String>
+    <s:String x:Key="UploadSignature">Upload Signature</s:String>
 </ResourceDictionary>

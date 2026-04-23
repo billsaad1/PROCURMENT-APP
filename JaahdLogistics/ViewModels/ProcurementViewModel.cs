@@ -169,7 +169,8 @@ namespace JaahdLogistics.ViewModels
 
             if (CurrentPO.Status == "Pending") CurrentPO.Status = "CheckedByLogistics";
             else if (CurrentPO.Status == "CheckedByLogistics") CurrentPO.Status = "ReviewedByFinance";
-            else if (CurrentPO.Status == "ReviewedByFinance") CurrentPO.Status = "FinalApproved";
+            else if (CurrentPO.Status == "ReviewedByFinance") CurrentPO.Status = "ApprovedByPM";
+            else if (CurrentPO.Status == "ApprovedByPM") CurrentPO.Status = "FinalApproved";
 
             _dataService.ApproveEntity("PO", CurrentPO.Id, user.Id, CurrentPO.Status);
             _dataService.SavePO(CurrentPO);
@@ -186,7 +187,8 @@ namespace JaahdLogistics.ViewModels
 
             if (CurrentBidAnalysis.Status == "Pending") CurrentBidAnalysis.Status = "CheckedByLogistics";
             else if (CurrentBidAnalysis.Status == "CheckedByLogistics") CurrentBidAnalysis.Status = "ReviewedByFinance";
-            else if (CurrentBidAnalysis.Status == "ReviewedByFinance") CurrentBidAnalysis.Status = "FinalApproved";
+            else if (CurrentBidAnalysis.Status == "ReviewedByFinance") CurrentBidAnalysis.Status = "ApprovedByPM";
+            else if (CurrentBidAnalysis.Status == "ApprovedByPM") CurrentBidAnalysis.Status = "FinalApproved";
 
             _dataService.ApproveEntity("BidAnalysis", CurrentBidAnalysis.Id, user.Id, CurrentBidAnalysis.Status);
             _dataService.SaveBidAnalysis(CurrentBidAnalysis);

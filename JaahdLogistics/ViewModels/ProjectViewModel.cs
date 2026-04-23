@@ -33,7 +33,7 @@ namespace JaahdLogistics.ViewModels
             {
                 var lines = _dataService.GetBudgetLines(value.Id);
                 BudgetLines = new ObservableCollection<BudgetLineDisplay>(
-                    lines.Select(l => new BudgetLineDisplay(l, _dataService.GetRemainingBudget(l.Id)))
+                    lines.Select(l => new BudgetLineDisplay(l, _dataService.GetSpentBudget(l.Id), _dataService.GetRemainingBudget(l.Id)))
                 );
             }
             else
@@ -54,8 +54,8 @@ namespace JaahdLogistics.ViewModels
         private void AddBudgetLine()
         {
             if (SelectedProject == null) return;
-            var newLine = new BudgetLine { ProjectId = SelectedProject.Id, Code = "1.1", TotalAmount = 0, Currency = "USD" };
-            BudgetLines.Add(new BudgetLineDisplay(newLine, 0));
+            var newLine = new BudgetLine { ProjectId = SelectedProject.Id, Code = (BudgetLines.Count + 1).ToString(), TotalAmount = 0, Currency = "USD" };
+            BudgetLines.Add(new BudgetLineDisplay(newLine, 0, 0));
         }
 
         [RelayCommand]
@@ -121,11 +121,15 @@ namespace JaahdLogistics.ViewModels
         public BudgetLine Model { get; }
 
         [ObservableProperty]
+        private decimal _spent;
+
+        [ObservableProperty]
         private decimal _remaining;
 
-        public BudgetLineDisplay(BudgetLine model, decimal remaining)
+        public BudgetLineDisplay(BudgetLine model, decimal spent, decimal remaining)
         {
             Model = model;
+            _spent = spent;
             _remaining = remaining;
         }
 
@@ -137,17 +141,21 @@ namespace JaahdLogistics.ViewModels
         public decimal Quantity
         {
             get => Model.Quantity;
-            set { Model.Quantity = value; Model.TotalAmount = Model.Quantity * Model.UnitPrice; OnPropertyChanged(); OnPropertyChanged(nameof(TotalAmount)); OnPropertyChanged(nameof(Spent)); }
+            set { Model.Quantity = value; Model.TotalAmount = Model.Quantity * Model.UnitPrice; OnPropertyChanged(); OnPropertyChanged(nameof(TotalAmount)); UpdateRemaining(); }
         }
 
         public decimal UnitPrice
         {
             get => Model.UnitPrice;
-            set { Model.UnitPrice = value; Model.TotalAmount = Model.Quantity * Model.UnitPrice; OnPropertyChanged(); OnPropertyChanged(nameof(TotalAmount)); OnPropertyChanged(nameof(Spent)); }
+            set { Model.UnitPrice = value; Model.TotalAmount = Model.Quantity * Model.UnitPrice; OnPropertyChanged(); OnPropertyChanged(nameof(TotalAmount)); UpdateRemaining(); }
         }
 
         public decimal TotalAmount => Model.TotalAmount;
         public string Currency { get => Model.Currency; set { Model.Currency = value; OnPropertyChanged(); } }
-        public decimal Spent => Model.TotalAmount - Remaining;
+
+        private void UpdateRemaining()
+        {
+            Remaining = TotalAmount - Spent;
+        }
     }
 }

@@ -71,4 +71,7 @@
     <s:String x:Key="VendorHistoryReport">تقرير تاريخ الموردين</s:String>
     <s:String x:Key="OrderCount">عدد الطلبات</s:String>
     <s:String x:Key="TotalValue">القيمة الإجمالية</s:String>
+    <s:String x:Key="Date">التاريخ</s:String>
+    <s:String x:Key="UserSignature">توقيعي</s:String>
+    <s:String x:Key="UploadSignature">تحميل التوقيع</s:String>
 </ResourceDictionary>

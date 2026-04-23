@@ -15,6 +15,21 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private PurchaseRequisition _currentPR = new();
 
+        partial void OnCurrentPRChanged(PurchaseRequisition value)
+        {
+            if (value != null)
+            {
+                value.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == nameof(PurchaseRequisition.Currency))
+                    {
+                        var rate = _dataService.GetLastExchangeRate(value.Currency);
+                        if (rate > 0) value.ExchangeRate = rate;
+                    }
+                };
+            }
+        }
+
         [ObservableProperty]
         private string _budgetWarning = string.Empty;
 
@@ -56,51 +71,84 @@ namespace JaahdLogistics.ViewModels
         }
 
         [RelayCommand]
+        private void RemoveItem(PRItem item)
+        {
+            if (item != null) CurrentPR.Items.Remove(item);
+        }
+
+        [RelayCommand]
+        private void PopulateFromBudgetLine(PRItem item)
+        {
+            if (item == null || item.BudgetLineId == 0) return;
+            var bl = BudgetLines.FirstOrDefault(b => b.Id == item.BudgetLineId);
+            if (bl != null)
+            {
+                item.Description = bl.Description ?? string.Empty;
+                item.Unit = bl.Unit;
+                item.Quantity = bl.Quantity;
+                item.UnitPrice = bl.UnitPrice;
+            }
+        }
+
+        [RelayCommand]
         private void SavePR()
         {
-            if (CurrentPR.RequesterId == 0) CurrentPR.RequesterId = AuthService.CurrentUser?.Id ?? 0;
-            if (CurrentPR.Date == default) CurrentPR.Date = DateTime.Now;
-
-            BudgetWarning = string.Empty;
-            // Check budgets
-            foreach (var item in CurrentPR.Items)
+            try
             {
-                if (item.BudgetLineId == 0)
+                if (CurrentPR.RequesterId == 0) CurrentPR.RequesterId = AuthService.CurrentUser?.Id ?? 0;
+                if (CurrentPR.Date == default) CurrentPR.Date = DateTime.Now;
+
+                if (string.IsNullOrEmpty(CurrentPR.PRNumber))
                 {
-                    MessageBox.Show($"Please select a Budget Line for item: {item.Description}", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("PR Number is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                var remaining = _dataService.GetRemainingBudget(item.BudgetLineId);
-                var budgetLine = BudgetLines.FirstOrDefault(b => b.Id == item.BudgetLineId);
-
-                decimal itemPriceInBudgetCurrency = item.TotalPrice;
-
-                // If PR is YER and Budget is USD
-                if (CurrentPR.Currency == "YER" && budgetLine?.Currency == "USD" && CurrentPR.ExchangeRate > 0)
+                BudgetWarning = string.Empty;
+                // Check budgets
+                foreach (var item in CurrentPR.Items)
                 {
-                    itemPriceInBudgetCurrency = item.TotalPrice / CurrentPR.ExchangeRate;
-                }
-                // If PR is USD and Budget is YER
-                else if (CurrentPR.Currency == "USD" && budgetLine?.Currency == "YER")
-                {
-                    itemPriceInBudgetCurrency = item.TotalPrice * CurrentPR.ExchangeRate;
+                    if (item.BudgetLineId == 0)
+                    {
+                        MessageBox.Show($"Please select a Budget Line for item: {item.Description}", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    var remaining = _dataService.GetRemainingBudget(item.BudgetLineId);
+                    var budgetLine = BudgetLines.FirstOrDefault(b => b.Id == item.BudgetLineId);
+
+                    decimal itemPriceInBudgetCurrency = item.TotalPrice;
+
+                    // If PR is YER and Budget is USD
+                    if (CurrentPR.Currency == "YER" && budgetLine?.Currency == "USD" && CurrentPR.ExchangeRate > 0)
+                    {
+                        itemPriceInBudgetCurrency = item.TotalPrice / CurrentPR.ExchangeRate;
+                    }
+                    // If PR is USD and Budget is YER
+                    else if (CurrentPR.Currency == "USD" && budgetLine?.Currency == "YER")
+                    {
+                        itemPriceInBudgetCurrency = item.TotalPrice * CurrentPR.ExchangeRate;
+                    }
+
+                    if (itemPriceInBudgetCurrency > remaining)
+                    {
+                        BudgetWarning += $"Warning: Item {item.Description} exceeds remaining budget ({remaining:N2} {budgetLine?.Currency})! \n";
+                    }
                 }
 
-                if (itemPriceInBudgetCurrency > remaining)
+                if (!string.IsNullOrEmpty(BudgetWarning))
                 {
-                    BudgetWarning += $"Warning: Item {item.Description} exceeds remaining budget ({remaining:N2} {budgetLine?.Currency})! \n";
+                    MessageBox.Show("Cannot save PR: One or more items exceed the budget limit.\n\n" + BudgetWarning, "Budget Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
                 }
+
+                _dataService.SavePR(CurrentPR);
+                MessageBox.Show("PR Saved Successfully");
             }
-
-            if (!string.IsNullOrEmpty(BudgetWarning))
+            catch (Exception ex)
             {
-                MessageBox.Show("Cannot save PR: One or more items exceed the budget limit.\n\n" + BudgetWarning, "Budget Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                MessageBox.Show($"Error saving PR: {ex.Message}", "Save Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
-            _dataService.SavePR(CurrentPR);
-            MessageBox.Show("PR Saved Successfully");
         }
 
         [RelayCommand]
@@ -112,7 +160,8 @@ namespace JaahdLogistics.ViewModels
             // Logic for multi-stage approval
             if (CurrentPR.Status == "Pending") CurrentPR.Status = "CheckedByLogistics";
             else if (CurrentPR.Status == "CheckedByLogistics") CurrentPR.Status = "ReviewedByFinance";
-            else if (CurrentPR.Status == "ReviewedByFinance") CurrentPR.Status = "FinalApproved";
+            else if (CurrentPR.Status == "ReviewedByFinance") CurrentPR.Status = "ApprovedByPM";
+            else if (CurrentPR.Status == "ApprovedByPM") CurrentPR.Status = "FinalApproved";
 
             _dataService.ApproveEntity("PR", CurrentPR.Id, user.Id, CurrentPR.Status);
             _dataService.SavePR(CurrentPR);
