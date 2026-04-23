@@ -10,8 +10,6 @@
         FlowDirection="{Binding CurrentFlowDirection}"
         Title="Jaahd Logistics Management System" Height="600" Width="1000">
     <Window.Resources>
-        <helpers:BindingProxy x:Key="Proxy" Data="{Binding}"/>
-
         <DataTemplate DataType="{x:Type vm:LoginViewModel}">
             <views:LoginView/>
         </DataTemplate>

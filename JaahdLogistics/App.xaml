@@ -10,6 +10,7 @@
 
             <helpers:NullToVisibilityConverter xmlns:helpers="clr-namespace:JaahdLogistics.Helpers" x:Key="NullToVisibilityConverter"/>
             <helpers:ImageBytesConverter xmlns:helpers="clr-namespace:JaahdLogistics.Helpers" x:Key="ImageBytesConverter"/>
+            <helpers:BindingProxy xmlns:helpers="clr-namespace:JaahdLogistics.Helpers" x:Key="Proxy" Data="{Binding}"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

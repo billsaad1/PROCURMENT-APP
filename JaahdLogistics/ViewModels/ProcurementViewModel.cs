@@ -157,6 +157,7 @@ namespace JaahdLogistics.ViewModels
 
             _dataService.SavePO(CurrentPO);
             MessageBox.Show("Purchase Order Created Successfully");
+            OnPropertyChanged(nameof(ApprovedPRs)); // Refresh list
         }
 
         [RelayCommand]

@@ -42,9 +42,9 @@ namespace JaahdLogistics.Services
             using var connection = new SqliteConnection(_connectionString);
             if (user.Id == 0)
             {
-                connection.Execute(
+                user.Id = connection.QuerySingle<int>(
                     "INSERT INTO Users (Username, PasswordHash, Role, FullName, Position, SignatureImage) " +
-                    "VALUES (@Username, @PasswordHash, @Role, @FullName, @Position, @SignatureImage)", user);
+                    "VALUES (@Username, @PasswordHash, @Role, @FullName, @Position, @SignatureImage); SELECT last_insert_rowid();", user);
             }
             else
             {
@@ -65,11 +65,34 @@ namespace JaahdLogistics.Services
             using var connection = new SqliteConnection(_connectionString);
             if (project.Id == 0)
             {
-                connection.Execute("INSERT INTO Projects (Name, Code, Year) VALUES (@Name, @Code, @Year)", project);
+                project.Id = connection.QuerySingle<int>(
+                    "INSERT INTO Projects (Name, Code, Year) VALUES (@Name, @Code, @Year); SELECT last_insert_rowid();", project);
             }
             else
             {
                 connection.Execute("UPDATE Projects SET Name=@Name, Code=@Code, Year=@Year WHERE Id=@Id", project);
+            }
+        }
+
+        public void DeleteProject(int id)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            using var transaction = connection.BeginTransaction();
+            try {
+                // Cascading delete for demo purposes.
+                // In production, you'd usually restrict deletion of projects with active procurement.
+                connection.Execute("DELETE FROM PRItems WHERE PRId IN (SELECT Id FROM PurchaseRequisitions WHERE ProjectId = @id)", new { id }, transaction);
+                connection.Execute("DELETE FROM PurchaseRequisitions WHERE ProjectId = @id", new { id }, transaction);
+                connection.Execute("DELETE FROM BudgetLines WHERE ProjectId = @id", new { id }, transaction);
+                connection.Execute("DELETE FROM Projects WHERE Id = @id", new { id }, transaction);
+                transaction.Commit();
+            } catch (SqliteException ex) when (ex.SqliteErrorCode == 19) {
+                transaction.Rollback();
+                throw new Exception("Cannot delete project because it is referenced in complex procurement documents (POs, GRNs). Delete those first.");
+            } catch {
+                transaction.Rollback();
+                throw;
             }
         }
 
@@ -102,9 +125,9 @@ namespace JaahdLogistics.Services
             using var connection = new SqliteConnection(_connectionString);
             if (rfq.Id == 0)
             {
-                connection.Execute(
+                rfq.Id = connection.QuerySingle<int>(
                     "INSERT INTO RFQs (RFQNumber, PRId, Date, ClosingDate, Terms) " +
-                    "VALUES (@RFQNumber, @PRId, @Date, @ClosingDate, @Terms)", rfq);
+                    "VALUES (@RFQNumber, @PRId, @Date, @ClosingDate, @Terms); SELECT last_insert_rowid();", rfq);
             }
             else
             {
@@ -217,7 +240,12 @@ namespace JaahdLogistics.Services
                     connection.Execute(
                         "UPDATE PurchaseRequisitions SET PRNumber=@PRNumber, ProjectId=@ProjectId, Justification=@Justification, Status=@Status WHERE Id=@Id",
                         pr, transaction);
-                    connection.Execute("DELETE FROM PRItems WHERE PRId = @Id", new { pr.Id }, transaction);
+
+                    try {
+                        connection.Execute("DELETE FROM PRItems WHERE PRId = @Id", new { pr.Id }, transaction);
+                    } catch (SqliteException ex) when (ex.SqliteErrorCode == 19) {
+                         throw new Exception("Cannot update PR items because they are already referenced in subsequent documents.");
+                    }
                 }
 
                 foreach (var item in pr.Items)
@@ -241,16 +269,22 @@ namespace JaahdLogistics.Services
             using var connection = new SqliteConnection(_connectionString);
             if (budgetLine.Id == 0)
             {
-                connection.Execute(
-                    "INSERT INTO BudgetLines (ProjectId, Code, Description, TotalAmount, Currency) " +
-                    "VALUES (@ProjectId, @Code, @Description, @TotalAmount, @Currency)", budgetLine);
+                budgetLine.Id = connection.QuerySingle<int>(
+                    "INSERT INTO BudgetLines (ProjectId, Code, Name, Description, Unit, Quantity, UnitPrice, TotalAmount, Currency) " +
+                    "VALUES (@ProjectId, @Code, @Name, @Description, @Unit, @Quantity, @UnitPrice, @TotalAmount, @Currency); SELECT last_insert_rowid();", budgetLine);
             }
             else
             {
                 connection.Execute(
-                    "UPDATE BudgetLines SET Code=@Code, Description=@Description, " +
-                    "TotalAmount=@TotalAmount, Currency=@Currency WHERE Id=@Id", budgetLine);
+                    "UPDATE BudgetLines SET Code=@Code, Name=@Name, Description=@Description, Unit=@Unit, " +
+                    "Quantity=@Quantity, UnitPrice=@UnitPrice, TotalAmount=@TotalAmount, Currency=@Currency WHERE Id=@Id", budgetLine);
             }
+        }
+
+        public void DeleteBudgetLine(int id)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Execute("DELETE FROM BudgetLines WHERE Id = @id", new { id });
         }
 
         public IEnumerable<BudgetLine> GetBudgetLines(int projectId)

@@ -18,14 +18,23 @@ namespace JaahdLogistics.Models
         public ObservableCollection<POItem> Items { get; set; } = new();
     }
 
-    public class POItem
+    public class POItem : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
     {
         public int Id { get; set; }
         public int POId { get; set; }
-        public string Description { get; set; } = string.Empty;
-        public string? Unit { get; set; }
-        public decimal Quantity { get; set; }
-        public decimal UnitPrice { get; set; }
+
+        private string _description = string.Empty;
+        public string Description { get => _description; set => SetProperty(ref _description, value); }
+
+        private string? _unit;
+        public string? Unit { get => _unit; set => SetProperty(ref _unit, value); }
+
+        private decimal _quantity;
+        public decimal Quantity { get => _quantity; set { SetProperty(ref _quantity, value); OnPropertyChanged(nameof(TotalPrice)); } }
+
+        private decimal _unitPrice;
+        public decimal UnitPrice { get => _unitPrice; set { SetProperty(ref _unitPrice, value); OnPropertyChanged(nameof(TotalPrice)); } }
+
         public decimal TotalPrice => Quantity * UnitPrice;
     }
 }

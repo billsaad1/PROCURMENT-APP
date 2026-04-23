@@ -27,6 +27,10 @@ namespace JaahdLogistics
                 var langService = new LanguageService();
                 var mainVM = new MainViewModel(dataService, langService, connectionString);
 
+                // Initialize the global binding proxy
+                var proxy = Resources["Proxy"] as JaahdLogistics.Helpers.BindingProxy;
+                if (proxy != null) proxy.Data = mainVM;
+
                 var mainWindow = new MainWindow();
                 mainWindow.DataContext = mainVM;
 

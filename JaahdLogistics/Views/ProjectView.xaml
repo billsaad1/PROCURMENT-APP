@@ -15,7 +15,10 @@
 
         <DockPanel Grid.Column="0" Margin="0,0,10,0">
             <TextBlock Text="{DynamicResource Projects}" DockPanel.Dock="Top" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
-            <Button Content="{DynamicResource AddProject}" DockPanel.Dock="Bottom" Command="{Binding AddProjectCommand}" Margin="0,10,0,0"/>
+            <UniformGrid DockPanel.Dock="Bottom" Columns="2" Margin="0,10,0,0">
+                <Button Content="{DynamicResource AddProject}" Command="{Binding AddProjectCommand}" Margin="0,0,5,0"/>
+                <Button Content="Delete Project" Command="{Binding DeleteProjectCommand}" Background="#C0392B"/>
+            </UniformGrid>
             <ListBox ItemsSource="{Binding Projects}" SelectedItem="{Binding SelectedProject}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
@@ -53,12 +56,20 @@
                 </Grid>
             </StackPanel>
 
-            <Button Content="{DynamicResource AddBudgetLine}" DockPanel.Dock="Bottom" Command="{Binding AddBudgetLineCommand}" Margin="0,10,0,0"/>
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                <Button Content="{DynamicResource AddBudgetLine}" Command="{Binding AddBudgetLineCommand}" Width="150" Margin="0,0,10,0"/>
+                <Button Content="{DynamicResource Save}" Command="{Binding SaveCommand}" Width="100"/>
+            </StackPanel>
+
             <DataGrid ItemsSource="{Binding BudgetLines}" AutoGenerateColumns="False" CanUserAddRows="False">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="{DynamicResource Code}" Binding="{Binding Code}" Width="Auto"/>
+                    <DataGridTextColumn Header="{DynamicResource Name}" Binding="{Binding Name}" Width="Auto"/>
                     <DataGridTextColumn Header="{DynamicResource Description}" Binding="{Binding Description}" Width="*"/>
-                    <DataGridTextColumn Header="{DynamicResource Amount}" Binding="{Binding TotalAmount}" Width="Auto"/>
+                    <DataGridTextColumn Header="{DynamicResource Unit}" Binding="{Binding Unit, UpdateSourceTrigger=PropertyChanged}" Width="Auto"/>
+                    <DataGridTextColumn Header="{DynamicResource Quantity}" Binding="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" Width="Auto"/>
+                    <DataGridTextColumn Header="{DynamicResource UnitPrice}" Binding="{Binding UnitPrice, UpdateSourceTrigger=PropertyChanged}" Width="Auto"/>
+                    <DataGridTextColumn Header="{DynamicResource Amount}" Binding="{Binding TotalAmount, Mode=OneWay}" IsReadOnly="True" Width="Auto"/>
                     <DataGridTextColumn Header="Spent" Binding="{Binding Spent, Mode=OneWay, StringFormat=N2}" IsReadOnly="True" Width="Auto"/>
                     <DataGridTextColumn Header="Remaining" Binding="{Binding Remaining, Mode=OneWay, StringFormat=N2}" IsReadOnly="True" Width="Auto"/>
                     <DataGridComboBoxColumn Header="{DynamicResource Currency}" SelectedItemBinding="{Binding Currency}" Width="Auto">
@@ -87,6 +98,14 @@
                             </Style>
                         </DataGridComboBoxColumn.EditingElementStyle>
                     </DataGridComboBoxColumn>
+                    <DataGridTemplateColumn Width="Auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Delete" Command="{Binding DataContext.DeleteBudgetLineCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}" Background="#C0392B" Padding="5,2"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </DockPanel>

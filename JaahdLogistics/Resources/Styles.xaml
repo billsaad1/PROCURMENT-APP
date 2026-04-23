@@ -69,7 +69,6 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Binding to global Settings via Proxy -->
                     <Image Source="{Binding Data.Settings.LogoImage, Source={StaticResource Proxy}, Converter={StaticResource ImageBytesConverter}}"
                            Height="80" Width="80" Stretch="Uniform" HorizontalAlignment="Left"/>
 

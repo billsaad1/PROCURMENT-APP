@@ -24,7 +24,8 @@
                     <ScaleTransform ScaleX="{Binding ElementName=ZoomSlider, Path=Value}" ScaleY="{Binding ElementName=ZoomSlider, Path=Value}"/>
                 </Border.LayoutTransform>
                 <!-- A4 Paper size in 96 DPI: 794 x 1123 -->
-                <ContentControl x:Name="PreviewContent" Width="794" Height="1123" Padding="40"/>
+                <ContentControl x:Name="PreviewContent" Width="794" Height="1123" Padding="40"
+                                Template="{StaticResource PrintFormTemplate}"/>
             </Border>
         </ScrollViewer>
     </Grid>

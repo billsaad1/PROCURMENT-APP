@@ -20,6 +20,9 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private FlowDirection _currentFlowDirection = FlowDirection.LeftToRight;
 
+        [ObservableProperty]
+        private Settings _settings = new();
+
         public string ConnectionString { get; }
 
         public MainViewModel(IDataService dataService, LanguageService languageService, string connectionString)
@@ -27,6 +30,7 @@ namespace JaahdLogistics.ViewModels
             _dataService = dataService;
             _languageService = languageService;
             ConnectionString = connectionString;
+            Settings = _dataService.GetSettings();
             ShowLogin();
         }
 

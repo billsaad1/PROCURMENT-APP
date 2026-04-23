@@ -17,6 +17,8 @@ namespace JaahdLogistics.Services
         void SaveBidAnalysis(BidAnalysis analysis);
         void SavePO(PurchaseOrder po);
         void SaveBudgetLine(BudgetLine budgetLine);
+        void DeleteBudgetLine(int id);
+        void DeleteProject(int id);
         IEnumerable<BudgetLine> GetBudgetLines(int projectId);
         Settings GetSettings();
         void SaveSettings(Settings settings);

@@ -61,16 +61,58 @@ namespace JaahdLogistics.ViewModels
         [RelayCommand]
         private void Save()
         {
-            if (SelectedProject == null) return;
-
-            _dataService.SaveProject(SelectedProject);
-            foreach (var line in BudgetLines)
+            try
             {
-                _dataService.SaveBudgetLine(line.Model);
-            }
+                if (SelectedProject == null) return;
 
-            MessageBox.Show("Project and Budget Lines saved successfully.");
-            OnSelectedProjectChanged(SelectedProject); // Refresh to recalculate remaining
+                _dataService.SaveProject(SelectedProject);
+                foreach (var line in BudgetLines)
+                {
+                    _dataService.SaveBudgetLine(line.Model);
+                }
+
+                MessageBox.Show("Project and Budget Lines saved successfully.");
+                OnSelectedProjectChanged(SelectedProject); // Refresh to recalculate remaining
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error saving project: {ex.Message}", "Save Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        [RelayCommand]
+        private void DeleteProject()
+        {
+            if (SelectedProject == null) return;
+            var result = MessageBox.Show($"Are you sure you want to delete project '{SelectedProject.Name}' and all its budget lines?", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (result == MessageBoxResult.Yes)
+            {
+                _dataService.DeleteProject(SelectedProject.Id);
+                Projects.Remove(SelectedProject);
+                SelectedProject = null;
+            }
+        }
+
+        [RelayCommand]
+        private void DeleteBudgetLine(BudgetLineDisplay line)
+        {
+            if (line == null) return;
+            var result = MessageBox.Show($"Delete budget line '{line.Code}'?", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (result == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    if (line.Model.Id > 0)
+                    {
+                        _dataService.DeleteBudgetLine(line.Model.Id);
+                    }
+                    BudgetLines.Remove(line);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Cannot delete budget line: {ex.Message}", "Delete Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
     }
 
@@ -88,8 +130,23 @@ namespace JaahdLogistics.ViewModels
         }
 
         public string Code { get => Model.Code; set { Model.Code = value; OnPropertyChanged(); } }
+        public string Name { get => Model.Name; set { Model.Name = value; OnPropertyChanged(); } }
         public string? Description { get => Model.Description; set { Model.Description = value; OnPropertyChanged(); } }
-        public decimal TotalAmount { get => Model.TotalAmount; set { Model.TotalAmount = value; OnPropertyChanged(); } }
+        public string? Unit { get => Model.Unit; set { Model.Unit = value; OnPropertyChanged(); } }
+
+        public decimal Quantity
+        {
+            get => Model.Quantity;
+            set { Model.Quantity = value; Model.TotalAmount = Model.Quantity * Model.UnitPrice; OnPropertyChanged(); OnPropertyChanged(nameof(TotalAmount)); OnPropertyChanged(nameof(Spent)); }
+        }
+
+        public decimal UnitPrice
+        {
+            get => Model.UnitPrice;
+            set { Model.UnitPrice = value; Model.TotalAmount = Model.Quantity * Model.UnitPrice; OnPropertyChanged(); OnPropertyChanged(nameof(TotalAmount)); OnPropertyChanged(nameof(Spent)); }
+        }
+
+        public decimal TotalAmount => Model.TotalAmount;
         public string Currency { get => Model.Currency; set { Model.Currency = value; OnPropertyChanged(); } }
         public decimal Spent => Model.TotalAmount - Remaining;
     }
