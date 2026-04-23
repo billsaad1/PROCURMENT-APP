@@ -167,6 +167,8 @@ CREATE TABLE IF NOT EXISTS Inventory (
 CREATE TABLE IF NOT EXISTS Settings (
     Id INTEGER PRIMARY KEY CHECK (Id = 1),
     AssociationName TEXT,
+    Address TEXT,
+    ContactInfo TEXT,
     LogoImage BLOB,
     PRTerms TEXT,
     RFQTerms TEXT,
