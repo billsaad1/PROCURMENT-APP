@@ -59,6 +59,8 @@
                     <DataGridTextColumn Header="{DynamicResource Code}" Binding="{Binding Code}" Width="Auto"/>
                     <DataGridTextColumn Header="{DynamicResource Description}" Binding="{Binding Description}" Width="*"/>
                     <DataGridTextColumn Header="{DynamicResource Amount}" Binding="{Binding TotalAmount}" Width="Auto"/>
+                    <DataGridTextColumn Header="Spent" Binding="{Binding Spent, Mode=OneWay, StringFormat=N2}" IsReadOnly="True" Width="Auto"/>
+                    <DataGridTextColumn Header="Remaining" Binding="{Binding Remaining, Mode=OneWay, StringFormat=N2}" IsReadOnly="True" Width="Auto"/>
                     <DataGridComboBoxColumn Header="{DynamicResource Currency}" SelectedItemBinding="{Binding Currency}" Width="Auto">
                         <DataGridComboBoxColumn.ElementStyle>
                             <Style TargetType="ComboBox">

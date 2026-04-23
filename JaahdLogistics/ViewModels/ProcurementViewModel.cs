@@ -92,6 +92,30 @@ namespace JaahdLogistics.ViewModels
         [RelayCommand]
         private void CreatePO()
         {
+            if (SelectedPR == null) return;
+
+            // Budget Check for PO
+            foreach (var item in SelectedPR.Items)
+            {
+                if (item.BudgetLineId == 0) continue;
+
+                var budgetLines = _dataService.GetBudgetLines(SelectedPR.ProjectId);
+                var budgetLine = budgetLines.FirstOrDefault(b => b.Id == item.BudgetLineId);
+                var remaining = _dataService.GetRemainingBudget(item.BudgetLineId);
+
+                decimal itemPriceInBudgetCurrency = item.TotalPrice;
+                if (SelectedPR.Currency == "YER" && budgetLine?.Currency == "USD" && SelectedPR.ExchangeRate > 0)
+                    itemPriceInBudgetCurrency = item.TotalPrice / SelectedPR.ExchangeRate;
+                else if (SelectedPR.Currency == "USD" && budgetLine?.Currency == "YER")
+                    itemPriceInBudgetCurrency = item.TotalPrice * SelectedPR.ExchangeRate;
+
+                if (itemPriceInBudgetCurrency > remaining)
+                {
+                    MessageBox.Show($"Cannot create PO: Item '{item.Description}' exceeds remaining budget ({remaining:N2} {budgetLine?.Currency}).", "Budget Violation", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+            }
+
             if (!SkipBidAnalysis && CurrentBidAnalysis.Status != "FinalApproved")
             {
                 MessageBox.Show("Cannot create a Purchase Order unless the Bid Analysis is approved or 'Skip Bid Analysis' is checked.");

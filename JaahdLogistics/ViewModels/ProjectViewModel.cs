@@ -1,4 +1,6 @@
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using JaahdLogistics.Models;
@@ -17,7 +19,7 @@ namespace JaahdLogistics.ViewModels
         private Project? _selectedProject;
 
         [ObservableProperty]
-        private ObservableCollection<BudgetLine> _budgetLines = new();
+        private ObservableCollection<BudgetLineDisplay> _budgetLines = new();
 
         public ProjectViewModel(IDataService dataService)
         {
@@ -29,7 +31,10 @@ namespace JaahdLogistics.ViewModels
         {
             if (value != null)
             {
-                BudgetLines = new ObservableCollection<BudgetLine>(_dataService.GetBudgetLines(value.Id));
+                var lines = _dataService.GetBudgetLines(value.Id);
+                BudgetLines = new ObservableCollection<BudgetLineDisplay>(
+                    lines.Select(l => new BudgetLineDisplay(l, _dataService.GetRemainingBudget(l.Id)))
+                );
             }
             else
             {
@@ -40,7 +45,7 @@ namespace JaahdLogistics.ViewModels
         [RelayCommand]
         private void AddProject()
         {
-            var newProject = new Project { Name = "New Project", Code = "PROJ-" + (Projects.Count + 1), Year = DateTime.Now.Year };
+            var newProject = new Project { Name = "New Project", Code = "PROJ-" + (Projects.Count + 1), Year = System.DateTime.Now.Year };
             _dataService.SaveProject(newProject);
             Projects.Add(newProject);
         }
@@ -49,9 +54,43 @@ namespace JaahdLogistics.ViewModels
         private void AddBudgetLine()
         {
             if (SelectedProject == null) return;
-            var newLine = new BudgetLine { ProjectId = SelectedProject.Id, Code = "1.1", TotalAmount = 0 };
-            _dataService.SaveBudgetLine(newLine);
-            BudgetLines.Add(newLine);
+            var newLine = new BudgetLine { ProjectId = SelectedProject.Id, Code = "1.1", TotalAmount = 0, Currency = "USD" };
+            BudgetLines.Add(new BudgetLineDisplay(newLine, 0));
         }
+
+        [RelayCommand]
+        private void Save()
+        {
+            if (SelectedProject == null) return;
+
+            _dataService.SaveProject(SelectedProject);
+            foreach (var line in BudgetLines)
+            {
+                _dataService.SaveBudgetLine(line.Model);
+            }
+
+            MessageBox.Show("Project and Budget Lines saved successfully.");
+            OnSelectedProjectChanged(SelectedProject); // Refresh to recalculate remaining
+        }
+    }
+
+    public partial class BudgetLineDisplay : ObservableObject
+    {
+        public BudgetLine Model { get; }
+
+        [ObservableProperty]
+        private decimal _remaining;
+
+        public BudgetLineDisplay(BudgetLine model, decimal remaining)
+        {
+            Model = model;
+            _remaining = remaining;
+        }
+
+        public string Code { get => Model.Code; set { Model.Code = value; OnPropertyChanged(); } }
+        public string? Description { get => Model.Description; set { Model.Description = value; OnPropertyChanged(); } }
+        public decimal TotalAmount { get => Model.TotalAmount; set { Model.TotalAmount = value; OnPropertyChanged(); } }
+        public string Currency { get => Model.Currency; set { Model.Currency = value; OnPropertyChanged(); } }
+        public decimal Spent => Model.TotalAmount - Remaining;
     }
 }

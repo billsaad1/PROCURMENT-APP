@@ -65,7 +65,11 @@ namespace JaahdLogistics.ViewModels
             // Check budgets
             foreach (var item in CurrentPR.Items)
             {
-                if (item.BudgetLineId == 0) continue;
+                if (item.BudgetLineId == 0)
+                {
+                    MessageBox.Show($"Please select a Budget Line for item: {item.Description}", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
 
                 var remaining = _dataService.GetRemainingBudget(item.BudgetLineId);
                 var budgetLine = BudgetLines.FirstOrDefault(b => b.Id == item.BudgetLineId);
@@ -87,6 +91,12 @@ namespace JaahdLogistics.ViewModels
                 {
                     BudgetWarning += $"Warning: Item {item.Description} exceeds remaining budget ({remaining:N2} {budgetLine?.Currency})! \n";
                 }
+            }
+
+            if (!string.IsNullOrEmpty(BudgetWarning))
+            {
+                MessageBox.Show("Cannot save PR: One or more items exceed the budget limit.\n\n" + BudgetWarning, "Budget Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
 
             _dataService.SavePR(CurrentPR);
