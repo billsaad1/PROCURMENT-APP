@@ -43,7 +43,9 @@ namespace JaahdLogistics.Models
         public int PRId { get; set; }
 
         private int _budgetLineId;
-        public int BudgetLineId { get => _budgetLineId; set => SetProperty(ref _budgetLineId, value); }
+        public int BudgetLineId { get => _budgetLineId; set { if (SetProperty(ref _budgetLineId, value)) { OnBudgetLineChanged?.Invoke(this); } } }
+
+        public Action<PRItem>? OnBudgetLineChanged { get; set; }
 
         private string _description = string.Empty;
         public string Description { get => _description; set => SetProperty(ref _description, value); }

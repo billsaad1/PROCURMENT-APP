@@ -42,12 +42,16 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private ObservableCollection<BudgetLine> _budgetLines = new();
 
+        [ObservableProperty]
+        private Settings _settings;
+
         public string[] Currencies { get; } = { "USD", "YER" };
 
         public PurchaseRequisitionViewModel(IDataService dataService)
         {
             _dataService = dataService;
             _projects = new ObservableCollection<Project>(_dataService.GetProjects());
+            _settings = _dataService.GetSettings();
         }
 
         partial void OnSelectedProjectChanged(Project? value)
@@ -67,7 +71,9 @@ namespace JaahdLogistics.ViewModels
         [RelayCommand]
         private void AddItem()
         {
-            CurrentPR.Items.Add(new PRItem());
+            var item = new PRItem();
+            item.OnBudgetLineChanged = PopulateFromBudgetLine;
+            CurrentPR.Items.Add(item);
         }
 
         [RelayCommand]
