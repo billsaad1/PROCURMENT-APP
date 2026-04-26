@@ -55,9 +55,9 @@ namespace JaahdLogistics.ViewModels
         }
 
         [RelayCommand]
-        private void Print(System.Windows.FrameworkElement element)
+        private void Print()
         {
-            new PrintService().ShowPreview(element);
+            new PrintService().ShowPreview(this, "GRNPrintTemplate");
         }
     }
 }

@@ -42,6 +42,11 @@ namespace JaahdLogistics.Services
             using var connection = new SqliteConnection(_connectionString);
             if (user.Id == 0)
             {
+                // If the user doesn't have a hash set, it's a new user from settings, set a default password
+                if (string.IsNullOrEmpty(user.PasswordHash))
+                {
+                    user.PasswordHash = JaahdLogistics.Helpers.SecurityHelper.HashPassword("1234");
+                }
                 user.Id = connection.QuerySingle<int>(
                     "INSERT INTO Users (Username, PasswordHash, Role, FullName, Position, SignatureImage) " +
                     "VALUES (@Username, @PasswordHash, @Role, @FullName, @Position, @SignatureImage); SELECT last_insert_rowid();", user);
@@ -52,6 +57,12 @@ namespace JaahdLogistics.Services
                     "UPDATE Users SET Username=@Username, Role=@Role, FullName=@FullName, " +
                     "Position=@Position, SignatureImage=@SignatureImage WHERE Id=@Id", user);
             }
+        }
+
+        public void DeleteUser(int id)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Execute("DELETE FROM Users WHERE Id = @id", new { id });
         }
 
         public IEnumerable<Project> GetProjects()
@@ -368,6 +379,14 @@ namespace JaahdLogistics.Services
                 new { entityType, entityId, userId, status });
         }
 
+        public IEnumerable<dynamic> GetApprovals(string entityType, int entityId)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            return connection.Query<dynamic>(
+                "SELECT a.*, u.FullName, u.Position, u.SignatureImage FROM Approvals a JOIN Users u ON a.UserId = u.Id " +
+                "WHERE a.EntityType = @entityType AND a.EntityId = @entityId", new { entityType, entityId });
+        }
+
         public void SaveGRN(GoodsReceivingNotes grn, List<GRNItems> items)
         {
             using var connection = new SqliteConnection(_connectionString);
@@ -430,6 +449,12 @@ namespace JaahdLogistics.Services
                 connection.Execute(
                     "UPDATE ThreeWayMatch SET POId=@POId, GRNId=@GRNId, InvoiceNumber=@InvoiceNumber, Status=@Status WHERE Id=@Id", match);
             }
+        }
+
+        public IEnumerable<string> GetPreviousItemDescriptions()
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            return connection.Query<string>("SELECT DISTINCT Description FROM PRItems UNION SELECT DISTINCT Description FROM POItems");
         }
     }
 }

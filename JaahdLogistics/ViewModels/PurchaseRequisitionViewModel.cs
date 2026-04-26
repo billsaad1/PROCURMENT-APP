@@ -27,7 +27,37 @@ namespace JaahdLogistics.ViewModels
                         if (rate > 0) value.ExchangeRate = rate;
                     }
                 };
+                LoadApprovals();
             }
+        }
+
+        private void LoadApprovals()
+        {
+            if (CurrentPR.Id == 0) return;
+            var approvals = _dataService.GetApprovals("PR", CurrentPR.Id);
+            foreach (var app in approvals)
+            {
+                string status = (string)app.Status;
+                byte[]? sig = (byte[]?)app.SignatureImage;
+                string? name = (string?)app.FullName;
+
+                if (status == "CheckedByLogistics") { CurrentPR.LogisticsSignature = sig; CurrentPR.LogisticsName = name; }
+                else if (status == "ReviewedByFinance") { CurrentPR.FinanceSignature = sig; CurrentPR.FinanceName = name; }
+                else if (status == "ApprovedByPM") { CurrentPR.PMSignature = sig; CurrentPR.PMName = name; }
+                else if (status == "FinalApproved") { CurrentPR.FinalSignature = sig; CurrentPR.FinalName = name; }
+            }
+            // Set requester signature from current user if new PR
+            if (CurrentPR.RequesterId != 0)
+            {
+                var users = _dataService.GetUsers();
+                var req = users.FirstOrDefault(u => u.Id == CurrentPR.RequesterId);
+                if (req != null)
+                {
+                    CurrentPR.RequesterSignature = req.SignatureImage;
+                    CurrentPR.RequesterName = req.FullName;
+                }
+            }
+            OnPropertyChanged(nameof(CurrentPR));
         }
 
         [ObservableProperty]
@@ -45,6 +75,9 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private Settings _settings;
 
+        [ObservableProperty]
+        private ObservableCollection<string> _previousDescriptions;
+
         public string[] Currencies { get; } = { "USD", "YER" };
 
         public PurchaseRequisitionViewModel(IDataService dataService)
@@ -52,6 +85,7 @@ namespace JaahdLogistics.ViewModels
             _dataService = dataService;
             _projects = new ObservableCollection<Project>(_dataService.GetProjects());
             _settings = _dataService.GetSettings();
+            _previousDescriptions = new ObservableCollection<string>(_dataService.GetPreviousItemDescriptions());
         }
 
         partial void OnSelectedProjectChanged(Project? value)
@@ -144,8 +178,7 @@ namespace JaahdLogistics.ViewModels
 
                 if (!string.IsNullOrEmpty(BudgetWarning))
                 {
-                    MessageBox.Show("Cannot save PR: One or more items exceed the budget limit.\n\n" + BudgetWarning, "Budget Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
+                    MessageBox.Show("Warning: One or more items exceed the budget limit.\n\n" + BudgetWarning, "Budget Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
 
                 _dataService.SavePR(CurrentPR);
@@ -160,25 +193,50 @@ namespace JaahdLogistics.ViewModels
         [RelayCommand]
         private void Approve()
         {
-            var user = AuthService.CurrentUser;
-            if (user == null) return;
+            try
+            {
+                var user = AuthService.CurrentUser;
+                if (user == null)
+                {
+                    MessageBox.Show("You must be logged in to approve.", "Auth Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
 
-            // Logic for multi-stage approval
-            if (CurrentPR.Status == "Pending") CurrentPR.Status = "CheckedByLogistics";
-            else if (CurrentPR.Status == "CheckedByLogistics") CurrentPR.Status = "ReviewedByFinance";
-            else if (CurrentPR.Status == "ReviewedByFinance") CurrentPR.Status = "ApprovedByPM";
-            else if (CurrentPR.Status == "ApprovedByPM") CurrentPR.Status = "FinalApproved";
+                if (CurrentPR.Id == 0)
+                {
+                    MessageBox.Show("Please save the PR before approving.", "Save Required", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
 
-            _dataService.ApproveEntity("PR", CurrentPR.Id, user.Id, CurrentPR.Status);
-            _dataService.SavePR(CurrentPR);
+                // Logic for multi-stage approval
+                string oldStatus = CurrentPR.Status;
+                if (CurrentPR.Status == "Pending") CurrentPR.Status = "CheckedByLogistics";
+                else if (CurrentPR.Status == "CheckedByLogistics") CurrentPR.Status = "ReviewedByFinance";
+                else if (CurrentPR.Status == "ReviewedByFinance") CurrentPR.Status = "ApprovedByPM";
+                else if (CurrentPR.Status == "ApprovedByPM") CurrentPR.Status = "FinalApproved";
 
-            MessageBox.Show($"PR {CurrentPR.PRNumber} status updated to: {CurrentPR.Status}");
+                if (oldStatus != CurrentPR.Status)
+                {
+                    _dataService.ApproveEntity("PR", CurrentPR.Id, user.Id, CurrentPR.Status);
+                    _dataService.SavePR(CurrentPR);
+                    LoadApprovals();
+                    MessageBox.Show($"PR {CurrentPR.PRNumber} status updated to: {CurrentPR.Status}");
+                }
+                else
+                {
+                    MessageBox.Show("This PR is already fully approved or in a state that cannot be further approved.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error during approval: {ex.Message}", "Approval Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         [RelayCommand]
-        private void Print(FrameworkElement element)
+        private void Print()
         {
-            new PrintService().ShowPreview(element);
+            new PrintService().ShowPreview(this, "PRPrintTemplate");
         }
     }
 }

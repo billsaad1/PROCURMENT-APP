@@ -75,7 +75,15 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="{DynamicResource Description}" Binding="{Binding Description}" Width="*"/>
+                <DataGridTemplateColumn Header="{DynamicResource Description}" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ComboBox IsEditable="True"
+                                      Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                                      ItemsSource="{Binding Source={StaticResource ViewProxy}, Path=Data.PreviousDescriptions}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Header="{DynamicResource Unit}" Binding="{Binding Unit}" Width="80"/>
                 <DataGridTextColumn Header="{DynamicResource Quantity}" Binding="{Binding Quantity}" Width="80"/>
                 <DataGridTextColumn Header="{DynamicResource UnitPrice}" Binding="{Binding UnitPrice}" Width="80"/>
@@ -109,29 +117,37 @@
         <UniformGrid Grid.Row="5" Columns="4" Margin="0,20,0,20">
             <StackPanel HorizontalAlignment="Center">
                 <TextBlock Text="Requester (PM)" FontWeight="Bold" HorizontalAlignment="Center"/>
-                <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5"/>
-                <TextBlock Text="Name: ____________" FontSize="10"/>
+                <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5">
+                    <Image Source="{Binding CurrentPR.RequesterSignature, Converter={StaticResource ImageBytesConverter}}"/>
+                </Border>
+                <TextBlock Text="{Binding CurrentPR.RequesterName, FallbackValue='Name: ____________'}" FontSize="10" HorizontalAlignment="Center"/>
             </StackPanel>
             <StackPanel HorizontalAlignment="Center">
                 <TextBlock Text="Logistics Manager" FontWeight="Bold" HorizontalAlignment="Center"/>
-                <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5"/>
-                <TextBlock Text="Name: ____________" FontSize="10"/>
+                <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5">
+                    <Image Source="{Binding CurrentPR.LogisticsSignature, Converter={StaticResource ImageBytesConverter}}"/>
+                </Border>
+                <TextBlock Text="{Binding CurrentPR.LogisticsName, FallbackValue='Name: ____________'}" FontSize="10" HorizontalAlignment="Center"/>
             </StackPanel>
             <StackPanel HorizontalAlignment="Center">
                 <TextBlock Text="Finance Manager" FontWeight="Bold" HorizontalAlignment="Center"/>
-                <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5"/>
-                <TextBlock Text="Name: ____________" FontSize="10"/>
+                <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5">
+                    <Image Source="{Binding CurrentPR.FinanceSignature, Converter={StaticResource ImageBytesConverter}}"/>
+                </Border>
+                <TextBlock Text="{Binding CurrentPR.FinanceName, FallbackValue='Name: ____________'}" FontSize="10" HorizontalAlignment="Center"/>
             </StackPanel>
             <StackPanel HorizontalAlignment="Center">
                 <TextBlock Text="Head of Association" FontWeight="Bold" HorizontalAlignment="Center"/>
-                <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5"/>
-                <TextBlock Text="Name: ____________" FontSize="10"/>
+                <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5">
+                    <Image Source="{Binding CurrentPR.FinalSignature, Converter={StaticResource ImageBytesConverter}}"/>
+                </Border>
+                <TextBlock Text="{Binding CurrentPR.FinalName, FallbackValue='Name: ____________'}" FontSize="10" HorizontalAlignment="Center"/>
             </StackPanel>
         </UniformGrid>
 
         <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right" x:Name="ControlButtons">
             <TextBlock Text="{Binding CurrentPR.Status}" VerticalAlignment="Center" Margin="0,0,20,0" FontWeight="Bold" Foreground="{StaticResource SecondaryBlueBrush}"/>
-            <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" CommandParameter="{Binding ElementName=PrintRoot}" Width="120" Height="35" Margin="0,0,10,0"/>
+            <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
             <Button Content="{DynamicResource Approve}" Command="{Binding ApproveCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
             <Button Content="{DynamicResource Save}" Command="{Binding SavePRCommand}" Width="120" Height="35"/>
         </StackPanel>

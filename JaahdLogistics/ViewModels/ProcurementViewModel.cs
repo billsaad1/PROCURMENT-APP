@@ -197,9 +197,9 @@ namespace JaahdLogistics.ViewModels
         }
 
         [RelayCommand]
-        private void Print(FrameworkElement element)
+        private void Print()
         {
-            new PrintService().ShowPreview(element);
+            new PrintService().ShowPreview(this, "POPrintTemplate");
         }
     }
 }

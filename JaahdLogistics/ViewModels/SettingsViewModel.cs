@@ -15,11 +15,17 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private byte[]? _currentUserSignature;
 
+        [ObservableProperty]
+        private ObservableCollection<User> _users;
+
+        public string[] Roles { get; } = { "Admin", "ProjectManager", "ProcurementManager", "FinanceManager", "Storekeeper", "HeadOfAssociation" };
+
         public SettingsViewModel(IDataService dataService)
         {
             _dataService = dataService;
             _settings = _dataService.GetSettings();
             CurrentUserSignature = AuthService.CurrentUser?.SignatureImage;
+            _users = new ObservableCollection<User>(_dataService.GetUsers());
         }
 
         [RelayCommand]
@@ -31,6 +37,29 @@ namespace JaahdLogistics.ViewModels
             {
                 user.SignatureImage = CurrentUserSignature;
                 _dataService.SaveUser(user);
+            }
+
+            foreach (var u in Users)
+            {
+                _dataService.SaveUser(u);
+            }
+
+            System.Windows.MessageBox.Show("Settings saved successfully.");
+        }
+
+        [RelayCommand]
+        private void AddUser()
+        {
+            Users.Add(new User { Username = "newuser", Role = "ProjectManager", FullName = "New User" });
+        }
+
+        [RelayCommand]
+        private void RemoveUser(User user)
+        {
+            if (user != null)
+            {
+                if (user.Id != 0) _dataService.DeleteUser(user.Id);
+                Users.Remove(user);
             }
         }
 

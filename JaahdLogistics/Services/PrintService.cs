@@ -7,13 +7,9 @@ namespace JaahdLogistics.Services
 {
     public class PrintService
     {
-        public void ShowPreview(FrameworkElement element)
+        public void ShowPreview(object dataContext, string templateName)
         {
-            // Create a clone or deep copy of the element to avoid visual tree issues
-            // For simplicity in this demo, we use the element directly but ideally,
-            // you should render it to a fixed document or a visual.
-
-            var preview = new PrintPreviewWindow(element);
+            var preview = new PrintPreviewWindow(dataContext, templateName);
             preview.ShowDialog();
         }
 

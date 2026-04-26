@@ -16,11 +16,11 @@ namespace JaahdLogistics.Helpers
         public string GenerateNumber(string prefix, int projectId)
         {
             using var connection = new SqliteConnection(_connectionString);
-            var project = connection.QuerySingleOrDefault<dynamic>("SELECT Code, Year FROM Projects WHERE Id = @projectId", new { projectId });
+            var project = connection.QuerySingleOrDefault<JaahdLogistics.Models.Project>("SELECT * FROM Projects WHERE Id = @projectId", new { projectId });
             if (project == null) return $"{prefix}-{DateTime.Now.Year}-001";
 
             string projectCode = project.Code;
-            int year = Convert.ToInt32(project.Year);
+            int year = project.Year;
 
             // Get current count for this type and project
             string countQuery = prefix switch {
@@ -31,7 +31,8 @@ namespace JaahdLogistics.Helpers
                 _ => "SELECT 0"
             };
 
-            var count = connection.ExecuteScalar<int>(countQuery, new { projectId });
+            // SQLite COUNT(*) returns Int64 (long)
+            var count = connection.ExecuteScalar<long>(countQuery, new { projectId });
 
             return $"{projectCode}-{year}-JAAHD-{prefix}-{(count + 1):D3}";
         }

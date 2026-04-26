@@ -22,6 +22,18 @@ namespace JaahdLogistics.Models
         private string _status = "Pending";
         public string Status { get => _status; set => SetProperty(ref _status, value); }
 
+        public byte[]? RequesterSignature { get; set; }
+        public byte[]? LogisticsSignature { get; set; }
+        public byte[]? FinanceSignature { get; set; }
+        public byte[]? PMSignature { get; set; }
+        public byte[]? FinalSignature { get; set; }
+
+        public string? RequesterName { get; set; }
+        public string? LogisticsName { get; set; }
+        public string? FinanceName { get; set; }
+        public string? PMName { get; set; }
+        public string? FinalName { get; set; }
+
         public ObservableCollection<PRItem> Items { get; set; } = new();
 
         public decimal TotalAmount => Items.Sum(i => i.TotalPrice);

@@ -51,6 +51,36 @@
                 </StackPanel>
             </GroupBox>
 
+            <GroupBox Header="User Management" Margin="0,0,0,20" Padding="10">
+                <StackPanel>
+                    <DataGrid ItemsSource="{Binding Users}" AutoGenerateColumns="False" CanUserAddRows="False" Height="200" Margin="0,0,0,10">
+                        <DataGrid.Resources>
+                            <localhelpers:BindingProxy x:Key="ViewProxy" Data="{Binding}" xmlns:localhelpers="clr-namespace:JaahdLogistics.Helpers"/>
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Username" Binding="{Binding Username}" Width="100"/>
+                            <DataGridTextColumn Header="Full Name" Binding="{Binding FullName}" Width="*"/>
+                            <DataGridTemplateColumn Header="Role" Width="150">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ComboBox ItemsSource="{Binding Source={StaticResource ViewProxy}, Path=Data.Roles}"
+                                                  SelectedItem="{Binding Role, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="X" Command="{Binding Data.RemoveUserCommand, Source={StaticResource ViewProxy}}" CommandParameter="{Binding}" Background="#C0392B"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button Content="Add User" Command="{Binding AddUserCommand}" HorizontalAlignment="Left" Width="100"/>
+                </StackPanel>
+            </GroupBox>
+
             <GroupBox Header="{DynamicResource TermsConditions}" Padding="10">
                 <StackPanel>
                     <TextBlock Text="{DynamicResource PRTerms}" FontWeight="Bold" Margin="0,10,0,5"/>

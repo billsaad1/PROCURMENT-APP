@@ -27,6 +27,10 @@ namespace JaahdLogistics
                 var langService = new LanguageService();
                 var mainVM = new MainViewModel(dataService, langService, connectionString);
 
+                // Start background sync if cloud connection is available
+                var syncService = new SyncService(dataService);
+                _ = syncService.StartAutoSync();
+
                 // Initialize the global binding proxy
                 var proxy = Resources["Proxy"] as JaahdLogistics.Helpers.BindingProxy;
                 if (proxy != null) proxy.Data = mainVM;
