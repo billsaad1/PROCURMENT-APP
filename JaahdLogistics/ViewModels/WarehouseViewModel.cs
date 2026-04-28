@@ -24,9 +24,13 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private ObservableCollection<GRNItems> _grnItems = new();
 
+        [ObservableProperty]
+        private Settings _settings;
+
         public WarehouseViewModel(IDataService dataService)
         {
             _dataService = dataService;
+            _settings = _dataService.GetSettings();
             // Filter for approved POs
             _pendingPOs = new ObservableCollection<PurchaseOrder>(_dataService.GetPOs().Where(po => po.Status == "FinalApproved"));
         }

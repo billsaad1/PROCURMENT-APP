@@ -32,20 +32,27 @@ namespace JaahdLogistics.ViewModels
         [RelayCommand]
         private void Save()
         {
-            _dataService.SaveSettings(Settings);
-            var user = AuthService.CurrentUser;
-            if (user != null)
+            try
             {
-                user.SignatureImage = CurrentUserSignature;
-                _dataService.SaveUser(user);
-            }
+                _dataService.SaveSettings(Settings);
+                var user = AuthService.CurrentUser;
+                if (user != null)
+                {
+                    user.SignatureImage = CurrentUserSignature;
+                    _dataService.SaveUser(user);
+                }
 
-            foreach (var u in Users)
+                foreach (var u in Users)
+                {
+                    _dataService.SaveUser(u);
+                }
+
+                System.Windows.MessageBox.Show("Settings saved successfully.");
+            }
+            catch (System.Exception ex)
             {
-                _dataService.SaveUser(u);
+                System.Windows.MessageBox.Show($"Error saving settings: {ex.Message}", "Save Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
             }
-
-            System.Windows.MessageBox.Show("Settings saved successfully.");
         }
 
         [RelayCommand]

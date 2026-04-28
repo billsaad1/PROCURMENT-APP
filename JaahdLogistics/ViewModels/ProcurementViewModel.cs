@@ -35,9 +35,13 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private ObservableCollection<Bidder> _bidders = new();
 
+        [ObservableProperty]
+        private Settings _settings;
+
         public ProcurementViewModel(IDataService dataService)
         {
             _dataService = dataService;
+            _settings = _dataService.GetSettings();
             // Load PRs that are ready for procurement (Approved)
             _approvedPRs = new ObservableCollection<PurchaseRequisition>(_dataService.GetPRs().Where(p => p.Status == "FinalApproved"));
         }

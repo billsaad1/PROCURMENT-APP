@@ -6,150 +6,178 @@
              xmlns:local="clr-namespace:JaahdLogistics.Helpers"
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="800">
-    <Grid x:Name="PrintRoot" Margin="15">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/> <!-- Header -->
-            <RowDefinition Height="Auto"/> <!-- Title -->
-            <RowDefinition Height="Auto"/> <!-- Info -->
-            <RowDefinition Height="*"/>    <!-- Grid -->
-            <RowDefinition Height="Auto"/> <!-- Summary -->
-            <RowDefinition Height="Auto"/> <!-- Signatures -->
-            <RowDefinition Height="Auto"/> <!-- Controls -->
-        </Grid.RowDefinitions>
+    <TabControl x:Name="PRTabs" Margin="10" SelectedIndex="{Binding SelectedTabIndex}">
+        <TabItem Header="{DynamicResource PRList}">
+            <Grid Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Button Content="{DynamicResource NewPR}" Command="{Binding NewPRCommand}" Width="120" HorizontalAlignment="Left" Margin="0,0,0,10"/>
+                <DataGrid Grid.Row="1" ItemsSource="{Binding PurchaseRequisitions}" AutoGenerateColumns="False" IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{DynamicResource PRNumber}" Binding="{Binding PRNumber}" Width="Auto"/>
+                        <DataGridTextColumn Header="{DynamicResource Date}" Binding="{Binding Date, StringFormat=d}" Width="Auto"/>
+                        <DataGridTextColumn Header="{DynamicResource Total}" Binding="{Binding TotalAmount, StringFormat=N2}" Width="Auto"/>
+                        <DataGridTextColumn Header="{DynamicResource Status}" Binding="{Binding Status}" Width="*"/>
+                        <DataGridTemplateColumn Width="Auto">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="{DynamicResource Select}" Command="{Binding DataContext.SelectPRCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </TabItem>
+        <TabItem Header="{DynamicResource PREdit}">
+            <Grid x:Name="PrintRoot" Margin="15">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/> <!-- Header -->
+                    <RowDefinition Height="Auto"/> <!-- Title -->
+                    <RowDefinition Height="Auto"/> <!-- Info -->
+                    <RowDefinition Height="*"/>    <!-- Grid -->
+                    <RowDefinition Height="Auto"/> <!-- Summary -->
+                    <RowDefinition Height="Auto"/> <!-- Signatures -->
+                    <RowDefinition Height="Auto"/> <!-- Controls -->
+                </Grid.RowDefinitions>
 
-        <!-- Header for printing -->
-        <Grid Grid.Row="0" Margin="0,0,0,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Image Source="{Binding Settings.LogoImage, Converter={StaticResource ImageBytesConverter}}"
-                   Height="60" Width="60" Margin="0,0,15,0"/>
-            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                <TextBlock Text="{Binding Settings.AssociationName}" FontSize="16" FontWeight="Bold"/>
-                <TextBlock Text="Logistics Management" FontSize="12"/>
-            </StackPanel>
-        </Grid>
+                <!-- Header for printing -->
+                <Grid Grid.Row="0" Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Source="{Binding Settings.LogoImage, Converter={StaticResource ImageBytesConverter}}"
+                           Height="60" Width="60" Margin="0,0,15,0"/>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Settings.AssociationName}" FontSize="16" FontWeight="Bold"/>
+                        <TextBlock Text="Logistics Management" FontSize="12"/>
+                    </StackPanel>
+                </Grid>
 
-        <TextBlock Grid.Row="1" Text="{DynamicResource PR}" FontSize="22" FontWeight="Bold" Margin="0,0,0,15" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Row="1" Text="{DynamicResource PR}" FontSize="22" FontWeight="Bold" Margin="0,0,0,15" HorizontalAlignment="Center"/>
 
-        <Grid Grid.Row="2" Margin="0,0,0,15">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+                <Grid Grid.Row="2" Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-            <TextBlock Text="{DynamicResource PRNumber}" VerticalAlignment="Center" Margin="5"/>
-            <TextBox Grid.Column="1" Text="{Binding CurrentPR.PRNumber}" Margin="5"/>
+                    <TextBlock Text="{DynamicResource PRNumber}" VerticalAlignment="Center" Margin="5"/>
+                    <TextBox Grid.Column="1" Text="{Binding CurrentPR.PRNumber}" Margin="5"/>
 
-            <TextBlock Grid.Column="2" Text="{DynamicResource Project}" VerticalAlignment="Center" Margin="5"/>
-            <ComboBox Grid.Column="3" ItemsSource="{Binding Projects}" SelectedItem="{Binding SelectedProject}" DisplayMemberPath="Name" Margin="5"/>
+                    <TextBlock Grid.Column="2" Text="{DynamicResource Project}" VerticalAlignment="Center" Margin="5"/>
+                    <ComboBox Grid.Column="3" ItemsSource="{Binding Projects}" SelectedItem="{Binding SelectedProject}" DisplayMemberPath="Name" Margin="5"/>
 
-            <TextBlock Grid.Row="1" Text="{DynamicResource Currency}" VerticalAlignment="Center" Margin="5"/>
-            <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Currencies}" SelectedItem="{Binding CurrentPR.Currency}" Margin="5"/>
+                    <TextBlock Grid.Row="1" Text="{DynamicResource Currency}" VerticalAlignment="Center" Margin="5"/>
+                    <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Currencies}" SelectedItem="{Binding CurrentPR.Currency}" Margin="5"/>
 
-            <TextBlock Grid.Row="1" Grid.Column="2" Text="{DynamicResource ExchangeRate}" VerticalAlignment="Center" Margin="5"/>
-            <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding CurrentPR.ExchangeRate}" Margin="5"/>
-        </Grid>
+                    <TextBlock Grid.Row="1" Grid.Column="2" Text="{DynamicResource ExchangeRate}" VerticalAlignment="Center" Margin="5"/>
+                    <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding CurrentPR.ExchangeRate}" Margin="5"/>
+                </Grid>
 
-        <DataGrid Grid.Row="3" ItemsSource="{Binding CurrentPR.Items}" AutoGenerateColumns="False" CanUserAddRows="False">
-            <DataGrid.Resources>
-                <local:BindingProxy x:Key="ViewProxy" Data="{Binding}"/>
-            </DataGrid.Resources>
-            <DataGrid.Columns>
-                <DataGridTemplateColumn Header="{DynamicResource BudgetLine}" Width="120">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <DockPanel>
-                                <Button Content="↻" Command="{Binding Data.PopulateFromBudgetLineCommand, Source={StaticResource ViewProxy}}" CommandParameter="{Binding}" DockPanel.Dock="Right" Margin="2,0,0,0"/>
-                                <ComboBox ItemsSource="{Binding Source={StaticResource ViewProxy}, Path=Data.BudgetLines}"
-                                          SelectedValue="{Binding BudgetLineId, UpdateSourceTrigger=PropertyChanged}"
-                                          SelectedValuePath="Id" DisplayMemberPath="Code"/>
-                            </DockPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="{DynamicResource Description}" Width="*">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <ComboBox IsEditable="True"
-                                      Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
-                                      ItemsSource="{Binding Source={StaticResource ViewProxy}, Path=Data.PreviousDescriptions}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTextColumn Header="{DynamicResource Unit}" Binding="{Binding Unit}" Width="80"/>
-                <DataGridTextColumn Header="{DynamicResource Quantity}" Binding="{Binding Quantity}" Width="80"/>
-                <DataGridTextColumn Header="{DynamicResource UnitPrice}" Binding="{Binding UnitPrice}" Width="80"/>
-                <DataGridTextColumn Header="{DynamicResource Total}" Binding="{Binding TotalPrice, Mode=OneWay}" IsReadOnly="True" Width="100"/>
-                <DataGridTemplateColumn Width="Auto">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Content="X" Command="{Binding Data.RemoveItemCommand, Source={StaticResource ViewProxy}}" CommandParameter="{Binding}" Background="#C0392B" Foreground="White" FontWeight="Bold"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+                <DataGrid Grid.Row="3" ItemsSource="{Binding CurrentPR.Items}" AutoGenerateColumns="False" CanUserAddRows="False">
+                    <DataGrid.Resources>
+                        <local:BindingProxy x:Key="ViewProxy" Data="{Binding}"/>
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="{DynamicResource BudgetLine}" Width="120">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <DockPanel>
+                                        <Button Content="↻" Command="{Binding Data.PopulateFromBudgetLineCommand, Source={StaticResource ViewProxy}}" CommandParameter="{Binding}" DockPanel.Dock="Right" Margin="2,0,0,0"/>
+                                        <ComboBox ItemsSource="{Binding Source={StaticResource ViewProxy}, Path=Data.BudgetLines}"
+                                                  SelectedValue="{Binding BudgetLineId, UpdateSourceTrigger=PropertyChanged}"
+                                                  SelectedValuePath="Id" DisplayMemberPath="Code"/>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="{DynamicResource Description}" Width="*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ComboBox IsEditable="True"
+                                              Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                                              ItemsSource="{Binding Source={StaticResource ViewProxy}, Path=Data.PreviousDescriptions}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="{DynamicResource Unit}" Binding="{Binding Unit}" Width="80"/>
+                        <DataGridTextColumn Header="{DynamicResource Quantity}" Binding="{Binding Quantity}" Width="80"/>
+                        <DataGridTextColumn Header="{DynamicResource UnitPrice}" Binding="{Binding UnitPrice}" Width="80"/>
+                        <DataGridTextColumn Header="{DynamicResource Total}" Binding="{Binding TotalPrice, Mode=OneWay}" IsReadOnly="True" Width="100"/>
+                        <DataGridTemplateColumn Width="Auto">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="X" Command="{Binding Data.RemoveItemCommand, Source={StaticResource ViewProxy}}" CommandParameter="{Binding}" Background="#C0392B" Foreground="White" FontWeight="Bold"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
 
-        <Grid Grid.Row="4" Margin="0,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <Button Content="{DynamicResource AddItem}" Command="{Binding AddItemCommand}" Padding="15,5" Margin="0,0,10,0" x:Name="AddItemBtn"/>
-            <TextBlock Grid.Column="1" Text="{Binding BudgetWarning}" Foreground="Red" VerticalAlignment="Center" FontWeight="Bold" TextWrapping="Wrap"/>
-            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                <TextBlock Text="{DynamicResource Total}" FontWeight="Bold" Margin="0,0,10,0"/>
-                <TextBlock Text="{Binding CurrentPR.TotalAmount, StringFormat=N2}" FontWeight="Bold" FontSize="16"/>
-                <TextBlock Text="{Binding CurrentPR.Currency}" Margin="5,0,0,0" VerticalAlignment="Bottom"/>
-            </StackPanel>
-        </Grid>
+                <Grid Grid.Row="4" Margin="0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Content="{DynamicResource AddItem}" Command="{Binding AddItemCommand}" Padding="15,5" Margin="0,0,10,0" x:Name="AddItemBtn"/>
+                    <TextBlock Grid.Column="1" Text="{Binding BudgetWarning}" Foreground="Red" VerticalAlignment="Center" FontWeight="Bold" TextWrapping="Wrap"/>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="{DynamicResource Total}" FontWeight="Bold" Margin="0,0,10,0"/>
+                        <TextBlock Text="{Binding CurrentPR.TotalAmount, StringFormat=N2}" FontWeight="Bold" FontSize="16"/>
+                        <TextBlock Text="{Binding CurrentPR.Currency}" Margin="5,0,0,0" VerticalAlignment="Bottom"/>
+                    </StackPanel>
+                </Grid>
 
-        <!-- Signatures Area -->
-        <UniformGrid Grid.Row="5" Columns="4" Margin="0,20,0,20">
-            <StackPanel HorizontalAlignment="Center">
-                <TextBlock Text="Requester (PM)" FontWeight="Bold" HorizontalAlignment="Center"/>
-                <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5">
-                    <Image Source="{Binding CurrentPR.RequesterSignature, Converter={StaticResource ImageBytesConverter}}"/>
-                </Border>
-                <TextBlock Text="{Binding CurrentPR.RequesterName, FallbackValue='Name: ____________'}" FontSize="10" HorizontalAlignment="Center"/>
-            </StackPanel>
-            <StackPanel HorizontalAlignment="Center">
-                <TextBlock Text="Logistics Manager" FontWeight="Bold" HorizontalAlignment="Center"/>
-                <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5">
-                    <Image Source="{Binding CurrentPR.LogisticsSignature, Converter={StaticResource ImageBytesConverter}}"/>
-                </Border>
-                <TextBlock Text="{Binding CurrentPR.LogisticsName, FallbackValue='Name: ____________'}" FontSize="10" HorizontalAlignment="Center"/>
-            </StackPanel>
-            <StackPanel HorizontalAlignment="Center">
-                <TextBlock Text="Finance Manager" FontWeight="Bold" HorizontalAlignment="Center"/>
-                <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5">
-                    <Image Source="{Binding CurrentPR.FinanceSignature, Converter={StaticResource ImageBytesConverter}}"/>
-                </Border>
-                <TextBlock Text="{Binding CurrentPR.FinanceName, FallbackValue='Name: ____________'}" FontSize="10" HorizontalAlignment="Center"/>
-            </StackPanel>
-            <StackPanel HorizontalAlignment="Center">
-                <TextBlock Text="Head of Association" FontWeight="Bold" HorizontalAlignment="Center"/>
-                <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5">
-                    <Image Source="{Binding CurrentPR.FinalSignature, Converter={StaticResource ImageBytesConverter}}"/>
-                </Border>
-                <TextBlock Text="{Binding CurrentPR.FinalName, FallbackValue='Name: ____________'}" FontSize="10" HorizontalAlignment="Center"/>
-            </StackPanel>
-        </UniformGrid>
+                <!-- Signatures Area -->
+                <UniformGrid Grid.Row="5" Columns="4" Margin="0,20,0,20">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="Requester (PM)" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5">
+                            <Image Source="{Binding CurrentPR.RequesterSignature, Converter={StaticResource ImageBytesConverter}}"/>
+                        </Border>
+                        <TextBlock Text="{Binding CurrentPR.RequesterName, FallbackValue='Name: ____________'}" FontSize="10" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="Logistics Manager" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5">
+                            <Image Source="{Binding CurrentPR.LogisticsSignature, Converter={StaticResource ImageBytesConverter}}"/>
+                        </Border>
+                        <TextBlock Text="{Binding CurrentPR.LogisticsName, FallbackValue='Name: ____________'}" FontSize="10" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="Finance Manager" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5">
+                            <Image Source="{Binding CurrentPR.FinanceSignature, Converter={StaticResource ImageBytesConverter}}"/>
+                        </Border>
+                        <TextBlock Text="{Binding CurrentPR.FinanceName, FallbackValue='Name: ____________'}" FontSize="10" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="Head of Association" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5">
+                            <Image Source="{Binding CurrentPR.FinalSignature, Converter={StaticResource ImageBytesConverter}}"/>
+                        </Border>
+                        <TextBlock Text="{Binding CurrentPR.FinalName, FallbackValue='Name: ____________'}" FontSize="10" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </UniformGrid>
 
-        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right" x:Name="ControlButtons">
-            <TextBlock Text="{Binding CurrentPR.Status}" VerticalAlignment="Center" Margin="0,0,20,0" FontWeight="Bold" Foreground="{StaticResource SecondaryBlueBrush}"/>
-            <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
-            <Button Content="{DynamicResource Approve}" Command="{Binding ApproveCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
-            <Button Content="{DynamicResource Save}" Command="{Binding SavePRCommand}" Width="120" Height="35"/>
-        </StackPanel>
-    </Grid>
+                <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right" x:Name="ControlButtons">
+                    <TextBlock Text="{Binding CurrentPR.Status}" VerticalAlignment="Center" Margin="0,0,20,0" FontWeight="Bold" Foreground="{StaticResource SecondaryBlueBrush}"/>
+                    <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
+                    <Button Content="{DynamicResource Approve}" Command="{Binding ApproveCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
+                    <Button Content="{DynamicResource Save}" Command="{Binding SavePRCommand}" Width="120" Height="35"/>
+                </StackPanel>
+            </Grid>
+        </TabItem>
+    </TabControl>
 </UserControl>

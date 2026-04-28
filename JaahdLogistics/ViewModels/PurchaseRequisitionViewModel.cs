@@ -15,6 +15,12 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private PurchaseRequisition _currentPR = new();
 
+        [ObservableProperty]
+        private ObservableCollection<PurchaseRequisition> _purchaseRequisitions = new();
+
+        [ObservableProperty]
+        private int _selectedTabIndex;
+
         partial void OnCurrentPRChanged(PurchaseRequisition value)
         {
             if (value != null)
@@ -86,6 +92,12 @@ namespace JaahdLogistics.ViewModels
             _projects = new ObservableCollection<Project>(_dataService.GetProjects());
             _settings = _dataService.GetSettings();
             _previousDescriptions = new ObservableCollection<string>(_dataService.GetPreviousItemDescriptions());
+            LoadPRs();
+        }
+
+        private void LoadPRs()
+        {
+            PurchaseRequisitions = new ObservableCollection<PurchaseRequisition>(_dataService.GetPRs());
         }
 
         partial void OnSelectedProjectChanged(Project? value)
@@ -182,12 +194,30 @@ namespace JaahdLogistics.ViewModels
                 }
 
                 _dataService.SavePR(CurrentPR);
+                LoadPRs();
                 MessageBox.Show("PR Saved Successfully");
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error saving PR: {ex.Message}", "Save Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        [RelayCommand]
+        private void NewPR()
+        {
+            CurrentPR = new PurchaseRequisition();
+            SelectedProject = null;
+            SelectedTabIndex = 1; // Switch to Edit tab
+        }
+
+        [RelayCommand]
+        private void SelectPR(PurchaseRequisition pr)
+        {
+            if (pr == null) return;
+            CurrentPR = pr;
+            SelectedProject = Projects.FirstOrDefault(p => p.Id == pr.ProjectId);
+            SelectedTabIndex = 1; // Switch to Edit tab
         }
 
         [RelayCommand]

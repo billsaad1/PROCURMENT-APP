@@ -66,6 +66,10 @@
     <s:String x:Key="Dashboard">لوحة التحكم</s:String>
     <s:String x:Key="MyPRStatus">حالة طلباتي</s:String>
     <s:String x:Key="Reports">التقارير</s:String>
+    <s:String x:Key="PRList">قائمة طلبات الشراء</s:String>
+    <s:String x:Key="PREdit">إنشاء/تعديل طلب الشراء</s:String>
+    <s:String x:Key="NewPR">طلب جديد</s:String>
+    <s:String x:Key="Select">اختيار</s:String>
     <s:String x:Key="ProjectSpendingReport">تقرير إنفاق المشاريع</s:String>
     <s:String x:Key="InventoryStatusReport">تقرير حالة المخزون</s:String>
     <s:String x:Key="VendorHistoryReport">تقرير تاريخ الموردين</s:String>

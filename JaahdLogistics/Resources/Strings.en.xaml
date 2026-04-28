@@ -66,6 +66,10 @@
     <s:String x:Key="Dashboard">Dashboard</s:String>
     <s:String x:Key="MyPRStatus">My Requisitions Status</s:String>
     <s:String x:Key="Reports">Reports</s:String>
+    <s:String x:Key="PRList">PR List</s:String>
+    <s:String x:Key="PREdit">Create/Edit PR</s:String>
+    <s:String x:Key="NewPR">New PR</s:String>
+    <s:String x:Key="Select">Select</s:String>
     <s:String x:Key="ProjectSpendingReport">Project Spending Report</s:String>
     <s:String x:Key="InventoryStatusReport">Inventory Status Report</s:String>
     <s:String x:Key="VendorHistoryReport">Vendor History Report</s:String>
