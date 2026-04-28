@@ -107,10 +107,13 @@ namespace JaahdLogistics.ViewModels
                 CurrentPR.ProjectId = value.Id;
                 BudgetLines = new ObservableCollection<BudgetLine>(_dataService.GetBudgetLines(value.Id));
 
-                // Automatic Numbering
-                var mainVM = Application.Current.MainWindow.DataContext as MainViewModel;
-                var helper = new NumberingHelper(mainVM?.ConnectionString ?? "Data Source=jaahd.db");
-                CurrentPR.PRNumber = helper.GenerateNumber("PR", value.Id);
+                // Automatic Numbering (only for new PRs)
+                if (string.IsNullOrEmpty(CurrentPR.PRNumber))
+                {
+                    var mainVM = Application.Current.MainWindow.DataContext as MainViewModel;
+                    var helper = new NumberingHelper(mainVM?.ConnectionString ?? "Data Source=jaahd.db");
+                    CurrentPR.PRNumber = helper.GenerateNumber("PR", value.Id);
+                }
             }
         }
 
@@ -215,9 +218,40 @@ namespace JaahdLogistics.ViewModels
         private void SelectPR(PurchaseRequisition pr)
         {
             if (pr == null) return;
+
+            // Ensure OnBudgetLineChanged is set for loaded items
+            foreach (var item in pr.Items)
+            {
+                item.OnBudgetLineChanged = PopulateFromBudgetLine;
+            }
+
             CurrentPR = pr;
             SelectedProject = Projects.FirstOrDefault(p => p.Id == pr.ProjectId);
             SelectedTabIndex = 1; // Switch to Edit tab
+        }
+
+        [RelayCommand]
+        private void DeletePR(PurchaseRequisition pr)
+        {
+            if (pr == null) return;
+            var result = MessageBox.Show($"Are you sure you want to delete PR {pr.PRNumber}?", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    _dataService.DeletePR(pr.Id);
+                    LoadPRs();
+                    if (CurrentPR.Id == pr.Id)
+                    {
+                        NewPR();
+                    }
+                    MessageBox.Show("PR Deleted Successfully");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Delete Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
 
         [RelayCommand]

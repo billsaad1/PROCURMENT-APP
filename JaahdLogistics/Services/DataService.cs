@@ -53,9 +53,20 @@ namespace JaahdLogistics.Services
             }
             else
             {
-                connection.Execute(
-                    "UPDATE Users SET Username=@Username, Role=@Role, FullName=@FullName, " +
-                    "Position=@Position, SignatureImage=@SignatureImage WHERE Id=@Id", user);
+                // Update everything EXCEPT PasswordHash unless it's explicitly provided
+                if (!string.IsNullOrEmpty(user.PasswordHash) && !user.PasswordHash.StartsWith("$")) // Simple check if it's a new plaintext password
+                {
+                     user.PasswordHash = JaahdLogistics.Helpers.SecurityHelper.HashPassword(user.PasswordHash);
+                     connection.Execute(
+                        "UPDATE Users SET Username=@Username, PasswordHash=@PasswordHash, Role=@Role, FullName=@FullName, " +
+                        "Position=@Position, SignatureImage=@SignatureImage WHERE Id=@Id", user);
+                }
+                else
+                {
+                    connection.Execute(
+                        "UPDATE Users SET Username=@Username, Role=@Role, FullName=@FullName, " +
+                        "Position=@Position, SignatureImage=@SignatureImage WHERE Id=@Id", user);
+                }
             }
         }
 
@@ -114,9 +125,36 @@ namespace JaahdLogistics.Services
             foreach (var pr in prs)
             {
                 var items = connection.Query<PRItem>("SELECT * FROM PRItems WHERE PRId = @Id", new { pr.Id }).ToList();
-                pr.Items = new ObservableCollection<PRItem>(items);
+                pr.Items.Clear();
+                foreach (var item in items)
+                {
+                    pr.Items.Add(item);
+                }
             }
             return prs;
+        }
+
+        public void DeletePR(int id)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            using var transaction = connection.BeginTransaction();
+            try
+            {
+                connection.Execute("DELETE FROM PRItems WHERE PRId = @id", new { id }, transaction);
+                connection.Execute("DELETE FROM PurchaseRequisitions WHERE Id = @id", new { id }, transaction);
+                transaction.Commit();
+            }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
+            {
+                transaction.Rollback();
+                throw new Exception("Cannot delete PR because it is referenced in an RFQ or PO. Delete those first.");
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
 
         public IEnumerable<PurchaseOrder> GetPOs()
@@ -249,7 +287,7 @@ namespace JaahdLogistics.Services
                 else
                 {
                     connection.Execute(
-                        "UPDATE PurchaseRequisitions SET PRNumber=@PRNumber, ProjectId=@ProjectId, Justification=@Justification, Status=@Status WHERE Id=@Id",
+                        "UPDATE PurchaseRequisitions SET PRNumber=@PRNumber, ProjectId=@ProjectId, Justification=@Justification, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate WHERE Id=@Id",
                         pr, transaction);
 
                     try {

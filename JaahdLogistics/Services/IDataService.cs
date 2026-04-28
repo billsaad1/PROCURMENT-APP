@@ -12,6 +12,7 @@ namespace JaahdLogistics.Services
         IEnumerable<Project> GetProjects();
         void SaveProject(Project project);
         IEnumerable<PurchaseRequisition> GetPRs();
+        void DeletePR(int id);
         IEnumerable<PurchaseOrder> GetPOs();
         void SavePR(PurchaseRequisition pr);
         void SaveRFQ(RFQ rfq);

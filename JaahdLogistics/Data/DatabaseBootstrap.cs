@@ -42,6 +42,13 @@ namespace JaahdLogistics.Data
                 try { connection.Execute("ALTER TABLE PurchaseRequisitions ADD COLUMN Currency TEXT NOT NULL DEFAULT 'USD'"); } catch { }
                 try { connection.Execute("ALTER TABLE PurchaseRequisitions ADD COLUMN ExchangeRate DECIMAL(18, 4) DEFAULT 1.0"); } catch { }
 
+                // Repair Settings table
+                try { connection.Execute("ALTER TABLE Settings ADD COLUMN Address TEXT"); } catch { }
+                try { connection.Execute("ALTER TABLE Settings ADD COLUMN ContactInfo TEXT"); } catch { }
+                try { connection.Execute("ALTER TABLE Settings ADD COLUMN PRTerms TEXT"); } catch { }
+                try { connection.Execute("ALTER TABLE Settings ADD COLUMN RFQTerms TEXT"); } catch { }
+                try { connection.Execute("ALTER TABLE Settings ADD COLUMN POTerms TEXT"); } catch { }
+
                 // Add signature blob to Users if missing (though it should be there)
                 try { connection.Execute("ALTER TABLE Users ADD COLUMN SignatureImage BLOB"); } catch { }
             }

@@ -3,14 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Application.Resources>
         <ResourceDictionary>
+            <helpers:NullToVisibilityConverter xmlns:helpers="clr-namespace:JaahdLogistics.Helpers" x:Key="NullToVisibilityConverter"/>
+            <helpers:ImageBytesConverter xmlns:helpers="clr-namespace:JaahdLogistics.Helpers" x:Key="ImageBytesConverter"/>
+            <helpers:BindingProxy xmlns:helpers="clr-namespace:JaahdLogistics.Helpers" x:Key="Proxy" Data="{Binding}"/>
+
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Resources/Strings.en.xaml"/>
                 <ResourceDictionary Source="/Resources/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-
-            <helpers:NullToVisibilityConverter xmlns:helpers="clr-namespace:JaahdLogistics.Helpers" x:Key="NullToVisibilityConverter"/>
-            <helpers:ImageBytesConverter xmlns:helpers="clr-namespace:JaahdLogistics.Helpers" x:Key="ImageBytesConverter"/>
-            <helpers:BindingProxy xmlns:helpers="clr-namespace:JaahdLogistics.Helpers" x:Key="Proxy" Data="{Binding}"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

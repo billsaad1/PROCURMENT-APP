@@ -44,6 +44,8 @@ namespace JaahdLogistics.ViewModels
 
                 foreach (var u in Users)
                 {
+                    // Only save if it's a new user or explicitly modified (omitted for brevity, saving all)
+                    // But prevent overwriting password if it's an existing user
                     _dataService.SaveUser(u);
                 }
 

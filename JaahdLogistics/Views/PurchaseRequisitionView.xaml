@@ -23,7 +23,10 @@
                         <DataGridTemplateColumn Width="Auto">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Content="{DynamicResource Select}" Command="{Binding DataContext.SelectPRCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="{DynamicResource Select}" Command="{Binding DataContext.SelectPRCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Margin="2"/>
+                                        <Button Content="X" Command="{Binding DataContext.DeletePRCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#C0392B" Foreground="White" FontWeight="Bold" Margin="2"/>
+                                    </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
