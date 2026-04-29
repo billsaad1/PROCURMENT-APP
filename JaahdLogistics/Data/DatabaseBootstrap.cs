@@ -117,23 +117,30 @@ namespace JaahdLogistics.Data
 
         private void AddColumnIfMissing(SqliteConnection connection, string tableName, string columnName, string columnDefinition)
         {
-            var columns = connection.Query<string>($"PRAGMA table_info({tableName})").Select(c => c.ToLower()).ToList();
             bool exists = false;
-            // Dapper's Query<string> with PRAGMA might return column names in a specific way, let's be safe.
-            // PRAGMA table_info returns rows, where the name is the second column.
-            var tableInfo = connection.Query($"PRAGMA table_info({tableName})");
-            foreach (var row in tableInfo)
+            try
             {
-                if (row.name.ToString().Equals(columnName, StringComparison.OrdinalIgnoreCase))
+                // PRAGMA table_info returns rows, where 'name' is one of the columns.
+                // We use dynamic to handle the multi-column result set.
+                var tableInfo = connection.Query($"PRAGMA table_info({tableName})");
+                foreach (var row in tableInfo)
                 {
-                    exists = true;
-                    break;
+                    // Dapper dynamic rows for SQLite might have properties named 'name'
+                    if (row.name != null && row.name.ToString().Equals(columnName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+
+                if (!exists)
+                {
+                    connection.Execute($"ALTER TABLE {tableName} ADD COLUMN {columnName} {columnDefinition}");
                 }
             }
-
-            if (!exists)
+            catch (Exception ex)
             {
-                connection.Execute($"ALTER TABLE {tableName} ADD COLUMN {columnName} {columnDefinition}");
+                System.Diagnostics.Debug.WriteLine($"Error checking/adding column {columnName} to {tableName}: {ex.Message}");
             }
         }
     }
