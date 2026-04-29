@@ -49,6 +49,12 @@ namespace JaahdLogistics.ViewModels
                     _dataService.SaveUser(u);
                 }
 
+                // Notify MainViewModel to reload settings
+                if (System.Windows.Application.Current.MainWindow.DataContext is MainViewModel mainVM)
+                {
+                    mainVM.ReloadSettings();
+                }
+
                 System.Windows.MessageBox.Show("Settings saved successfully.");
             }
             catch (System.Exception ex)

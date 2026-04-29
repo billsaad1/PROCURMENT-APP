@@ -14,14 +14,17 @@ namespace JaahdLogistics.Helpers
             {
                 var combined = password + GlobalSalt;
                 var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(combined));
-                return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+                // Add a prefix to identify hashed passwords
+                return "$SHA2$" + BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
             }
         }
 
         public static bool VerifyPassword(string password, string hash)
         {
-            // Backward compatibility check for un-salted hashes if any exist
-            if (hash.Length == 64)
+            if (string.IsNullOrEmpty(hash)) return false;
+
+            // Backward compatibility check for un-salted/un-prefixed hashes if any exist
+            if (hash.Length == 64 && !hash.StartsWith("$"))
             {
                 using (var sha256 = SHA256.Create())
                 {

@@ -23,6 +23,11 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private Settings _settings = new();
 
+        public void ReloadSettings()
+        {
+            Settings = _dataService.GetSettings();
+        }
+
         public string ConnectionString { get; }
 
         public MainViewModel(IDataService dataService, LanguageService languageService, string connectionString)

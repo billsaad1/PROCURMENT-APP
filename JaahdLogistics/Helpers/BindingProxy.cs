@@ -2,13 +2,8 @@ using System.Windows;
 
 namespace JaahdLogistics.Helpers
 {
-    public class BindingProxy : Freezable
+    public class BindingProxy : DependencyObject
     {
-        protected override Freezable CreateInstanceCore()
-        {
-            return new BindingProxy();
-        }
-
         public object Data
         {
             get { return (object)GetValue(DataProperty); }
