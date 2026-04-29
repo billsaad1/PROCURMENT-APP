@@ -32,9 +32,16 @@ namespace JaahdLogistics
                 _ = syncService.StartAutoSync();
 
                 // Initialize the global binding proxy
-                // Use TryFindResource or accessing the dictionary by key directly is safer than index
-                var proxy = TryFindResource("Proxy") as JaahdLogistics.Helpers.BindingProxy;
-                if (proxy != null) proxy.Data = mainVM;
+                // The Proxy is in Styles.xaml which is the second MergedDictionary
+                if (Resources.MergedDictionaries.Count > 1)
+                {
+                    var stylesDict = Resources.MergedDictionaries[1];
+                    if (stylesDict.Contains("Proxy"))
+                    {
+                        var proxy = stylesDict["Proxy"] as JaahdLogistics.Helpers.BindingProxy;
+                        if (proxy != null) proxy.Data = mainVM;
+                    }
+                }
 
                 var mainWindow = new MainWindow();
                 mainWindow.DataContext = mainVM;

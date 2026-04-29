@@ -7,6 +7,10 @@ namespace JaahdLogistics.Views
         public SettingsView()
         {
             InitializeComponent();
+            DataContextChanged += (s, e) => {
+                var proxy = Resources["ViewProxy"] as Helpers.BindingProxy;
+                if (proxy != null) proxy.Data = DataContext;
+            };
         }
     }
 }

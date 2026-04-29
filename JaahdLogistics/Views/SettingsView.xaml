@@ -55,7 +55,7 @@
                 <StackPanel>
                     <DataGrid ItemsSource="{Binding Users}" AutoGenerateColumns="False" CanUserAddRows="False" Height="200" Margin="0,0,0,10">
                         <DataGrid.Resources>
-                            <localhelpers:BindingProxy x:Key="ViewProxy" Data="{Binding}" xmlns:localhelpers="clr-namespace:JaahdLogistics.Helpers"/>
+                            <localhelpers:BindingProxy x:Key="ViewProxy" xmlns:localhelpers="clr-namespace:JaahdLogistics.Helpers"/>
                         </DataGrid.Resources>
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Username" Binding="{Binding Username}" Width="100"/>

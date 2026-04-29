@@ -89,7 +89,7 @@
 
                 <DataGrid Grid.Row="3" ItemsSource="{Binding CurrentPR.Items}" AutoGenerateColumns="False" CanUserAddRows="False">
                     <DataGrid.Resources>
-                        <local:BindingProxy x:Key="ViewProxy" Data="{Binding}"/>
+                        <local:BindingProxy x:Key="ViewProxy" />
                     </DataGrid.Resources>
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="{DynamicResource BudgetLine}" Width="120">

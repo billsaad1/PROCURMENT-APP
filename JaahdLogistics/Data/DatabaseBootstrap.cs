@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Microsoft.Data.Sqlite;
 using Dapper;
 
@@ -27,37 +28,37 @@ namespace JaahdLogistics.Data
                 connection.Execute(schema);
 
                 // Repair Projects table
-                try { connection.Execute("ALTER TABLE Projects ADD COLUMN Name TEXT NOT NULL DEFAULT ''"); } catch { }
-                try { connection.Execute("ALTER TABLE Projects ADD COLUMN Code TEXT NOT NULL DEFAULT ''"); } catch { }
-                try { connection.Execute("ALTER TABLE Projects ADD COLUMN Year INTEGER NOT NULL DEFAULT 0"); } catch { }
+                AddColumnIfMissing(connection, "Projects", "Name", "TEXT NOT NULL DEFAULT ''");
+                AddColumnIfMissing(connection, "Projects", "Code", "TEXT NOT NULL DEFAULT ''");
+                AddColumnIfMissing(connection, "Projects", "Year", "INTEGER NOT NULL DEFAULT 0");
 
                 // Repair BudgetLines table
-                try { connection.Execute("ALTER TABLE BudgetLines ADD COLUMN Name TEXT NOT NULL DEFAULT ''"); } catch { }
-                try { connection.Execute("ALTER TABLE BudgetLines ADD COLUMN Unit TEXT"); } catch { }
-                try { connection.Execute("ALTER TABLE BudgetLines ADD COLUMN Quantity DECIMAL(18, 2) NOT NULL DEFAULT 0"); } catch { }
-                try { connection.Execute("ALTER TABLE BudgetLines ADD COLUMN UnitPrice DECIMAL(18, 2) NOT NULL DEFAULT 0"); } catch { }
-                try { connection.Execute("ALTER TABLE BudgetLines ADD COLUMN Currency TEXT NOT NULL DEFAULT 'USD'"); } catch { }
+                AddColumnIfMissing(connection, "BudgetLines", "Name", "TEXT NOT NULL DEFAULT ''");
+                AddColumnIfMissing(connection, "BudgetLines", "Unit", "TEXT");
+                AddColumnIfMissing(connection, "BudgetLines", "Quantity", "DECIMAL(18, 2) NOT NULL DEFAULT 0");
+                AddColumnIfMissing(connection, "BudgetLines", "UnitPrice", "DECIMAL(18, 2) NOT NULL DEFAULT 0");
+                AddColumnIfMissing(connection, "BudgetLines", "Currency", "TEXT NOT NULL DEFAULT 'USD'");
 
                 // Repair PurchaseRequisitions table
-                try { connection.Execute("ALTER TABLE PurchaseRequisitions ADD COLUMN Currency TEXT NOT NULL DEFAULT 'USD'"); } catch { }
-                try { connection.Execute("ALTER TABLE PurchaseRequisitions ADD COLUMN ExchangeRate DECIMAL(18, 4) DEFAULT 1.0"); } catch { }
+                AddColumnIfMissing(connection, "PurchaseRequisitions", "Currency", "TEXT NOT NULL DEFAULT 'USD'");
+                AddColumnIfMissing(connection, "PurchaseRequisitions", "ExchangeRate", "DECIMAL(18, 4) DEFAULT 1.0");
 
                 // Repair Settings table
-                try { connection.Execute("ALTER TABLE Settings ADD COLUMN Address TEXT"); } catch { }
-                try { connection.Execute("ALTER TABLE Settings ADD COLUMN ContactInfo TEXT"); } catch { }
-                try { connection.Execute("ALTER TABLE Settings ADD COLUMN PRTerms TEXT"); } catch { }
-                try { connection.Execute("ALTER TABLE Settings ADD COLUMN RFQTerms TEXT"); } catch { }
-                try { connection.Execute("ALTER TABLE Settings ADD COLUMN POTerms TEXT"); } catch { }
+                AddColumnIfMissing(connection, "Settings", "Address", "TEXT");
+                AddColumnIfMissing(connection, "Settings", "ContactInfo", "TEXT");
+                AddColumnIfMissing(connection, "Settings", "PRTerms", "TEXT");
+                AddColumnIfMissing(connection, "Settings", "RFQTerms", "TEXT");
+                AddColumnIfMissing(connection, "Settings", "POTerms", "TEXT");
 
-                // Add signature blob to Users if missing (though it should be there)
-                try { connection.Execute("ALTER TABLE Users ADD COLUMN SignatureImage BLOB"); } catch { }
+                // Repair Users
+                AddColumnIfMissing(connection, "Users", "SignatureImage", "BLOB");
 
                 // Repair ThreeWayMatch table
-                try { connection.Execute("ALTER TABLE ThreeWayMatch ADD COLUMN InvoiceDetails TEXT"); } catch { }
-                try { connection.Execute("ALTER TABLE ThreeWayMatch ADD COLUMN InvoiceScan BLOB"); } catch { }
+                AddColumnIfMissing(connection, "ThreeWayMatch", "InvoiceDetails", "TEXT");
+                AddColumnIfMissing(connection, "ThreeWayMatch", "InvoiceScan", "BLOB");
 
                 // Repair PurchaseOrders table
-                try { connection.Execute("ALTER TABLE PurchaseOrders ADD COLUMN ProjectId INTEGER NOT NULL DEFAULT 0"); } catch { }
+                AddColumnIfMissing(connection, "PurchaseOrders", "ProjectId", "INTEGER NOT NULL DEFAULT 0");
             }
 
             var userCount = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Users");
@@ -106,10 +107,33 @@ namespace JaahdLogistics.Data
             {
                 CreateUser(connection, username, password, role, fullName);
             }
-            else if (user.PasswordHash == password) // Reset if it's plaintext
+            else if (user.PasswordHash == password || !JaahdLogistics.Helpers.SecurityHelper.VerifyPassword(password, user.PasswordHash))
             {
+                // Reset if it's plaintext OR if verification fails (might happen if salt changed or hash was corrupted)
                 connection.Execute("UPDATE Users SET PasswordHash = @hash, Role = @role, FullName = @fullName WHERE Username = @username",
                     new { hash, username, role, fullName });
+            }
+        }
+
+        private void AddColumnIfMissing(SqliteConnection connection, string tableName, string columnName, string columnDefinition)
+        {
+            var columns = connection.Query<string>($"PRAGMA table_info({tableName})").Select(c => c.ToLower()).ToList();
+            bool exists = false;
+            // Dapper's Query<string> with PRAGMA might return column names in a specific way, let's be safe.
+            // PRAGMA table_info returns rows, where the name is the second column.
+            var tableInfo = connection.Query($"PRAGMA table_info({tableName})");
+            foreach (var row in tableInfo)
+            {
+                if (row.name.ToString().Equals(columnName, StringComparison.OrdinalIgnoreCase))
+                {
+                    exists = true;
+                    break;
+                }
+            }
+
+            if (!exists)
+            {
+                connection.Execute($"ALTER TABLE {tableName} ADD COLUMN {columnName} {columnDefinition}");
             }
         }
     }
