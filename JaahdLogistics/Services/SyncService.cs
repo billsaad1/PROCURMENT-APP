@@ -35,7 +35,12 @@ namespace JaahdLogistics.Services
 
         public async Task SyncWithCloud()
         {
-            if (string.IsNullOrEmpty(_cloudConnectionString)) return;
+            if (string.IsNullOrEmpty(_cloudConnectionString))
+            {
+                // For demo purposes if no connection string is set, simulate work
+                await Task.Delay(1000);
+                return;
+            }
 
             await Task.Run(() =>
             {

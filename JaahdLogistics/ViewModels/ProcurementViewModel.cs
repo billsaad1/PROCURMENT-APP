@@ -49,16 +49,29 @@ namespace JaahdLogistics.ViewModels
         [RelayCommand]
         private void CreateRFQ()
         {
-            if (SelectedPR == null) return;
-            var mainVM = Application.Current.MainWindow.DataContext as MainViewModel;
-            var helper = new NumberingHelper(mainVM?.ConnectionString ?? "Data Source=jaahd.db");
-            CurrentRFQ = new RFQ
+            if (SelectedPR == null || SelectedPR.Id == 0)
             {
-                PRId = SelectedPR.Id,
-                Date = DateTime.Now,
-                RFQNumber = helper.GenerateNumber("RFQ", SelectedPR.ProjectId)
-            };
-            _dataService.SaveRFQ(CurrentRFQ);
+                MessageBox.Show("Please select a valid Purchase Requisition first.");
+                return;
+            }
+
+            try
+            {
+                var mainVM = Application.Current.MainWindow.DataContext as MainViewModel;
+                var helper = new NumberingHelper(mainVM?.ConnectionString ?? "Data Source=jaahd.db");
+                CurrentRFQ = new RFQ
+                {
+                    PRId = SelectedPR.Id,
+                    Date = DateTime.Now,
+                    RFQNumber = helper.GenerateNumber("RFQ", SelectedPR.ProjectId)
+                };
+                _dataService.SaveRFQ(CurrentRFQ);
+                MessageBox.Show($"RFQ {CurrentRFQ.RFQNumber} created successfully.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error creating RFQ: {ex.Message}");
+            }
         }
 
         [RelayCommand]
@@ -133,6 +146,7 @@ namespace JaahdLogistics.ViewModels
             CurrentPO = new PurchaseOrder
             {
                 PRId = SelectedPR.Id,
+                ProjectId = SelectedPR.ProjectId,
                 BidAnalysisId = SkipBidAnalysis ? (int?)null : CurrentBidAnalysis.Id,
                 Date = DateTime.Now,
                 PONumber = helper.GenerateNumber("PO", SelectedPR.ProjectId),

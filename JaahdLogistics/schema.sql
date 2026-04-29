@@ -103,6 +103,7 @@ CREATE TABLE IF NOT EXISTS PurchaseOrders (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
     PONumber TEXT UNIQUE NOT NULL,
     PRId INTEGER NOT NULL,
+    ProjectId INTEGER NOT NULL DEFAULT 0,
     BidAnalysisId INTEGER,
     VendorId INTEGER, -- Points to Bidders(Id)
     Date DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -153,6 +154,8 @@ CREATE TABLE IF NOT EXISTS ThreeWayMatch (
     POId INTEGER NOT NULL,
     GRNId INTEGER NOT NULL,
     InvoiceNumber TEXT,
+    InvoiceDetails TEXT,
+    InvoiceScan BLOB,
     Date DATETIME DEFAULT CURRENT_TIMESTAMP,
     Status TEXT DEFAULT 'Pending', -- Pending, LogisticsApproved, FinanceApproved, PMApproved
     FOREIGN KEY (POId) REFERENCES PurchaseOrders(Id),

@@ -11,7 +11,13 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="{DynamicResource Dashboard}" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>
+        <Grid Margin="0,0,0,20">
+            <TextBlock Text="{DynamicResource Dashboard}" FontSize="24" FontWeight="Bold"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <TextBlock Text="{Binding SyncStatus}" VerticalAlignment="Center" Margin="0,0,10,0" Opacity="0.7"/>
+                <Button Content="Sync Now" Command="{Binding SyncNowCommand}" IsEnabled="{Binding IsSyncing, Converter={StaticResource InverseBooleanConverter}}" Padding="10,5"/>
+            </StackPanel>
+        </Grid>
 
         <GroupBox Grid.Row="1" Header="{DynamicResource MyPRStatus}">
             <DataGrid ItemsSource="{Binding UserPRs}" AutoGenerateColumns="False" IsReadOnly="True">

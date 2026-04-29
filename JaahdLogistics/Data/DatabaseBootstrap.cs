@@ -51,6 +51,13 @@ namespace JaahdLogistics.Data
 
                 // Add signature blob to Users if missing (though it should be there)
                 try { connection.Execute("ALTER TABLE Users ADD COLUMN SignatureImage BLOB"); } catch { }
+
+                // Repair ThreeWayMatch table
+                try { connection.Execute("ALTER TABLE ThreeWayMatch ADD COLUMN InvoiceDetails TEXT"); } catch { }
+                try { connection.Execute("ALTER TABLE ThreeWayMatch ADD COLUMN InvoiceScan BLOB"); } catch { }
+
+                // Repair PurchaseOrders table
+                try { connection.Execute("ALTER TABLE PurchaseOrders ADD COLUMN ProjectId INTEGER NOT NULL DEFAULT 0"); } catch { }
             }
 
             var userCount = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Users");

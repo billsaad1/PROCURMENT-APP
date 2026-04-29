@@ -49,5 +49,24 @@ namespace JaahdLogistics.ViewModels
             _dataService.SaveThreeWayMatch(CurrentMatch);
             System.Windows.MessageBox.Show("Three-Way Match Verified Successfully");
         }
+
+        [RelayCommand]
+        private void UploadInvoiceScan()
+        {
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+            {
+                CurrentMatch.InvoiceScan = System.IO.File.ReadAllBytes(openFileDialog.FileName);
+                OnPropertyChanged(nameof(CurrentMatch));
+            }
+        }
+
+        [RelayCommand]
+        private void Save()
+        {
+            if (CurrentMatch.POId == 0) return;
+            _dataService.SaveThreeWayMatch(CurrentMatch);
+            System.Windows.MessageBox.Show("Saved Successfully");
+        }
     }
 }

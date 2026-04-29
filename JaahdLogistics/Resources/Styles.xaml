@@ -4,6 +4,7 @@
 
     <helpers:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
     <helpers:ImageBytesConverter x:Key="ImageBytesConverter"/>
+    <helpers:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
     <helpers:BindingProxy x:Key="Proxy"/>
 
     <!-- Professional Color Palette -->
@@ -253,19 +254,31 @@
                 <UniformGrid Grid.Row="5" Columns="4" Margin="0,40,0,0">
                     <StackPanel HorizontalAlignment="Center">
                         <TextBlock Text="Logistics" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5"/>
+                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5">
+                             <Image Source="{Binding CurrentPO.LogisticsSignature, Converter={StaticResource ImageBytesConverter}}"/>
+                        </Border>
+                        <TextBlock Text="{Binding CurrentPO.LogisticsName}" FontSize="10" HorizontalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Center">
                         <TextBlock Text="Finance" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5"/>
+                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5">
+                             <Image Source="{Binding CurrentPO.FinanceSignature, Converter={StaticResource ImageBytesConverter}}"/>
+                        </Border>
+                        <TextBlock Text="{Binding CurrentPO.FinanceName}" FontSize="10" HorizontalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Center">
                         <TextBlock Text="Project Manager" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5"/>
+                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5">
+                             <Image Source="{Binding CurrentPO.PMSignature, Converter={StaticResource ImageBytesConverter}}"/>
+                        </Border>
+                        <TextBlock Text="{Binding CurrentPO.PMName}" FontSize="10" HorizontalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Center">
                         <TextBlock Text="Approved By" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5"/>
+                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5">
+                             <Image Source="{Binding CurrentPO.FinalSignature, Converter={StaticResource ImageBytesConverter}}"/>
+                        </Border>
+                        <TextBlock Text="{Binding CurrentPO.FinalName}" FontSize="10" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </UniformGrid>
             </Grid>

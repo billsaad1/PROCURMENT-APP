@@ -16,6 +16,18 @@ namespace JaahdLogistics.Models
         public string? Terms { get; set; }
         public string Status { get; set; } = "Pending";
         public ObservableCollection<POItem> Items { get; set; } = new();
+
+        public byte[]? LogisticsSignature { get; set; }
+        public byte[]? FinanceSignature { get; set; }
+        public byte[]? PMSignature { get; set; }
+        public byte[]? FinalSignature { get; set; }
+
+        public string? LogisticsName { get; set; }
+        public string? FinanceName { get; set; }
+        public string? PMName { get; set; }
+        public string? FinalName { get; set; }
+
+        public decimal TotalAmount => Items.Sum(i => i.TotalPrice);
     }
 
     public class POItem : CommunityToolkit.Mvvm.ComponentModel.ObservableObject

@@ -68,7 +68,10 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <Button Content="{DynamicResource CreatePO}" Command="{Binding CreatePOCommand}" Margin="0,0,0,10"/>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <Button Content="{DynamicResource CreatePO}" Command="{Binding CreatePOCommand}"/>
+                    <CheckBox Content="Direct Purchase (Skip RFQ/Bid Analysis)" IsChecked="{Binding SkipBidAnalysis}" VerticalAlignment="Center" Margin="20,0,0,0"/>
+                </StackPanel>
 
                 <ScrollViewer Grid.Row="1" x:Name="POPrintRoot">
                     <Grid Margin="15" Background="White">

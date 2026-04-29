@@ -165,6 +165,16 @@ namespace JaahdLogistics.Services
             {
                 var items = connection.Query<POItem>("SELECT * FROM POItems WHERE POId = @Id", new { po.Id }).ToList();
                 po.Items = new ObservableCollection<POItem>(items);
+
+                // Load Approvals for PO
+                var approvals = GetApprovals("PO", po.Id);
+                foreach (var app in approvals)
+                {
+                    if (app.Status == "CheckedByLogistics") { po.LogisticsSignature = app.SignatureImage; po.LogisticsName = app.FullName; }
+                    if (app.Status == "ReviewedByFinance") { po.FinanceSignature = app.SignatureImage; po.FinanceName = app.FullName; }
+                    if (app.Status == "ApprovedByPM") { po.PMSignature = app.SignatureImage; po.PMName = app.FullName; }
+                    if (app.Status == "FinalApproved") { po.FinalSignature = app.SignatureImage; po.FinalName = app.FullName; }
+                }
             }
             return pos;
         }
@@ -242,8 +252,8 @@ namespace JaahdLogistics.Services
                 if (po.Id == 0)
                 {
                     po.Id = connection.QuerySingle<int>(
-                        "INSERT INTO PurchaseOrders (PONumber, PRId, BidAnalysisId, VendorId, Date, Terms, Status) " +
-                        "VALUES (@PONumber, @PRId, @BidAnalysisId, @VendorId, @Date, @Terms, @Status); SELECT last_insert_rowid();",
+                        "INSERT INTO PurchaseOrders (PONumber, PRId, ProjectId, BidAnalysisId, VendorId, Date, Terms, Status) " +
+                        "VALUES (@PONumber, @PRId, @ProjectId, @BidAnalysisId, @VendorId, @Date, @Terms, @Status); SELECT last_insert_rowid();",
                         po, transaction);
                 }
                 else
@@ -456,8 +466,8 @@ namespace JaahdLogistics.Services
                             new { AcceptedQuantity = item.AcceptedQuantity, Id = existing.Value }, transaction);
                     } else {
                         connection.Execute(
-                            "INSERT INTO Inventory (ItemDescription, ProjectId, CurrentQuantity) VALUES (@Description, @ProjectId, @AcceptedQuantity)",
-                            new { Description = poItem.Description, ProjectId = po.ProjectId, AcceptedQuantity = item.AcceptedQuantity }, transaction);
+                            "INSERT INTO Inventory (ItemDescription, ProjectId, CurrentQuantity, Unit) VALUES (@Description, @ProjectId, @AcceptedQuantity, @Unit)",
+                            new { Description = poItem.Description, ProjectId = po.ProjectId, AcceptedQuantity = item.AcceptedQuantity, Unit = poItem.Unit }, transaction);
                     }
                 }
                 transaction.Commit();
@@ -479,13 +489,14 @@ namespace JaahdLogistics.Services
             if (match.Id == 0)
             {
                 connection.Execute(
-                    "INSERT INTO ThreeWayMatch (POId, GRNId, InvoiceNumber, Date, Status) " +
-                    "VALUES (@POId, @GRNId, @InvoiceNumber, @Date, @Status)", match);
+                    "INSERT INTO ThreeWayMatch (POId, GRNId, InvoiceNumber, InvoiceDetails, InvoiceScan, Date, Status) " +
+                    "VALUES (@POId, @GRNId, @InvoiceNumber, @InvoiceDetails, @InvoiceScan, @Date, @Status)", match);
             }
             else
             {
                 connection.Execute(
-                    "UPDATE ThreeWayMatch SET POId=@POId, GRNId=@GRNId, InvoiceNumber=@InvoiceNumber, Status=@Status WHERE Id=@Id", match);
+                    "UPDATE ThreeWayMatch SET POId=@POId, GRNId=@GRNId, InvoiceNumber=@InvoiceNumber, " +
+                    "InvoiceDetails=@InvoiceDetails, InvoiceScan=@InvoiceScan, Status=@Status WHERE Id=@Id", match);
             }
         }
 
