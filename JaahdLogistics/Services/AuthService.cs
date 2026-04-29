@@ -26,7 +26,9 @@ namespace JaahdLogistics.Services
             if (CurrentUser == null) return false;
             return CurrentUser.Role == "LogisticsManager" ||
                    CurrentUser.Role == "FinanceManager" ||
-                   CurrentUser.Role == "HeadOfAssociation";
+                   CurrentUser.Role == "ProjectManager" ||
+                   CurrentUser.Role == "HeadOfAssociation" ||
+                   CurrentUser.Role == "Admin";
         }
     }
 }

@@ -42,8 +42,16 @@ namespace JaahdLogistics.ViewModels
         {
             _dataService = dataService;
             _settings = _dataService.GetSettings();
-            // Load PRs that are ready for procurement (Approved)
-            _approvedPRs = new ObservableCollection<PurchaseRequisition>(_dataService.GetPRs().Where(p => p.Status == "FinalApproved"));
+            LoadApprovedPRs();
+        }
+
+        private void LoadApprovedPRs()
+        {
+            // Load PRs that are ready for procurement (FinalApproved)
+            // and don't already have an RFQ or a PO (unless we want to allow multiple RFQs per PR, but usually 1:1 for this flow)
+            // For now, just load all FinalApproved PRs.
+            var prs = _dataService.GetPRs().Where(p => p.Status == "FinalApproved").ToList();
+            ApprovedPRs = new ObservableCollection<PurchaseRequisition>(prs);
         }
 
         [RelayCommand]
@@ -175,7 +183,7 @@ namespace JaahdLogistics.ViewModels
 
             _dataService.SavePO(CurrentPO);
             MessageBox.Show("Purchase Order Created Successfully");
-            OnPropertyChanged(nameof(ApprovedPRs)); // Refresh list
+            LoadApprovedPRs(); // Refresh list to remove the PR we just processed (if we implement exclusion)
         }
 
         [RelayCommand]

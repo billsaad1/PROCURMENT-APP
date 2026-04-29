@@ -72,6 +72,7 @@ namespace JaahdLogistics.Data
 
                 connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('admin', @adminHash, 'Admin', 'System Administrator')", new { adminHash });
                 connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('pm', @pmHash, 'ProjectManager', 'Project Manager')", new { pmHash });
+                connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('log', @procHash, 'LogisticsManager', 'Logistics Manager')", new { procHash });
                 connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('proc', @procHash, 'ProcurementManager', 'Procurement Manager')", new { procHash });
                 connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('fin', @finHash, 'FinanceManager', 'Finance Manager')", new { finHash });
                 connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('store', @storeHash, 'Storekeeper', 'Storekeeper')", new { storeHash });
