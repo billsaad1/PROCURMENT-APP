@@ -97,7 +97,12 @@ namespace JaahdLogistics.ViewModels
 
         private void LoadPRs()
         {
-            PurchaseRequisitions = new ObservableCollection<PurchaseRequisition>(_dataService.GetPRs());
+            var prs = _dataService.GetPRs();
+            PurchaseRequisitions.Clear();
+            foreach (var pr in prs)
+            {
+                PurchaseRequisitions.Add(pr);
+            }
         }
 
         partial void OnSelectedProjectChanged(Project? value)

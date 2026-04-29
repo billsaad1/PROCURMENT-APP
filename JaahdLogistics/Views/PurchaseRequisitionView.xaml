@@ -178,7 +178,8 @@
                     <TextBlock Text="{Binding CurrentPR.Status}" VerticalAlignment="Center" Margin="0,0,20,0" FontWeight="Bold" Foreground="{StaticResource SecondaryBlueBrush}"/>
                     <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
                     <Button Content="{DynamicResource Approve}" Command="{Binding ApproveCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
-                    <Button Content="{DynamicResource Save}" Command="{Binding SavePRCommand}" Width="120" Height="35"/>
+            <Button Content="{DynamicResource Save}" Command="{Binding SavePRCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
+            <Button Content="X" Command="{Binding DeletePRCommand}" CommandParameter="{Binding CurrentPR}" Width="50" Height="35" Background="#C0392B" Foreground="White" FontWeight="Bold"/>
                 </StackPanel>
             </Grid>
         </TabItem>
