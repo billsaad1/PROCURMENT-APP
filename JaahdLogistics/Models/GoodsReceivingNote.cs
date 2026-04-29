@@ -11,6 +11,7 @@ namespace JaahdLogistics.Models
         public DateTime Date { get; set; }
         public int ReceiverId { get; set; }
         public string Status { get; set; } = "Completed";
+        public List<GRNItems> Items { get; set; } = new();
     }
 
     public class GRNItems

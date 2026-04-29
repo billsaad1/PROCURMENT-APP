@@ -38,14 +38,14 @@
     <s:String x:Key="Generate">توليد</s:String>
     <s:String x:Key="RFQNumber">رقم طلب عروض الأسعار</s:String>
     <s:String x:Key="RFQDetailsPlaceholder">ستظهر تفاصيل طلب عروض الأسعار والأصناف هنا.</s:String>
-    <s:String x:Key="BidAnalysisPlaceholder">منطق تحليل ومقارنة العروض.</s:String>
-    <s:String x:Key="POPlaceholder">توليد وتفاصيل أمر الشراء.</s:String>
+    <s:String x:Key="CreateNew">إنشاء جديد</s:String>
     <s:String x:Key="AddBidder">إضافة مقدم عرض</s:String>
     <s:String x:Key="RecommendedBidder">مقدم العرض الموصى به</s:String>
     <s:String x:Key="CreatePO">إنشاء أمر شراء</s:String>
     <s:String x:Key="GRN">إشعار استلام بضائع</s:String>
     <s:String x:Key="SelectPO">اختر أمر الشراء</s:String>
     <s:String x:Key="CreateGRN">إنشاء إشعار استلام</s:String>
+    <s:String x:Key="GRNList">قائمة إشعارات الاستلام</s:String>
     <s:String x:Key="OrderedQty">الكمية المطلوبة</s:String>
     <s:String x:Key="ReceivedQty">الكمية المستلمة</s:String>
     <s:String x:Key="AcceptedQty">الكمية المقبولة</s:String>
@@ -53,6 +53,7 @@
     <s:String x:Key="RejectReason">سبب الرفض</s:String>
     <s:String x:Key="SaveGRN">حفظ إشعار الاستلام</s:String>
     <s:String x:Key="ThreeWayMatch">المطابقة الثلاثية</s:String>
+    <s:String x:Key="MatchList">قائمة المطابقات</s:String>
     <s:String x:Key="Verify">تحقق</s:String>
     <s:String x:Key="MatchDetailsPlaceholder">تظهر هنا المقارنة بين طلب الشراء وأمر الشراء وإشعار الاستلام.</s:String>
     <s:String x:Key="AssociationInfo">معلومات الجمعية</s:String>
@@ -66,6 +67,10 @@
     <s:String x:Key="Dashboard">لوحة التحكم</s:String>
     <s:String x:Key="MyPRStatus">حالة طلباتي</s:String>
     <s:String x:Key="Reports">التقارير</s:String>
+    <s:String x:Key="List">القائمة</s:String>
+    <s:String x:Key="Details">التفاصيل</s:String>
+    <s:String x:Key="Delete">حذف</s:String>
+    <s:String x:Key="New">جديد</s:String>
     <s:String x:Key="PRList">قائمة طلبات الشراء</s:String>
     <s:String x:Key="PREdit">إنشاء/تعديل طلب الشراء</s:String>
     <s:String x:Key="NewPR">طلب جديد</s:String>

@@ -6,51 +6,83 @@
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Margin="15">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-        <TextBlock Text="{DynamicResource ThreeWayMatch}" FontSize="22" FontWeight="Bold" Margin="0,0,0,15"/>
-
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,15">
-            <TextBlock Text="{DynamicResource SelectPO}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-            <ComboBox ItemsSource="{Binding CompletedPOs}" SelectedItem="{Binding SelectedPO}" DisplayMemberPath="PONumber" Width="200"/>
-            <Button Content="{DynamicResource Verify}" Command="{Binding VerifyMatchCommand}" Margin="10,0,0,0"/>
-        </StackPanel>
-
-        <Border Grid.Row="2" BorderBrush="Gray" BorderThickness="1" Padding="15">
-            <StackPanel>
-                <TextBlock Text="{Binding CurrentMatch.Status}" FontSize="18" Foreground="Green" FontWeight="Bold" Margin="0,0,0,15"/>
-
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <TextBlock Text="Invoice Number:" Margin="5"/>
-                    <TextBox Grid.Column="1" Text="{Binding CurrentMatch.InvoiceNumber}" Margin="5"/>
-
-                    <TextBlock Grid.Row="1" Text="Invoice Details:" Margin="5"/>
-                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding CurrentMatch.InvoiceDetails}" Height="60" TextWrapping="Wrap" Margin="5"/>
-
-                    <TextBlock Grid.Row="2" Text="Invoice Scan:" Margin="5"/>
-                    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
-                        <Button Content="Upload Scan" Command="{Binding UploadInvoiceScanCommand}" Margin="5"/>
-                        <TextBlock Text="File uploaded" Visibility="{Binding CurrentMatch.InvoiceScan, Converter={StaticResource NullToVisibilityConverter}}" VerticalAlignment="Center" Margin="10,0,0,0" Foreground="Gray"/>
-                    </StackPanel>
-
-                    <Button Grid.Row="3" Grid.Column="1" Content="Save Match Details" Command="{Binding SaveCommand}" HorizontalAlignment="Left" Margin="5,15,5,5"/>
-                </Grid>
+        <!-- Left Side: List -->
+        <Grid Margin="0,0,10,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock Text="{DynamicResource MatchList}" FontWeight="Bold" VerticalAlignment="Center"/>
+                <Button Content="{DynamicResource New}" Command="{Binding NewMatchCommand}" Margin="10,0,0,0"/>
             </StackPanel>
-        </Border>
+            <DataGrid Grid.Row="1" ItemsSource="{Binding Matches}" SelectedItem="{Binding SelectedMatch}" AutoGenerateColumns="False" IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Invoice #" Binding="{Binding InvoiceNumber}" Width="*"/>
+                    <DataGridTemplateColumn Width="Auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="X" Command="{Binding DataContext.DeleteMatchCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#C0392B"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <!-- Right Side: Details -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="{DynamicResource ThreeWayMatch}" FontSize="22" FontWeight="Bold" Margin="0,0,0,15"/>
+
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,15">
+                <TextBlock Text="{DynamicResource SelectPO}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <ComboBox ItemsSource="{Binding CompletedPOs}" SelectedItem="{Binding SelectedPO}" DisplayMemberPath="PONumber" Width="200"/>
+                <Button Content="{DynamicResource Verify}" Command="{Binding VerifyMatchCommand}" Margin="10,0,0,0"/>
+            </StackPanel>
+
+            <Border Grid.Row="2" BorderBrush="Gray" BorderThickness="1" Padding="15">
+                <StackPanel>
+                    <TextBlock Text="{Binding CurrentMatch.Status}" FontSize="18" Foreground="Green" FontWeight="Bold" Margin="0,0,0,15"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Invoice Number:" Margin="5"/>
+                        <TextBox Grid.Column="1" Text="{Binding CurrentMatch.InvoiceNumber}" Margin="5"/>
+
+                        <TextBlock Grid.Row="1" Text="Invoice Details:" Margin="5"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding CurrentMatch.InvoiceDetails}" Height="60" TextWrapping="Wrap" Margin="5"/>
+
+                        <TextBlock Grid.Row="2" Text="Invoice Scan:" Margin="5"/>
+                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                            <Button Content="Upload Scan" Command="{Binding UploadInvoiceScanCommand}" Margin="5"/>
+                            <TextBlock Text="File uploaded" Visibility="{Binding CurrentMatch.InvoiceScan, Converter={StaticResource NullToVisibilityConverter}}" VerticalAlignment="Center" Margin="10,0,0,0" Foreground="Gray"/>
+                        </StackPanel>
+
+                        <Button Grid.Row="3" Grid.Column="1" Content="Save Match Details" Command="{Binding SaveCommand}" HorizontalAlignment="Left" Margin="5,15,5,5"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </UserControl>

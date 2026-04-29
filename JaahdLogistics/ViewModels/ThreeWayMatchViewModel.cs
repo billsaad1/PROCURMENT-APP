@@ -20,10 +20,62 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private ThreeWayMatch _currentMatch = new();
 
+        [ObservableProperty]
+        private ObservableCollection<ThreeWayMatch> _matches = new();
+
+        [ObservableProperty]
+        private ThreeWayMatch? _selectedMatch;
+
         public ThreeWayMatchViewModel(IDataService dataService)
         {
             _dataService = dataService;
-            _completedPOs = new ObservableCollection<PurchaseOrder>(_dataService.GetPOs().Where(p => p.Status == "FinalApproved"));
+            RefreshAll();
+        }
+
+        [RelayCommand]
+        public void RefreshAll()
+        {
+            LoadCompletedPOs();
+            LoadMatches();
+        }
+
+        private void LoadCompletedPOs()
+        {
+            CompletedPOs = new ObservableCollection<PurchaseOrder>(_dataService.GetPOs().Where(p => p.Status == "FinalApproved"));
+        }
+
+        private void LoadMatches()
+        {
+            Matches = new ObservableCollection<ThreeWayMatch>(_dataService.GetThreeWayMatches());
+        }
+
+        partial void OnSelectedMatchChanged(ThreeWayMatch? value)
+        {
+            if (value != null)
+            {
+                CurrentMatch = value;
+                SelectedPO = CompletedPOs.FirstOrDefault(p => p.Id == value.POId);
+            }
+        }
+
+        [RelayCommand]
+        private void NewMatch()
+        {
+            CurrentMatch = new ThreeWayMatch();
+            SelectedPO = null;
+        }
+
+        [RelayCommand]
+        private void DeleteMatch(ThreeWayMatch match)
+        {
+            if (match == null) return;
+            var result = System.Windows.MessageBox.Show("Delete this Match record?", "Confirm", System.Windows.MessageBoxButton.YesNo);
+            if (result == System.Windows.MessageBoxResult.Yes)
+            {
+                _dataService.DeleteThreeWayMatch(match.Id);
+                LoadMatches();
+                if (CurrentMatch.Id == match.Id) NewMatch();
+            }
         }
 
         [RelayCommand]
@@ -67,6 +119,7 @@ namespace JaahdLogistics.ViewModels
             if (CurrentMatch.POId == 0) return;
             _dataService.SaveThreeWayMatch(CurrentMatch);
             System.Windows.MessageBox.Show("Saved Successfully");
+            LoadMatches();
         }
     }
 }

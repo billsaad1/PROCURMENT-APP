@@ -21,10 +21,28 @@ namespace JaahdLogistics.ViewModels
         private PurchaseRequisition? _selectedPR;
 
         [ObservableProperty]
+        private ObservableCollection<RFQ> _rFQs = new();
+
+        [ObservableProperty]
+        private RFQ? _selectedRFQ;
+
+        [ObservableProperty]
         private RFQ _currentRFQ = new();
 
         [ObservableProperty]
+        private ObservableCollection<BidAnalysis> _bidAnalyses = new();
+
+        [ObservableProperty]
+        private BidAnalysis? _selectedBidAnalysis;
+
+        [ObservableProperty]
         private BidAnalysis _currentBidAnalysis = new();
+
+        [ObservableProperty]
+        private ObservableCollection<PurchaseOrder> _pOs = new();
+
+        [ObservableProperty]
+        private PurchaseOrder? _selectedPO;
 
         [ObservableProperty]
         private PurchaseOrder _currentPO = new();
@@ -38,11 +56,36 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private Settings _settings;
 
+        [ObservableProperty]
+        private int _selectedTabIndex;
+
         public ProcurementViewModel(IDataService dataService)
         {
             _dataService = dataService;
             _settings = _dataService.GetSettings();
-            LoadApprovedPRs();
+            RefreshAll();
+        }
+
+        [RelayCommand]
+        private void NewRFQ()
+        {
+            CurrentRFQ = new RFQ();
+            SelectedPR = null;
+        }
+
+        [RelayCommand]
+        private void DeleteRFQ(RFQ rfq)
+        {
+            if (rfq == null) return;
+            var result = MessageBox.Show($"Delete RFQ {rfq.RFQNumber}?", "Confirm", MessageBoxButton.YesNo);
+            if (result == MessageBoxResult.Yes)
+            {
+                try {
+                    _dataService.DeleteRFQ(rfq.Id);
+                    LoadRFQs();
+                    if (CurrentRFQ.Id == rfq.Id) NewRFQ();
+                } catch (Exception ex) { MessageBox.Show(ex.Message); }
+            }
         }
 
         [RelayCommand]
@@ -65,6 +108,7 @@ namespace JaahdLogistics.ViewModels
                     RFQNumber = helper.GenerateNumber("RFQ", SelectedPR.ProjectId)
                 };
                 _dataService.SaveRFQ(CurrentRFQ);
+                LoadRFQs();
                 MessageBox.Show($"RFQ {CurrentRFQ.RFQNumber} created successfully.");
             }
             catch (Exception ex)
@@ -74,13 +118,33 @@ namespace JaahdLogistics.ViewModels
         }
 
         [RelayCommand]
+        private void NewBidAnalysis()
+        {
+            CurrentBidAnalysis = new BidAnalysis();
+            Bidders = new ObservableCollection<Bidder>();
+        }
+
+        [RelayCommand]
+        private void DeleteBidAnalysis(BidAnalysis analysis)
+        {
+            if (analysis == null) return;
+            var result = MessageBox.Show("Delete this Bid Analysis?", "Confirm", MessageBoxButton.YesNo);
+            if (result == MessageBoxResult.Yes)
+            {
+                try {
+                    _dataService.DeleteBidAnalysis(analysis.Id);
+                    LoadBidAnalyses();
+                    if (CurrentBidAnalysis.Id == analysis.Id) NewBidAnalysis();
+                } catch (Exception ex) { MessageBox.Show(ex.Message); }
+            }
+        }
+
+        [RelayCommand]
         private void CreateBidAnalysis()
         {
-            if (CurrentRFQ.Id == 0) return;
+            if (CurrentRFQ.Id == 0) { MessageBox.Show("Please select an RFQ first."); return; }
             CurrentBidAnalysis = new BidAnalysis { RFQId = CurrentRFQ.Id, Date = DateTime.Now };
             Bidders = new ObservableCollection<Bidder>();
-
-            // Suggesting bidders based on historical vendors or empty
             AddBidder();
         }
 
@@ -103,12 +167,34 @@ namespace JaahdLogistics.ViewModels
         {
             CurrentBidAnalysis.Bidders = new ObservableCollection<Bidder>(Bidders.ToList());
             _dataService.SaveBidAnalysis(CurrentBidAnalysis);
+            LoadBidAnalyses();
+        }
+
+        [RelayCommand]
+        private void NewPO()
+        {
+            CurrentPO = new PurchaseOrder();
+        }
+
+        [RelayCommand]
+        private void DeletePO(PurchaseOrder po)
+        {
+            if (po == null) return;
+            var result = MessageBox.Show($"Delete PO {po.PONumber}?", "Confirm", MessageBoxButton.YesNo);
+            if (result == MessageBoxResult.Yes)
+            {
+                try {
+                    _dataService.DeletePO(po.Id);
+                    LoadPOs();
+                    if (CurrentPO.Id == po.Id) NewPO();
+                } catch (Exception ex) { MessageBox.Show(ex.Message); }
+            }
         }
 
         [RelayCommand]
         private void CreatePO()
         {
-            if (SelectedPR == null) return;
+            if (SelectedPR == null) { MessageBox.Show("Please select a Purchase Requisition first."); return; }
 
             // Budget Check for PO
             foreach (var item in SelectedPR.Items)
@@ -174,6 +260,7 @@ namespace JaahdLogistics.ViewModels
 
             _dataService.SavePO(CurrentPO);
             MessageBox.Show("Purchase Order Created Successfully");
+            LoadPOs();
             LoadApprovedPRs(); // Refresh list to remove the PR we just processed (if we implement exclusion)
         }
 
@@ -214,19 +301,74 @@ namespace JaahdLogistics.ViewModels
         }
 
         [RelayCommand]
+        public void RefreshAll()
+        {
+            LoadApprovedPRs();
+            LoadRFQs();
+            LoadBidAnalyses();
+            LoadPOs();
+        }
+
+        [RelayCommand]
         public void LoadApprovedPRs()
         {
-            // Load PRs that are ready for procurement (FinalApproved)
-            // and don't already have an RFQ or a PO (unless we want to allow multiple RFQs per PR, but usually 1:1 for this flow)
-            // For now, just load all FinalApproved PRs.
             var prs = _dataService.GetPRs().Where(p => p.Status == "FinalApproved").ToList();
             ApprovedPRs = new ObservableCollection<PurchaseRequisition>(prs);
         }
 
         [RelayCommand]
+        public void LoadRFQs()
+        {
+            RFQs = new ObservableCollection<RFQ>(_dataService.GetRFQs());
+        }
+
+        [RelayCommand]
+        public void LoadBidAnalyses()
+        {
+            BidAnalyses = new ObservableCollection<BidAnalysis>(_dataService.GetBidAnalyses());
+        }
+
+        [RelayCommand]
+        public void LoadPOs()
+        {
+            POs = new ObservableCollection<PurchaseOrder>(_dataService.GetPOs());
+        }
+
+        partial void OnSelectedRFQChanged(RFQ? value)
+        {
+            if (value != null)
+            {
+                CurrentRFQ = value;
+                var pr = _dataService.GetPRs().FirstOrDefault(p => p.Id == value.PRId);
+                SelectedPR = pr;
+            }
+        }
+
+        partial void OnSelectedBidAnalysisChanged(BidAnalysis? value)
+        {
+            if (value != null)
+            {
+                CurrentBidAnalysis = value;
+                Bidders = value.Bidders;
+            }
+        }
+
+        partial void OnSelectedPOChanged(PurchaseOrder? value)
+        {
+            if (value != null)
+            {
+                CurrentPO = value;
+            }
+        }
+
+        [RelayCommand]
         private void Print()
         {
-            new PrintService().ShowPreview(this, "POPrintTemplate");
+            string template = "POPrintTemplate";
+            if (SelectedTabIndex == 0) template = "RFQPrintTemplate";
+            else if (SelectedTabIndex == 1) template = "BidAnalysisPrintTemplate";
+
+            new PrintService().ShowPreview(this, template);
         }
     }
 }

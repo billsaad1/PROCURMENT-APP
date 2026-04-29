@@ -197,6 +197,143 @@
         </Border>
     </ControlTemplate>
 
+    <ControlTemplate x:Key="RFQPrintTemplate">
+        <Border Background="White" Width="793" Height="1122" Padding="40">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Grid Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Source="{Binding Data.Settings.LogoImage, Source={StaticResource Proxy}, Converter={StaticResource ImageBytesConverter}}" Height="80" Width="80"/>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="20,0,0,0">
+                        <TextBlock Text="{Binding Data.Settings.AssociationName, Source={StaticResource Proxy}}" FontSize="20" FontWeight="Bold"/>
+                        <TextBlock Text="Request for Quotation" FontSize="16" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Grid>
+
+                <Separator Grid.Row="1" Margin="0,0,0,20"/>
+
+                <Grid Grid.Row="2" Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="RFQ Number:" FontWeight="Bold" Margin="5"/>
+                    <TextBlock Grid.Column="1" Text="{Binding CurrentRFQ.RFQNumber}" Margin="5"/>
+                    <TextBlock Grid.Column="2" Text="Closing Date:" FontWeight="Bold" Margin="5"/>
+                    <TextBlock Grid.Column="3" Text="{Binding CurrentRFQ.ClosingDate, StringFormat=d}" Margin="5"/>
+                </Grid>
+
+                <!-- Items -->
+                <DataGrid Grid.Row="3" ItemsSource="{Binding SelectedPR.Items}" AutoGenerateColumns="False"
+                          IsReadOnly="True" BorderThickness="1" BorderBrush="Black">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
+                        <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="80"/>
+                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="80"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!-- Terms -->
+                <StackPanel Grid.Row="4" Margin="0,20,0,0">
+                    <TextBlock Text="Terms &amp; Conditions:" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding CurrentRFQ.Terms}" TextWrapping="Wrap" Margin="5"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </ControlTemplate>
+
+    <ControlTemplate x:Key="BidAnalysisPrintTemplate">
+        <Border Background="White" Width="793" Height="1122" Padding="40">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Grid Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Source="{Binding Data.Settings.LogoImage, Source={StaticResource Proxy}, Converter={StaticResource ImageBytesConverter}}" Height="80" Width="80"/>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="20,0,0,0">
+                        <TextBlock Text="{Binding Data.Settings.AssociationName, Source={StaticResource Proxy}}" FontSize="20" FontWeight="Bold"/>
+                        <TextBlock Text="Bid Analysis / Comparison" FontSize="16" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Grid>
+
+                <Separator Grid.Row="1" Margin="0,0,0,20"/>
+
+                <Grid Grid.Row="2" Margin="0,0,0,10">
+                    <TextBlock Text="Analysis for RFQ: " FontWeight="Bold" HorizontalAlignment="Left"/>
+                    <TextBlock Text="{Binding CurrentRFQ.RFQNumber}" Margin="110,0,0,0"/>
+                </Grid>
+
+                <!-- Bidders Comparison -->
+                <ItemsControl Grid.Row="3" ItemsSource="{Binding Bidders}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,0,0,15">
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold" Background="#EEE" Padding="5"/>
+                                <DataGrid ItemsSource="{Binding Items}" AutoGenerateColumns="False" IsReadOnly="True" BorderThickness="0,0,0,1">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
+                                        <DataGridTextColumn Header="Qty" Binding="{Binding Quantity}" Width="50"/>
+                                        <DataGridTextColumn Header="Price" Binding="{Binding UnitPrice}" Width="80"/>
+                                        <DataGridTextColumn Header="Total" Binding="{Binding TotalPrice}" Width="80"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <StackPanel Grid.Row="4" Margin="0,10">
+                    <TextBlock Text="Justification:" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding CurrentBidAnalysis.Justification}" TextWrapping="Wrap" Margin="5"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                         <TextBlock Text="Recommended Bidder: " FontWeight="Bold"/>
+                         <TextBlock Text="{Binding CurrentBidAnalysis.RecommendedBidderName}"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Signatures -->
+                <UniformGrid Grid.Row="5" Columns="3" Margin="0,20,0,0">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="Logistics" FontWeight="Bold"/>
+                        <Border BorderBrush="Black" BorderThickness="1" Height="50" Width="120" Margin="5"/>
+                    </StackPanel>
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="Finance" FontWeight="Bold"/>
+                        <Border BorderBrush="Black" BorderThickness="1" Height="50" Width="120" Margin="5"/>
+                    </StackPanel>
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="Project Manager" FontWeight="Bold"/>
+                        <Border BorderBrush="Black" BorderThickness="1" Height="50" Width="120" Margin="5"/>
+                    </StackPanel>
+                </UniformGrid>
+            </Grid>
+        </Border>
+    </ControlTemplate>
+
     <ControlTemplate x:Key="POPrintTemplate">
         <Border Background="White" Width="793" Height="1122" Padding="40">
             <Grid>

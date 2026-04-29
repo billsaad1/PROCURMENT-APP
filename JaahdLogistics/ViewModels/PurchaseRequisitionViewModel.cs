@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Windows;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;

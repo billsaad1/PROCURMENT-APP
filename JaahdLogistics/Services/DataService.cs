@@ -118,6 +118,44 @@ namespace JaahdLogistics.Services
             }
         }
 
+        public void DeleteRFQ(int id)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            try { connection.Execute("DELETE FROM RFQs WHERE Id = @id", new { id }); }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 19) { throw new Exception("Cannot delete RFQ because it is referenced in a Bid Analysis."); }
+        }
+
+        public void DeleteBidAnalysis(int id)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            using var transaction = connection.BeginTransaction();
+            try
+            {
+                connection.Execute("DELETE FROM BidItems WHERE BidderId IN (SELECT Id FROM Bidders WHERE BidAnalysisId = @id)", new { id }, transaction);
+                connection.Execute("DELETE FROM Bidders WHERE BidAnalysisId = @id", new { id }, transaction);
+                connection.Execute("DELETE FROM BidAnalyses WHERE Id = @id", new { id }, transaction);
+                transaction.Commit();
+            }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 19) { transaction.Rollback(); throw new Exception("Cannot delete Bid Analysis because it is referenced in a PO."); }
+            catch { transaction.Rollback(); throw; }
+        }
+
+        public void DeletePO(int id)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            using var transaction = connection.BeginTransaction();
+            try
+            {
+                connection.Execute("DELETE FROM POItems WHERE POId = @id", new { id }, transaction);
+                connection.Execute("DELETE FROM PurchaseOrders WHERE Id = @id", new { id }, transaction);
+                transaction.Commit();
+            }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 19) { transaction.Rollback(); throw new Exception("Cannot delete PO because it is referenced in a GRN."); }
+            catch { transaction.Rollback(); throw; }
+        }
+
         public IEnumerable<PurchaseRequisition> GetPRs()
         {
             using var connection = new SqliteConnection(_connectionString);
@@ -177,6 +215,29 @@ namespace JaahdLogistics.Services
                 }
             }
             return pos;
+        }
+
+        public IEnumerable<RFQ> GetRFQs()
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            return connection.Query<RFQ>("SELECT * FROM RFQs");
+        }
+
+        public IEnumerable<BidAnalysis> GetBidAnalyses()
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            var analyses = connection.Query<BidAnalysis>("SELECT * FROM BidAnalyses").ToList();
+            foreach (var analysis in analyses)
+            {
+                var bidders = connection.Query<Bidder>("SELECT * FROM Bidders WHERE BidAnalysisId = @Id", new { analysis.Id }).ToList();
+                analysis.Bidders = new ObservableCollection<Bidder>(bidders);
+                foreach (var bidder in analysis.Bidders)
+                {
+                    var items = connection.Query<BidItem>("SELECT * FROM BidItems WHERE BidderId = @Id", new { bidder.Id }).ToList();
+                    bidder.Items = new ObservableCollection<BidItem>(items);
+                }
+            }
+            return analyses;
         }
 
         public void SaveRFQ(RFQ rfq)
@@ -480,7 +541,41 @@ namespace JaahdLogistics.Services
         public IEnumerable<GoodsReceivingNotes> GetGRNs()
         {
             using var connection = new SqliteConnection(_connectionString);
-            return connection.Query<GoodsReceivingNotes>("SELECT * FROM GoodsReceivingNotes");
+            var grns = connection.Query<GoodsReceivingNotes>("SELECT * FROM GoodsReceivingNotes").ToList();
+            foreach (var grn in grns)
+            {
+                var items = connection.Query<GRNItems>("SELECT * FROM GRNItems WHERE GRNId = @Id", new { grn.Id }).ToList();
+                grn.Items = items;
+            }
+            return grns;
+        }
+
+        public void DeleteGRN(int id)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            using var transaction = connection.BeginTransaction();
+            try
+            {
+                // Decrement inventory before deleting GRN
+                var items = connection.Query<GRNItems>("SELECT * FROM GRNItems WHERE GRNId = @id", new { id }, transaction);
+                var grn = connection.QuerySingle<GoodsReceivingNotes>("SELECT * FROM GoodsReceivingNotes WHERE Id = @id", new { id }, transaction);
+                var po = connection.QuerySingle<PurchaseOrder>("SELECT * FROM PurchaseOrders WHERE Id = @POId", new { POId = grn.POId }, transaction);
+
+                foreach (var item in items)
+                {
+                    var poItem = connection.QuerySingle<POItem>("SELECT * FROM POItems WHERE Id = @POItemId", new { item.POItemId }, transaction);
+                    connection.Execute(
+                        "UPDATE Inventory SET CurrentQuantity = CurrentQuantity - @AcceptedQuantity WHERE ItemDescription = @Description AND ProjectId = @ProjectId",
+                        new { AcceptedQuantity = item.AcceptedQuantity, Description = poItem.Description, ProjectId = po.ProjectId }, transaction);
+                }
+
+                connection.Execute("DELETE FROM GRNItems WHERE GRNId = @id", new { id }, transaction);
+                connection.Execute("DELETE FROM GoodsReceivingNotes WHERE Id = @id", new { id }, transaction);
+                transaction.Commit();
+            }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 19) { transaction.Rollback(); throw new Exception("Cannot delete GRN because it is referenced in a Three-Way Match."); }
+            catch { transaction.Rollback(); throw; }
         }
 
         public void SaveThreeWayMatch(ThreeWayMatch match)
@@ -498,6 +593,18 @@ namespace JaahdLogistics.Services
                     "UPDATE ThreeWayMatch SET POId=@POId, GRNId=@GRNId, InvoiceNumber=@InvoiceNumber, " +
                     "InvoiceDetails=@InvoiceDetails, InvoiceScan=@InvoiceScan, Status=@Status WHERE Id=@Id", match);
             }
+        }
+
+        public void DeleteThreeWayMatch(int id)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Execute("DELETE FROM ThreeWayMatch WHERE Id = @id", new { id });
+        }
+
+        public IEnumerable<ThreeWayMatch> GetThreeWayMatches()
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            return connection.Query<ThreeWayMatch>("SELECT * FROM ThreeWayMatch");
         }
 
         public IEnumerable<string> GetPreviousItemDescriptions()

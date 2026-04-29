@@ -13,6 +13,8 @@ namespace JaahdLogistics.Models
         public string? Justification { get; set; }
         public string Status { get; set; } = "Pending";
         public ObservableCollection<Bidder> Bidders { get; set; } = new();
+
+        public string RecommendedBidderName => Bidders.FirstOrDefault(b => b.Id == RecommendedBidderId)?.Name ?? "None";
     }
 
     public class Bidder

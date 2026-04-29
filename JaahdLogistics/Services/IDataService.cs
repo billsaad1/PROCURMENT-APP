@@ -13,7 +13,12 @@ namespace JaahdLogistics.Services
         void SaveProject(Project project);
         IEnumerable<PurchaseRequisition> GetPRs();
         void DeletePR(int id);
+        void DeleteRFQ(int id);
+        void DeleteBidAnalysis(int id);
+        void DeletePO(int id);
         IEnumerable<PurchaseOrder> GetPOs();
+        IEnumerable<RFQ> GetRFQs();
+        IEnumerable<BidAnalysis> GetBidAnalyses();
         void SavePR(PurchaseRequisition pr);
         void SaveRFQ(RFQ rfq);
         void SaveBidAnalysis(BidAnalysis analysis);
@@ -30,8 +35,11 @@ namespace JaahdLogistics.Services
         void ApproveEntity(string entityType, int entityId, int userId, string status);
         IEnumerable<dynamic> GetApprovals(string entityType, int entityId);
         void SaveGRN(GoodsReceivingNotes grn, List<GRNItems> items);
+        void DeleteGRN(int id);
         IEnumerable<GoodsReceivingNotes> GetGRNs();
         void SaveThreeWayMatch(ThreeWayMatch match);
+        void DeleteThreeWayMatch(int id);
+        IEnumerable<ThreeWayMatch> GetThreeWayMatches();
         IEnumerable<string> GetPreviousItemDescriptions();
     }
 }

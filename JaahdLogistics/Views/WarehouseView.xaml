@@ -7,32 +7,67 @@
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Margin="15">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-        <TextBlock Text="{DynamicResource GRN}" FontSize="22" FontWeight="Bold" Margin="0,0,0,15"/>
+        <!-- Left Side: List -->
+        <Grid Margin="0,0,10,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock Text="{DynamicResource GRNList}" FontWeight="Bold" VerticalAlignment="Center"/>
+                <Button Content="{DynamicResource New}" Command="{Binding NewGRNCommand}" Margin="10,0,0,0"/>
+            </StackPanel>
+            <DataGrid Grid.Row="1" ItemsSource="{Binding Grns}" SelectedItem="{Binding SelectedGRN}" AutoGenerateColumns="False" IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="GRN #" Binding="{Binding GRNNumber}" Width="*"/>
+                    <DataGridTemplateColumn Width="Auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="X" Command="{Binding DataContext.DeleteGRNCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#C0392B"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,15">
-            <TextBlock Text="{DynamicResource SelectPO}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-            <ComboBox ItemsSource="{Binding PendingPOs}" SelectedItem="{Binding SelectedPO}" DisplayMemberPath="PONumber" Width="200"/>
-            <Button Content="{DynamicResource CreateGRN}" Command="{Binding CreateGRNCommand}" Margin="10,0,0,0"/>
-        </StackPanel>
+        <!-- Right Side: Details -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <DataGrid Grid.Row="2" ItemsSource="{Binding GrnItems}" AutoGenerateColumns="False" CanUserAddRows="False">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="{DynamicResource Description}" Binding="{Binding Description}" Width="*" IsReadOnly="True"/>
-                <DataGridTextColumn Header="{DynamicResource OrderedQty}" Binding="{Binding OrderedQuantity}" Width="100" IsReadOnly="True"/>
-                <DataGridTextColumn Header="{DynamicResource ReceivedQty}" Binding="{Binding ReceivedQuantity}" Width="100"/>
-                <DataGridTextColumn Header="{DynamicResource AcceptedQty}" Binding="{Binding AcceptedQuantity}" Width="100"/>
-                <DataGridTextColumn Header="{DynamicResource RejectedQty}" Binding="{Binding RejectedQuantity}" Width="100"/>
-                <DataGridTextColumn Header="{DynamicResource RejectReason}" Binding="{Binding RejectReason}" Width="*"/>
-            </DataGrid.Columns>
-        </DataGrid>
+            <TextBlock Text="{DynamicResource GRN}" FontSize="22" FontWeight="Bold" Margin="0,0,0,15"/>
 
-        <Button Grid.Row="3" Content="{DynamicResource SaveGRN}" Command="{Binding SaveGRNCommand}" HorizontalAlignment="Right" Width="120" Height="35" Margin="0,15,0,0"/>
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,15">
+                <TextBlock Text="{DynamicResource SelectPO}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <ComboBox ItemsSource="{Binding PendingPOs}" SelectedItem="{Binding SelectedPO}" DisplayMemberPath="PONumber" Width="200"/>
+                <Button Content="{DynamicResource CreateGRN}" Command="{Binding CreateGRNCommand}" Margin="10,0,0,0"/>
+            </StackPanel>
+
+            <DataGrid Grid.Row="2" ItemsSource="{Binding GrnItems}" AutoGenerateColumns="False" CanUserAddRows="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="{DynamicResource Description}" Binding="{Binding Description}" Width="*" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="{DynamicResource OrderedQty}" Binding="{Binding OrderedQuantity}" Width="100" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="{DynamicResource ReceivedQty}" Binding="{Binding ReceivedQuantity}" Width="100"/>
+                    <DataGridTextColumn Header="{DynamicResource AcceptedQty}" Binding="{Binding AcceptedQuantity}" Width="100"/>
+                    <DataGridTextColumn Header="{DynamicResource RejectedQty}" Binding="{Binding RejectedQuantity}" Width="100"/>
+                    <DataGridTextColumn Header="{DynamicResource RejectReason}" Binding="{Binding RejectReason}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+                <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
+                <Button Content="{DynamicResource SaveGRN}" Command="{Binding SaveGRNCommand}" Width="120" Height="35"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>
