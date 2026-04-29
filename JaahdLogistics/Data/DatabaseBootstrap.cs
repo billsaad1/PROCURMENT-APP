@@ -63,36 +63,53 @@ namespace JaahdLogistics.Data
             var userCount = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Users");
             if (userCount == 0)
             {
-                string adminHash = JaahdLogistics.Helpers.SecurityHelper.HashPassword("admin");
-                string pmHash = JaahdLogistics.Helpers.SecurityHelper.HashPassword("pm");
-                string procHash = JaahdLogistics.Helpers.SecurityHelper.HashPassword("proc");
-                string finHash = JaahdLogistics.Helpers.SecurityHelper.HashPassword("fin");
-                string storeHash = JaahdLogistics.Helpers.SecurityHelper.HashPassword("store");
-                string headHash = JaahdLogistics.Helpers.SecurityHelper.HashPassword("head");
-
-                connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('admin', @adminHash, 'Admin', 'System Administrator')", new { adminHash });
-                connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('pm', @pmHash, 'ProjectManager', 'Project Manager')", new { pmHash });
-                connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('log', @procHash, 'LogisticsManager', 'Logistics Manager')", new { procHash });
-                connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('proc', @procHash, 'ProcurementManager', 'Procurement Manager')", new { procHash });
-                connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('fin', @finHash, 'FinanceManager', 'Finance Manager')", new { finHash });
-                connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('store', @storeHash, 'Storekeeper', 'Storekeeper')", new { storeHash });
-                connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES ('head', @headHash, 'HeadOfAssociation', 'Head of Association')", new { headHash });
+                CreateUser(connection, "admin", "admin", "Admin", "System Administrator");
+                CreateUser(connection, "pm", "pm", "ProjectManager", "Project Manager");
+                CreateUser(connection, "log", "log", "LogisticsManager", "Logistics Manager");
+                CreateUser(connection, "proc", "proc", "ProcurementManager", "Procurement Manager");
+                CreateUser(connection, "fin", "fin", "FinanceManager", "Finance Manager");
+                CreateUser(connection, "store", "store", "Storekeeper", "Storekeeper");
+                CreateUser(connection, "head", "head", "HeadOfAssociation", "Head of Association");
             }
             else
             {
-                // Repair step: If the admin user exists with a plaintext password from a previous version, update it to a hash.
-                var adminUser = connection.QuerySingleOrDefault<JaahdLogistics.Models.User>("SELECT * FROM Users WHERE Username = 'admin'");
-                if (adminUser != null && adminUser.PasswordHash == "admin")
-                {
-                    string adminHash = JaahdLogistics.Helpers.SecurityHelper.HashPassword("admin");
-                    connection.Execute("UPDATE Users SET PasswordHash = @adminHash WHERE Username = 'admin'", new { adminHash });
-                }
+                // Repair step: Ensure all default users exist and have hashed passwords
+                UpdateOrResetUser(connection, "admin", "admin", "Admin", "System Administrator");
+                UpdateOrResetUser(connection, "pm", "pm", "ProjectManager", "Project Manager");
+                UpdateOrResetUser(connection, "log", "log", "LogisticsManager", "Logistics Manager");
+                UpdateOrResetUser(connection, "proc", "proc", "ProcurementManager", "Procurement Manager");
+                UpdateOrResetUser(connection, "fin", "fin", "FinanceManager", "Finance Manager");
+                UpdateOrResetUser(connection, "store", "store", "Storekeeper", "Storekeeper");
+                UpdateOrResetUser(connection, "head", "head", "HeadOfAssociation", "Head of Association");
             }
 
             var settingsCount = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Settings WHERE Id = 1");
             if (settingsCount == 0)
             {
                 connection.Execute("INSERT INTO Settings (Id, AssociationName) VALUES (1, 'Jaahd Association')");
+            }
+        }
+
+        private void CreateUser(SqliteConnection connection, string username, string password, string role, string fullName)
+        {
+            string hash = JaahdLogistics.Helpers.SecurityHelper.HashPassword(password);
+            connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES (@username, @hash, @role, @fullName)",
+                new { username, hash, role, fullName });
+        }
+
+        private void UpdateOrResetUser(SqliteConnection connection, string username, string password, string role, string fullName)
+        {
+            var user = connection.QuerySingleOrDefault<JaahdLogistics.Models.User>("SELECT * FROM Users WHERE Username = @username", new { username });
+            string hash = JaahdLogistics.Helpers.SecurityHelper.HashPassword(password);
+
+            if (user == null)
+            {
+                CreateUser(connection, username, password, role, fullName);
+            }
+            else if (user.PasswordHash == password) // Reset if it's plaintext
+            {
+                connection.Execute("UPDATE Users SET PasswordHash = @hash, Role = @role, FullName = @fullName WHERE Username = @username",
+                    new { hash, username, role, fullName });
             }
         }
     }

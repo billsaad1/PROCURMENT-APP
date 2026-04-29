@@ -45,15 +45,6 @@ namespace JaahdLogistics.ViewModels
             LoadApprovedPRs();
         }
 
-        private void LoadApprovedPRs()
-        {
-            // Load PRs that are ready for procurement (FinalApproved)
-            // and don't already have an RFQ or a PO (unless we want to allow multiple RFQs per PR, but usually 1:1 for this flow)
-            // For now, just load all FinalApproved PRs.
-            var prs = _dataService.GetPRs().Where(p => p.Status == "FinalApproved").ToList();
-            ApprovedPRs = new ObservableCollection<PurchaseRequisition>(prs);
-        }
-
         [RelayCommand]
         private void CreateRFQ()
         {
@@ -220,6 +211,16 @@ namespace JaahdLogistics.ViewModels
             _dataService.SaveBidAnalysis(CurrentBidAnalysis);
 
             MessageBox.Show($"Bid Analysis status updated to: {CurrentBidAnalysis.Status}");
+        }
+
+        [RelayCommand]
+        public void LoadApprovedPRs()
+        {
+            // Load PRs that are ready for procurement (FinalApproved)
+            // and don't already have an RFQ or a PO (unless we want to allow multiple RFQs per PR, but usually 1:1 for this flow)
+            // For now, just load all FinalApproved PRs.
+            var prs = _dataService.GetPRs().Where(p => p.Status == "FinalApproved").ToList();
+            ApprovedPRs = new ObservableCollection<PurchaseRequisition>(prs);
         }
 
         [RelayCommand]
