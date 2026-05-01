@@ -176,7 +176,7 @@ namespace JaahdLogistics.ViewModels
                         return;
                     }
 
-                    var remaining = _dataService.GetRemainingBudget(item.BudgetLineId);
+                    var remaining = _dataService.GetRemainingBudget(item.BudgetLineId, CurrentPR.Id > 0 ? CurrentPR.Id : (int?)null);
                     var budgetLine = BudgetLines.FirstOrDefault(b => b.Id == item.BudgetLineId);
 
                     decimal itemPriceInBudgetCurrency = item.TotalPrice;

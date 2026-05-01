@@ -5,6 +5,8 @@
     <helpers:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
     <helpers:ImageBytesConverter x:Key="ImageBytesConverter"/>
     <helpers:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    <helpers:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
     <helpers:BindingProxy x:Key="Proxy"/>
 
     <!-- Professional Color Palette -->
@@ -217,7 +219,7 @@
                     <Image Source="{Binding Data.Settings.LogoImage, Source={StaticResource Proxy}, Converter={StaticResource ImageBytesConverter}}" Height="80" Width="80"/>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="20,0,0,0">
                         <TextBlock Text="{Binding Data.Settings.AssociationName, Source={StaticResource Proxy}}" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        <TextBlock Text="Request for Quotation (RFQ)" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Request for Quotation (RFQ) - طلب عرض سعر" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
 
@@ -230,9 +232,13 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="RFQ Number:" FontWeight="Bold" Margin="5"/>
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <TextBlock Text="RFQ Number / رقم طلب عرض السعر:" FontWeight="Bold"/>
+                    </StackPanel>
                     <TextBlock Grid.Column="1" Text="{Binding CurrentRFQ.RFQNumber}" Margin="5"/>
-                    <TextBlock Grid.Column="2" Text="Closing Date:" FontWeight="Bold" Margin="5"/>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5">
+                        <TextBlock Text="Closing Date / تاريخ الإغلاق:" FontWeight="Bold"/>
+                    </StackPanel>
                     <TextBlock Grid.Column="3" Text="{Binding CurrentRFQ.ClosingDate, StringFormat=d}" Margin="5"/>
                 </Grid>
 
@@ -240,17 +246,17 @@
                 <DataGrid Grid.Row="3" ItemsSource="{Binding SelectedPR.Items}" AutoGenerateColumns="False"
                           IsReadOnly="True" BorderThickness="1" BorderBrush="Black">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
-                        <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="80"/>
-                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="80"/>
-                        <DataGridTextColumn Header="Unit Price" Width="100"/>
-                        <DataGridTextColumn Header="Total" Width="100"/>
+                        <DataGridTextColumn Header="Description / الوصف" Binding="{Binding Description}" Width="*"/>
+                        <DataGridTextColumn Header="Unit / الوحدة" Binding="{Binding Unit}" Width="80"/>
+                        <DataGridTextColumn Header="Quantity / الكمية" Binding="{Binding Quantity}" Width="80"/>
+                        <DataGridTextColumn Header="Unit Price / سعر الوحدة" Width="100"/>
+                        <DataGridTextColumn Header="Total / الإجمالي" Width="100"/>
                     </DataGrid.Columns>
                 </DataGrid>
 
                 <!-- Terms -->
                 <StackPanel Grid.Row="4" Margin="0,20,0,0">
-                    <TextBlock Text="Terms &amp; Conditions:" FontWeight="Bold"/>
+                    <TextBlock Text="Terms &amp; Conditions / الشروط والأحكام:" FontWeight="Bold"/>
                     <TextBlock Text="{Binding CurrentRFQ.Terms}" TextWrapping="Wrap" Margin="5"/>
 
                     <Grid Margin="0,40,0,0">
@@ -259,11 +265,11 @@
                              <ColumnDefinition Width="*"/>
                          </Grid.ColumnDefinitions>
                          <StackPanel HorizontalAlignment="Center">
-                             <TextBlock Text="Vendor Signature &amp; Stamp" FontWeight="Bold"/>
+                             <TextBlock Text="Vendor Signature &amp; Stamp / توقيع وختم المورد" FontWeight="Bold"/>
                              <Border BorderBrush="Black" BorderThickness="1" Height="80" Width="200" Margin="10"/>
                          </StackPanel>
                          <StackPanel Grid.Column="1" HorizontalAlignment="Center">
-                             <TextBlock Text="Logistics Manager" FontWeight="Bold"/>
+                             <TextBlock Text="Logistics Manager / مسؤول اللوجستيات" FontWeight="Bold"/>
                              <Border BorderBrush="Black" BorderThickness="1" Height="80" Width="200" Margin="10"/>
                          </StackPanel>
                     </Grid>
@@ -315,53 +321,68 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Matrix Content -->
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <DataGrid ItemsSource="{Binding MatrixRows}" AutoGenerateColumns="False" IsReadOnly="True" BorderBrush="Black" BorderThickness="1">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="NO" Binding="{Binding SourceItem.Id}" Width="30"/>
-                                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
-                                <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="50"/>
-                                <DataGridTextColumn Header="QTY" Binding="{Binding Quantity}" Width="50"/>
-                                <DataGridTextColumn Header="Est. Price" Binding="{Binding EstimativeUnitPrice}" Width="80"/>
-                                <DataGridTextColumn Header="Est. Total" Binding="{Binding EstimativeTotal}" Width="80"/>
+                        <StackPanel>
+                            <!-- Header -->
+                            <Grid Background="#EEE">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Description / Unit / Qty" FontWeight="Bold" Margin="5"/>
+                                <ItemsControl Grid.Column="1" ItemsSource="{Binding Bidders}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="Black" BorderThickness="1,0,1,0" Width="100">
+                                                <TextBlock Text="{Binding Name}" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
 
-                                <!-- Bidder Columns -->
-                                <DataGridTemplateColumn Header="BIDDER 1">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                                <TextBlock Text="{Binding BidderPrices[0].UnitPrice, StringFormat=N2}" Margin="2"/>
-                                                <TextBlock Grid.Column="1" Text="{Binding BidderPrices[0].TotalPrice, StringFormat=N2}" FontWeight="Bold" Margin="2"/>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Header="BIDDER 2">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                                <TextBlock Text="{Binding BidderPrices[1].UnitPrice, StringFormat=N2}" Margin="2"/>
-                                                <TextBlock Grid.Column="1" Text="{Binding BidderPrices[1].TotalPrice, StringFormat=N2}" FontWeight="Bold" Margin="2"/>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Header="BIDDER 3">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                                <TextBlock Text="{Binding BidderPrices[2].UnitPrice, StringFormat=N2}" Margin="2"/>
-                                                <TextBlock Grid.Column="1" Text="{Binding BidderPrices[2].TotalPrice, StringFormat=N2}" FontWeight="Bold" Margin="2"/>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                            </DataGrid.Columns>
-                        </DataGrid>
+                            <ItemsControl ItemsSource="{Binding MatrixRows}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="200"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border BorderBrush="Gray" BorderThickness="0,0,0,1">
+                                                <StackPanel Margin="5">
+                                                    <TextBlock Text="{Binding Description}" FontWeight="Bold"/>
+                                                    <TextBlock Text="{Binding Unit, StringFormat='Unit: \{0\}'}" FontSize="10"/>
+                                                    <TextBlock Text="{Binding Quantity, StringFormat='Qty: \{0\}'}" FontSize="10"/>
+                                                </StackPanel>
+                                            </Border>
+                                            <ItemsControl Grid.Column="1" ItemsSource="{Binding BidderPrices}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <StackPanel Orientation="Horizontal"/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border BorderBrush="Gray" BorderThickness="1" Width="100">
+                                                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                                <TextBlock Text="{Binding UnitPrice, StringFormat=N2}" FontSize="10"/>
+                                                                <TextBlock Text="{Binding TotalPrice, StringFormat=N2}" FontWeight="Bold"/>
+                                                            </StackPanel>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
                     </ScrollViewer>
                 </Grid>
 

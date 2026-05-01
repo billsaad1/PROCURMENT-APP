@@ -5,14 +5,24 @@ using System.Linq;
 
 namespace JaahdLogistics.Models
 {
-    public class PurchaseRequisition : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
+    public partial class PurchaseRequisition : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
     {
         public int Id { get; set; }
-        public string PRNumber { get; set; } = string.Empty;
-        public int ProjectId { get; set; }
-        public int RequesterId { get; set; }
-        public DateTime Date { get; set; }
-        public string? Justification { get; set; }
+
+        private string _prNumber = string.Empty;
+        public string PRNumber { get => _prNumber; set => SetProperty(ref _prNumber, value); }
+
+        private int _projectId;
+        public int ProjectId { get => _projectId; set => SetProperty(ref _projectId, value); }
+
+        private int _requesterId;
+        public int RequesterId { get => _requesterId; set => SetProperty(ref _requesterId, value); }
+
+        private DateTime _date;
+        public DateTime Date { get => _date; set => SetProperty(ref _date, value); }
+
+        private string? _justification;
+        public string? Justification { get => _justification; set => SetProperty(ref _justification, value); }
 
         private string _currency = "USD";
         public string Currency { get => _currency; set => SetProperty(ref _currency, value); }
@@ -23,17 +33,35 @@ namespace JaahdLogistics.Models
         private string _status = "Pending";
         public string Status { get => _status; set => SetProperty(ref _status, value); }
 
-        public byte[]? RequesterSignature { get; set; }
-        public byte[]? LogisticsSignature { get; set; }
-        public byte[]? FinanceSignature { get; set; }
-        public byte[]? PMSignature { get; set; }
-        public byte[]? FinalSignature { get; set; }
+        private byte[]? _requesterSignature;
+        public byte[]? RequesterSignature { get => _requesterSignature; set => SetProperty(ref _requesterSignature, value); }
 
-        public string? RequesterName { get; set; }
-        public string? LogisticsName { get; set; }
-        public string? FinanceName { get; set; }
-        public string? PMName { get; set; }
-        public string? FinalName { get; set; }
+        private byte[]? _logisticsSignature;
+        public byte[]? LogisticsSignature { get => _logisticsSignature; set => SetProperty(ref _logisticsSignature, value); }
+
+        private byte[]? _financeSignature;
+        public byte[]? FinanceSignature { get => _financeSignature; set => SetProperty(ref _financeSignature, value); }
+
+        private byte[]? _pmSignature;
+        public byte[]? PMSignature { get => _pmSignature; set => SetProperty(ref _pmSignature, value); }
+
+        private byte[]? _finalSignature;
+        public byte[]? FinalSignature { get => _finalSignature; set => SetProperty(ref _finalSignature, value); }
+
+        private string? _requesterName;
+        public string? RequesterName { get => _requesterName; set => SetProperty(ref _requesterName, value); }
+
+        private string? _logisticsName;
+        public string? LogisticsName { get => _logisticsName; set => SetProperty(ref _logisticsName, value); }
+
+        private string? _financeName;
+        public string? FinanceName { get => _financeName; set => SetProperty(ref _financeName, value); }
+
+        private string? _pmName;
+        public string? PMName { get => _pmName; set => SetProperty(ref _pmName, value); }
+
+        private string? _finalName;
+        public string? FinalName { get => _finalName; set => SetProperty(ref _finalName, value); }
 
         public ObservableCollection<PRItem> Items { get; set; } = new();
 

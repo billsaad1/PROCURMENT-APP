@@ -203,17 +203,19 @@ namespace JaahdLogistics.ViewModels
         }
 
         [RelayCommand]
-        private void RemoveBidder()
+        private void RemoveBidder(Bidder bidder)
         {
-            if (Bidders.Count <= 1) return;
-            var lastBidder = Bidders.Last();
+            if (bidder == null || Bidders.Count <= 1) return;
+
+            int index = Bidders.IndexOf(bidder);
+            if (index < 0) return;
 
             foreach(var row in MatrixRows)
             {
-                if (row.BidderPrices.Count > 0)
-                    row.BidderPrices.RemoveAt(row.BidderPrices.Count - 1);
+                if (row.BidderPrices.Count > index)
+                    row.BidderPrices.RemoveAt(index);
             }
-            Bidders.Remove(lastBidder);
+            Bidders.Remove(bidder);
         }
 
         [RelayCommand]
@@ -286,8 +288,8 @@ namespace JaahdLogistics.ViewModels
                 if (item.BudgetLineId == 0) continue;
 
                 var budgetLines = _dataService.GetBudgetLines(SelectedPR.ProjectId);
-                var budgetLine = budgetLines.FirstOrDefault(b => b.Id == item.BudgetLineId);
-                var remaining = _dataService.GetRemainingBudget(item.BudgetLineId);
+                var budgetLine = budgetLines.FirstOrDefault(b => b.Id == (int)item.BudgetLineId);
+                var remaining = _dataService.GetRemainingBudget((int)item.BudgetLineId, SelectedPR.Id);
 
                 decimal itemPriceInBudgetCurrency = item.TotalPrice;
                 if (SelectedPR.Currency == "YER" && budgetLine?.Currency == "USD" && SelectedPR.ExchangeRate > 0)
@@ -302,10 +304,20 @@ namespace JaahdLogistics.ViewModels
                 }
             }
 
-            if (!SkipBidAnalysis && CurrentBidAnalysis.Status != "FinalApproved")
+            var analysisToUse = SkipBidAnalysis ? null : SelectedBidAnalysis;
+
+            if (!SkipBidAnalysis)
             {
-                MessageBox.Show("Cannot create a Purchase Order unless the Bid Analysis is approved or 'Skip Bid Analysis' is checked.");
-                return;
+                if (analysisToUse == null)
+                {
+                    MessageBox.Show("Please select an approved Bid Analysis first.");
+                    return;
+                }
+                if (analysisToUse.Status != "FinalApproved")
+                {
+                    MessageBox.Show("Cannot create a Purchase Order unless the selected Bid Analysis is approved.");
+                    return;
+                }
             }
             if (SelectedPR == null) return;
 
@@ -316,7 +328,7 @@ namespace JaahdLogistics.ViewModels
             {
                 PRId = SelectedPR.Id,
                 ProjectId = SelectedPR.ProjectId,
-                BidAnalysisId = SkipBidAnalysis ? (int?)null : CurrentBidAnalysis.Id,
+                BidAnalysisId = SkipBidAnalysis ? (int?)null : analysisToUse?.Id,
                 Date = DateTime.Now,
                 PONumber = helper.GenerateNumber("PO", SelectedPR.ProjectId),
                 Status = "Pending"
@@ -326,12 +338,12 @@ namespace JaahdLogistics.ViewModels
             {
                 foreach(var item in SelectedPR.Items)
                 {
-                    CurrentPO.Items.Add(new POItem { Description = item.Description, Quantity = item.Quantity, Unit = item.Unit });
+                    CurrentPO.Items.Add(new POItem { Description = item.Description, Quantity = item.Quantity, Unit = item.Unit, UnitPrice = item.UnitPrice });
                 }
             }
-            else
+            else if (analysisToUse != null)
             {
-                var winner = Bidders.FirstOrDefault(b => b.Id == (CurrentBidAnalysis.RecommendedBidderId ?? 0));
+                var winner = analysisToUse.Bidders.FirstOrDefault(b => b.Id == (analysisToUse.RecommendedBidderId ?? 0));
                 if (winner != null)
                 {
                     CurrentPO.VendorId = winner.Id;
@@ -339,6 +351,11 @@ namespace JaahdLogistics.ViewModels
                     {
                         CurrentPO.Items.Add(new POItem { Description = item.Description, Quantity = item.Quantity, Unit = item.Unit, UnitPrice = item.UnitPrice });
                     }
+                }
+                else
+                {
+                    MessageBox.Show("The selected Bid Analysis does not have a Recommended Bidder set.");
+                    return;
                 }
             }
 

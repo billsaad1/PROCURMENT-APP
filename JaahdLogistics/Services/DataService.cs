@@ -429,16 +429,22 @@ namespace JaahdLogistics.Services
                 "PRTerms=@PRTerms, RFQTerms=@RFQTerms, POTerms=@POTerms WHERE Id=1", settings);
         }
 
-        public decimal GetSpentBudget(int budgetLineId)
+        public decimal GetSpentBudget(int budgetLineId, int? excludePRId = null)
         {
             using var connection = new SqliteConnection(_connectionString);
             var budgetLine = connection.QuerySingleOrDefault<BudgetLine>("SELECT * FROM BudgetLines WHERE Id = @budgetLineId", new { budgetLineId });
             if (budgetLine == null) return 0;
 
-            var prItems = connection.Query<dynamic>(
-                "SELECT pi.Quantity, pi.UnitPrice, pr.Currency, pr.ExchangeRate " +
-                "FROM PRItems pi JOIN PurchaseRequisitions pr ON pi.PRId = pr.Id " +
-                "WHERE pi.BudgetLineId = @budgetLineId AND pr.Status != 'Rejected'", new { budgetLineId });
+            string sql = "SELECT pi.Quantity, pi.UnitPrice, pr.Currency, pr.ExchangeRate " +
+                         "FROM PRItems pi JOIN PurchaseRequisitions pr ON pi.PRId = pr.Id " +
+                         "WHERE pi.BudgetLineId = @budgetLineId AND pr.Status != 'Rejected'";
+
+            if (excludePRId.HasValue)
+            {
+                sql += " AND pr.Id != @excludePRId";
+            }
+
+            var prItems = connection.Query<dynamic>(sql, new { budgetLineId, excludePRId });
 
             decimal totalSpentInBudgetCurrency = 0;
             foreach (var item in prItems)
@@ -464,13 +470,13 @@ namespace JaahdLogistics.Services
             return totalSpentInBudgetCurrency;
         }
 
-        public decimal GetRemainingBudget(int budgetLineId)
+        public decimal GetRemainingBudget(int budgetLineId, int? excludePRId = null)
         {
             using var connection = new SqliteConnection(_connectionString);
             var budgetLine = connection.QuerySingleOrDefault<BudgetLine>("SELECT * FROM BudgetLines WHERE Id = @budgetLineId", new { budgetLineId });
             if (budgetLine == null) return 0;
 
-            return budgetLine.TotalAmount - GetSpentBudget(budgetLineId);
+            return budgetLine.TotalAmount - GetSpentBudget(budgetLineId, excludePRId);
         }
 
         public decimal GetLastExchangeRate(string currency)

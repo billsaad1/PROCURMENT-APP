@@ -5,30 +5,64 @@ using System.Linq;
 
 namespace JaahdLogistics.Models
 {
-    public class PurchaseOrder
+    public class PurchaseOrder : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
     {
         public int Id { get; set; }
-        public string PONumber { get; set; } = string.Empty;
+
+        private string _poNumber = string.Empty;
+        public string PONumber { get => _poNumber; set => SetProperty(ref _poNumber, value); }
+
         public int PRId { get; set; }
         public int ProjectId { get; set; }
         public int? BidAnalysisId { get; set; }
         public int? VendorId { get; set; }
-        public DateTime Date { get; set; }
-        public string? Terms { get; set; }
-        public string Status { get; set; } = "Pending";
+
+        private DateTime _date;
+        public DateTime Date { get => _date; set => SetProperty(ref _date, value); }
+
+        private string? _terms;
+        public string? Terms { get => _terms; set => SetProperty(ref _terms, value); }
+
+        private string _status = "Pending";
+        public string Status { get => _status; set => SetProperty(ref _status, value); }
+
         public ObservableCollection<POItem> Items { get; set; } = new();
 
-        public byte[]? LogisticsSignature { get; set; }
-        public byte[]? FinanceSignature { get; set; }
-        public byte[]? PMSignature { get; set; }
-        public byte[]? FinalSignature { get; set; }
+        private byte[]? _logisticsSignature;
+        public byte[]? LogisticsSignature { get => _logisticsSignature; set => SetProperty(ref _logisticsSignature, value); }
 
-        public string? LogisticsName { get; set; }
-        public string? FinanceName { get; set; }
-        public string? PMName { get; set; }
-        public string? FinalName { get; set; }
+        private byte[]? _financeSignature;
+        public byte[]? FinanceSignature { get => _financeSignature; set => SetProperty(ref _financeSignature, value); }
+
+        private byte[]? _pmSignature;
+        public byte[]? PMSignature { get => _pmSignature; set => SetProperty(ref _pmSignature, value); }
+
+        private byte[]? _finalSignature;
+        public byte[]? FinalSignature { get => _finalSignature; set => SetProperty(ref _finalSignature, value); }
+
+        private string? _logisticsName;
+        public string? LogisticsName { get => _logisticsName; set => SetProperty(ref _logisticsName, value); }
+
+        private string? _financeName;
+        public string? FinanceName { get => _financeName; set => SetProperty(ref _financeName, value); }
+
+        private string? _pmName;
+        public string? PMName { get => _pmName; set => SetProperty(ref _pmName, value); }
+
+        private string? _finalName;
+        public string? FinalName { get => _finalName; set => SetProperty(ref _finalName, value); }
 
         public decimal TotalAmount => Items.Sum(i => i.TotalPrice);
+
+        public PurchaseOrder()
+        {
+            Items.CollectionChanged += (s, e) => {
+                OnPropertyChanged(nameof(TotalAmount));
+                if (e.NewItems != null) {
+                    foreach (POItem item in e.NewItems) item.PropertyChanged += (s2, e2) => OnPropertyChanged(nameof(TotalAmount));
+                }
+            };
+        }
     }
 
     public class POItem : CommunityToolkit.Mvvm.ComponentModel.ObservableObject

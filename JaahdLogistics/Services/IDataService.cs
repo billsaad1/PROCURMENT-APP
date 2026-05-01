@@ -29,8 +29,8 @@ namespace JaahdLogistics.Services
         IEnumerable<BudgetLine> GetBudgetLines(int projectId);
         Settings GetSettings();
         void SaveSettings(Settings settings);
-        decimal GetSpentBudget(int budgetLineId);
-        decimal GetRemainingBudget(int budgetLineId);
+        decimal GetSpentBudget(int budgetLineId, int? excludePRId = null);
+        decimal GetRemainingBudget(int budgetLineId, int? excludePRId = null);
         decimal GetLastExchangeRate(string currency);
         void ApproveEntity(string entityType, int entityId, int userId, string status);
         IEnumerable<dynamic> GetApprovals(string entityType, int entityId);

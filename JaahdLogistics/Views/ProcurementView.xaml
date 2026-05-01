@@ -129,28 +129,24 @@
                         <ComboBox ItemsSource="{Binding RFQs}" SelectedItem="{Binding SelectedRFQ}" DisplayMemberPath="RFQNumber" Width="150" Margin="0,0,10,0"/>
                         <Button Content="{DynamicResource CreateNew}" Command="{Binding CreateBidAnalysisCommand}"/>
                         <Button Content="{DynamicResource AddBidder}" Command="{Binding AddBidderCommand}" Margin="10,0,0,0"/>
-                        <Button Content="Remove Bidder" Command="{Binding RemoveBidderCommand}" Margin="5,0,0,0" Background="#C0392B"/>
                         <Button Content="{DynamicResource Save}" Command="{Binding SaveBidAnalysisCommand}" Margin="10,0,0,0" Background="#27AE60"/>
                         <Button Content="{DynamicResource Approve}" Command="{Binding ApproveBidAnalysisCommand}" Margin="10,0,0,0"/>
                     </StackPanel>
 
-                    <DataGrid Grid.Row="1" ItemsSource="{Binding MatrixRows}" AutoGenerateColumns="False" CanUserAddRows="False" SelectionMode="Single">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="150" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="50" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="QTY" Binding="{Binding Quantity}" Width="50" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="Estimative Price" Binding="{Binding EstimativeUnitPrice}" Width="80" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="Est. Total" Binding="{Binding EstimativeTotal}" Width="80" IsReadOnly="True"/>
-                        </DataGrid.Columns>
-
-                        <!-- Dynamic Columns for Bidders using ColumnTemplate -->
-                        <DataGrid.Resources>
-                            <!-- We use an ItemsControl inside the row to show bidder prices -->
-                        </DataGrid.Resources>
-
-                        <DataGrid.RowDetailsTemplate>
-                            <DataTemplate>
-                                <ItemsControl ItemsSource="{Binding BidderPrices}" Margin="20,0,0,0">
+                    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <!-- Header -->
+                            <Grid Background="#34495E">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Description" Foreground="White" FontWeight="Bold" Margin="10,5"/>
+                                <TextBlock Grid.Column="1" Text="Unit" Foreground="White" FontWeight="Bold" Margin="10,5" Width="50"/>
+                                <TextBlock Grid.Column="2" Text="Qty" Foreground="White" FontWeight="Bold" Margin="10,5" Width="50"/>
+                                <ItemsControl Grid.Column="3" ItemsSource="{Binding Bidders}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <StackPanel Orientation="Horizontal"/>
@@ -158,19 +154,53 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border BorderBrush="Gray" BorderThickness="1" Margin="2" Padding="5">
-                                                <StackPanel>
-                                                    <TextBlock Text="Price:" FontSize="10"/>
-                                                    <TextBox Text="{Binding UnitPrice, UpdateSourceTrigger=PropertyChanged}" Width="70"/>
-                                                    <TextBlock Text="{Binding TotalPrice, StringFormat=N2}" FontWeight="Bold"/>
-                                                </StackPanel>
+                                            <Border BorderBrush="White" BorderThickness="1,0,0,0" Width="100">
+                                                <TextBlock Text="{Binding Name}" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" Margin="5"/>
                                             </Border>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                            </DataTemplate>
-                        </DataGrid.RowDetailsTemplate>
-                    </DataGrid>
+                            </Grid>
+
+                            <ItemsControl ItemsSource="{Binding MatrixRows}">
+                                <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="200"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border BorderBrush="LightGray" BorderThickness="0,0,0,1">
+                                            <TextBlock Text="{Binding Description}" Margin="10,5" TextWrapping="Wrap"/>
+                                        </Border>
+                                        <Border Grid.Column="1" BorderBrush="LightGray" BorderThickness="1,0,0,1" Width="50">
+                                            <TextBlock Text="{Binding Unit}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <Border Grid.Column="2" BorderBrush="LightGray" BorderThickness="1,0,0,1" Width="50">
+                                            <TextBlock Text="{Binding Quantity}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ItemsControl Grid.Column="3" ItemsSource="{Binding BidderPrices}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Orientation="Horizontal"/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border BorderBrush="LightGray" BorderThickness="1,0,0,1" Width="100" Padding="5">
+                                                        <TextBox Text="{Binding UnitPrice, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" HorizontalContentAlignment="Right"/>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        </StackPanel>
+                    </ScrollViewer>
 
                     <!-- Bidder Info & Totals Matrix -->
                     <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Auto" Margin="0,10">
@@ -205,7 +235,8 @@
 
                                             <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                                                 <Button Content="📁" Command="{Binding DataContext.UploadQuoteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" ToolTip="Upload Quote Scan" Padding="5,2" Margin="0,0,5,0"/>
-                                                <Button Content="👁" Command="{Binding DataContext.ViewQuoteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" ToolTip="View Quote Scan" Padding="5,2" Background="#34495E"/>
+                                                <Button Content="👁" Command="{Binding DataContext.ViewQuoteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" ToolTip="View Quote Scan" Padding="5,2" Background="#34495E" Margin="0,0,5,0"/>
+                                                <Button Content="🗑" Command="{Binding DataContext.RemoveBidderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" ToolTip="Remove Bidder" Padding="5,2" Background="#C0392B"/>
                                             </StackPanel>
                                         </StackPanel>
                                     </Border>
@@ -268,10 +299,15 @@
                 <Grid Grid.Column="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <TextBlock Text="Select PR" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <ComboBox ItemsSource="{Binding ApprovedPRs}" SelectedItem="{Binding SelectedPR}" DisplayMemberPath="PRNumber" Width="150" Margin="0,0,10,0"/>
+                        <TextBlock Text="Select Bid Analysis" VerticalAlignment="Center" Margin="10,0,10,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                        <ComboBox ItemsSource="{Binding BidAnalyses}" SelectedItem="{Binding SelectedBidAnalysis}" DisplayMemberPath="Id" Width="100" Margin="0,0,10,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
                         <Button Content="{DynamicResource CreatePO}" Command="{Binding CreatePOCommand}"/>
                         <CheckBox Content="Direct Purchase (Skip RFQ/Bid Analysis)" IsChecked="{Binding SkipBidAnalysis}" VerticalAlignment="Center" Margin="20,0,0,0"/>
                     </StackPanel>
