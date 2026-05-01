@@ -216,8 +216,8 @@
                     </Grid.ColumnDefinitions>
                     <Image Source="{Binding Data.Settings.LogoImage, Source={StaticResource Proxy}, Converter={StaticResource ImageBytesConverter}}" Height="80" Width="80"/>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="20,0,0,0">
-                        <TextBlock Text="{Binding Data.Settings.AssociationName, Source={StaticResource Proxy}}" FontSize="20" FontWeight="Bold"/>
-                        <TextBlock Text="Request for Quotation" FontSize="16" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding Data.Settings.AssociationName, Source={StaticResource Proxy}}" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Request for Quotation (RFQ)" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
 
@@ -243,6 +243,8 @@
                         <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
                         <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="80"/>
                         <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="80"/>
+                        <DataGridTextColumn Header="Unit Price" Width="100"/>
+                        <DataGridTextColumn Header="Total" Width="100"/>
                     </DataGrid.Columns>
                 </DataGrid>
 
@@ -250,6 +252,21 @@
                 <StackPanel Grid.Row="4" Margin="0,20,0,0">
                     <TextBlock Text="Terms &amp; Conditions:" FontWeight="Bold"/>
                     <TextBlock Text="{Binding CurrentRFQ.Terms}" TextWrapping="Wrap" Margin="5"/>
+
+                    <Grid Margin="0,40,0,0">
+                         <Grid.ColumnDefinitions>
+                             <ColumnDefinition Width="*"/>
+                             <ColumnDefinition Width="*"/>
+                         </Grid.ColumnDefinitions>
+                         <StackPanel HorizontalAlignment="Center">
+                             <TextBlock Text="Vendor Signature &amp; Stamp" FontWeight="Bold"/>
+                             <Border BorderBrush="Black" BorderThickness="1" Height="80" Width="200" Margin="10"/>
+                         </StackPanel>
+                         <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                             <TextBlock Text="Logistics Manager" FontWeight="Bold"/>
+                             <Border BorderBrush="Black" BorderThickness="1" Height="80" Width="200" Margin="10"/>
+                         </StackPanel>
+                    </Grid>
                 </StackPanel>
             </Grid>
         </Border>
@@ -309,8 +326,40 @@
                                 <DataGridTextColumn Header="Est. Price" Binding="{Binding EstimativeUnitPrice}" Width="80"/>
                                 <DataGridTextColumn Header="Est. Total" Binding="{Binding EstimativeTotal}" Width="80"/>
 
-                                <!-- We can't easily do dynamic columns in XAML DataGrid for printing without code-behind or complex hacks,
-                                     so we'll show a summary matrix below or use a simplified view for the print -->
+                                <!-- Bidder Columns -->
+                                <DataGridTemplateColumn Header="BIDDER 1">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding BidderPrices[0].UnitPrice, StringFormat=N2}" Margin="2"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding BidderPrices[0].TotalPrice, StringFormat=N2}" FontWeight="Bold" Margin="2"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Header="BIDDER 2">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding BidderPrices[1].UnitPrice, StringFormat=N2}" Margin="2"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding BidderPrices[1].TotalPrice, StringFormat=N2}" FontWeight="Bold" Margin="2"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Header="BIDDER 3">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding BidderPrices[2].UnitPrice, StringFormat=N2}" Margin="2"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding BidderPrices[2].TotalPrice, StringFormat=N2}" FontWeight="Bold" Margin="2"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                             </DataGrid.Columns>
                         </DataGrid>
                     </ScrollViewer>

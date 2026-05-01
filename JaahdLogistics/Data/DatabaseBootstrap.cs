@@ -68,6 +68,7 @@ namespace JaahdLogistics.Data
                 AddColumnIfMissing(connection, "Bidders", "Discount", "DECIMAL(18, 2) DEFAULT 0");
                 AddColumnIfMissing(connection, "Bidders", "MiscCosts", "DECIMAL(18, 2) DEFAULT 0");
                 AddColumnIfMissing(connection, "Bidders", "TotalAmount", "DECIMAL(18, 2) DEFAULT 0");
+                AddColumnIfMissing(connection, "Bidders", "QuoteScan", "BLOB");
             }
 
             var userCount = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Users");

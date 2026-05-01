@@ -91,6 +91,7 @@ CREATE TABLE IF NOT EXISTS Bidders (
     Discount DECIMAL(18, 2) DEFAULT 0,
     MiscCosts DECIMAL(18, 2) DEFAULT 0,
     TotalAmount DECIMAL(18, 2) DEFAULT 0,
+    QuoteScan BLOB,
     FOREIGN KEY (BidAnalysisId) REFERENCES BidAnalyses(Id)
 );
 

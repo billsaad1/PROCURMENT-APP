@@ -220,8 +220,38 @@ namespace JaahdLogistics.ViewModels
         private void SaveBidAnalysis()
         {
             CurrentBidAnalysis.Bidders = new ObservableCollection<Bidder>(Bidders.ToList());
+            // Sync TotalAmount for DB
+            foreach (var bidder in CurrentBidAnalysis.Bidders)
+            {
+                bidder.TotalAmount = bidder.CalculatedTotal;
+            }
             _dataService.SaveBidAnalysis(CurrentBidAnalysis);
             LoadBidAnalyses();
+            MessageBox.Show("Bid Analysis Saved Successfully");
+        }
+
+        [RelayCommand]
+        private void UploadQuote(Bidder bidder)
+        {
+            if (bidder == null) return;
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "Image Files|*.jpg;*.jpeg;*.png;*.pdf"
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                bidder.QuoteScan = System.IO.File.ReadAllBytes(dialog.FileName);
+                MessageBox.Show("Quote Scan Uploaded.");
+            }
+        }
+
+        [RelayCommand]
+        private void ViewQuote(Bidder bidder)
+        {
+            if (bidder?.QuoteScan == null) return;
+            var tempFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "QuoteScan.png");
+            System.IO.File.WriteAllBytes(tempFile, bidder.QuoteScan);
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(tempFile) { UseShellExecute = true });
         }
 
         [RelayCommand]

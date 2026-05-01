@@ -19,7 +19,7 @@ namespace JaahdLogistics.Models
         public string RecommendedBidderName => Bidders.FirstOrDefault(b => b.Id == RecommendedBidderId)?.Name ?? "None";
     }
 
-    public class Bidder
+    public class Bidder : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
     {
         public int Id { get; set; }
         public int BidAnalysisId { get; set; }
@@ -29,20 +29,27 @@ namespace JaahdLogistics.Models
         public decimal Discount { get; set; }
         public decimal MiscCosts { get; set; }
         public decimal TotalAmount { get; set; }
+        private byte[]? _quoteScan;
+        public byte[]? QuoteScan { get => _quoteScan; set => SetProperty(ref _quoteScan, value); }
         public ObservableCollection<BidItem> Items { get; set; } = new();
 
         public decimal CalculatedSubTotal => Items.Sum(i => i.TotalPrice);
         public decimal CalculatedTotal => CalculatedSubTotal - Discount + MiscCosts;
     }
 
-    public class BidItem
+    public class BidItem : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
     {
         public int Id { get; set; }
         public int BidderId { get; set; }
         public string Description { get; set; } = string.Empty;
         public string? Unit { get; set; }
         public decimal Quantity { get; set; }
-        public decimal UnitPrice { get; set; }
+        private decimal _unitPrice;
+        public decimal UnitPrice
+        {
+            get => _unitPrice;
+            set { SetProperty(ref _unitPrice, value); OnPropertyChanged(nameof(TotalPrice)); }
+        }
         public decimal TotalPrice => Quantity * UnitPrice;
     }
 }

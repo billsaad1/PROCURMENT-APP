@@ -54,6 +54,7 @@
                                   IsSynchronizedWithCurrentItem="True"/>
                         <Button Content="🔄" Command="{Binding LoadApprovedPRsCommand}" Margin="5,0,0,0" ToolTip="Refresh PR List"/>
                         <Button Content="{DynamicResource Generate}" Command="{Binding CreateRFQCommand}" Margin="10,0,0,0"/>
+                        <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" Margin="10,0,0,0" Background="#34495E"/>
                     </StackPanel>
                     <Grid Grid.Row="2">
                         <Grid.ColumnDefinitions>
@@ -124,6 +125,8 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <TextBlock Text="Select RFQ" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <ComboBox ItemsSource="{Binding RFQs}" SelectedItem="{Binding SelectedRFQ}" DisplayMemberPath="RFQNumber" Width="150" Margin="0,0,10,0"/>
                         <Button Content="{DynamicResource CreateNew}" Command="{Binding CreateBidAnalysisCommand}"/>
                         <Button Content="{DynamicResource AddBidder}" Command="{Binding AddBidderCommand}" Margin="10,0,0,0"/>
                         <Button Content="Remove Bidder" Command="{Binding RemoveBidderCommand}" Margin="5,0,0,0" Background="#C0392B"/>
@@ -199,6 +202,11 @@
                                                 <TextBlock Text="GRAND TOTAL: " Foreground="DarkRed"/>
                                                 <TextBlock Text="{Binding CalculatedTotal, StringFormat=N2}" FontWeight="Bold" Foreground="DarkRed"/>
                                             </StackPanel>
+
+                                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                                <Button Content="📁" Command="{Binding DataContext.UploadQuoteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" ToolTip="Upload Quote Scan" Padding="5,2" Margin="0,0,5,0"/>
+                                                <Button Content="👁" Command="{Binding DataContext.ViewQuoteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" ToolTip="View Quote Scan" Padding="5,2" Background="#34495E"/>
+                                            </StackPanel>
                                         </StackPanel>
                                     </Border>
                                 </DataTemplate>
@@ -211,13 +219,15 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="150"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Justification" VerticalAlignment="Center" Margin="5"/>
                         <TextBox Grid.Column="1" Text="{Binding CurrentBidAnalysis.Justification}" Margin="5"/>
 
                         <TextBlock Grid.Column="2" Text="{DynamicResource RecommendedBidder}" VerticalAlignment="Center" Margin="5"/>
-                        <ComboBox Grid.Column="3" ItemsSource="{Binding Bidders}" SelectedValue="{Binding CurrentBidAnalysis.RecommendedBidderId}" SelectedValuePath="Id" DisplayMemberPath="Name" Margin="5"/>
+                        <ComboBox Grid.Column="3" ItemsSource="{Binding Bidders}" SelectedValue="{Binding CurrentBidAnalysis.RecommendedBidderId}" SelectedValuePath="Id" DisplayMemberPath="Name" Margin="5" Width="150"/>
+                        <Button Grid.Column="4" Content="{DynamicResource Print}" Command="{Binding PrintCommand}" Margin="5" Background="#34495E"/>
                     </Grid>
                 </Grid>
             </Grid>
