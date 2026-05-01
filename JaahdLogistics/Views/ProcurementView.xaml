@@ -92,7 +92,7 @@
         <TabItem Header="{DynamicResource BidAnalysis}">
             <Grid Margin="10">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="300"/>
+                    <ColumnDefinition Width="250"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
@@ -110,53 +110,103 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto"/>
                             <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=d}" Width="*"/>
-                            <DataGridTemplateColumn Width="Auto">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Button Content="X" Command="{Binding DataContext.DeleteBidAnalysisCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#C0392B"/>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
 
-                <!-- Right Side: Details/Edit -->
+                <!-- Right Side: Details/Edit (Matrix) -->
                 <Grid Grid.Column="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
+
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                         <Button Content="{DynamicResource CreateNew}" Command="{Binding CreateBidAnalysisCommand}"/>
                         <Button Content="{DynamicResource AddBidder}" Command="{Binding AddBidderCommand}" Margin="10,0,0,0"/>
-                        <Button Content="{DynamicResource Save}" Command="{Binding SaveBidAnalysisCommand}" Margin="10,0,0,0"/>
+                        <Button Content="Remove Bidder" Command="{Binding RemoveBidderCommand}" Margin="5,0,0,0" Background="#C0392B"/>
+                        <Button Content="{DynamicResource Save}" Command="{Binding SaveBidAnalysisCommand}" Margin="10,0,0,0" Background="#27AE60"/>
                         <Button Content="{DynamicResource Approve}" Command="{Binding ApproveBidAnalysisCommand}" Margin="10,0,0,0"/>
                     </StackPanel>
-                    <ScrollViewer Grid.Row="1">
+
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding MatrixRows}" AutoGenerateColumns="False" CanUserAddRows="False" SelectionMode="Single">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="150" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="50" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="QTY" Binding="{Binding Quantity}" Width="50" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Estimative Price" Binding="{Binding EstimativeUnitPrice}" Width="80" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Est. Total" Binding="{Binding EstimativeTotal}" Width="80" IsReadOnly="True"/>
+                        </DataGrid.Columns>
+
+                        <!-- Dynamic Columns for Bidders using ColumnTemplate -->
+                        <DataGrid.Resources>
+                            <!-- We use an ItemsControl inside the row to show bidder prices -->
+                        </DataGrid.Resources>
+
+                        <DataGrid.RowDetailsTemplate>
+                            <DataTemplate>
+                                <ItemsControl ItemsSource="{Binding BidderPrices}" Margin="20,0,0,0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="Gray" BorderThickness="1" Margin="2" Padding="5">
+                                                <StackPanel>
+                                                    <TextBlock Text="Price:" FontSize="10"/>
+                                                    <TextBox Text="{Binding UnitPrice, UpdateSourceTrigger=PropertyChanged}" Width="70"/>
+                                                    <TextBlock Text="{Binding TotalPrice, StringFormat=N2}" FontWeight="Bold"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </DataTemplate>
+                        </DataGrid.RowDetailsTemplate>
+                    </DataGrid>
+
+                    <!-- Bidder Info & Totals Matrix -->
+                    <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Auto" Margin="0,10">
                         <ItemsControl ItemsSource="{Binding Bidders}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <GroupBox Header="{Binding Name}" Margin="0,0,0,10">
+                                    <Border BorderBrush="SteelBlue" BorderThickness="2" Margin="5" Width="200" Padding="10">
                                         <StackPanel>
-                                            <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="5" FontWeight="Bold"/>
-                                            <DataGrid ItemsSource="{Binding Items}" AutoGenerateColumns="False" CanUserAddRows="False">
-                                                <DataGrid.Columns>
-                                                    <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" IsReadOnly="True"/>
-                                                    <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="60" IsReadOnly="True"/>
-                                                    <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="60" IsReadOnly="True"/>
-                                                    <DataGridTextColumn Header="Unit Price" Binding="{Binding UnitPrice, UpdateSourceTrigger=PropertyChanged}" Width="100"/>
-                                                    <DataGridTextColumn Header="Total" Binding="{Binding TotalPrice}" Width="100" IsReadOnly="True"/>
-                                                </DataGrid.Columns>
-                                            </DataGrid>
+                                            <TextBlock Text="Bidder Name" FontWeight="Bold"/>
+                                            <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
+
+                                            <TextBlock Text="Discount"/>
+                                            <TextBox Text="{Binding Discount, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,5"/>
+
+                                            <TextBlock Text="Misc Costs"/>
+                                            <TextBox Text="{Binding MiscCosts, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,5"/>
+
+                                            <Separator Margin="0,5"/>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Subtotal: "/>
+                                                <TextBlock Text="{Binding CalculatedSubTotal, StringFormat=N2}" FontWeight="Bold"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="GRAND TOTAL: " Foreground="DarkRed"/>
+                                                <TextBlock Text="{Binding CalculatedTotal, StringFormat=N2}" FontWeight="Bold" Foreground="DarkRed"/>
+                                            </StackPanel>
                                         </StackPanel>
-                                    </GroupBox>
+                                    </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </ScrollViewer>
-                    <Grid Grid.Row="2" Margin="0,10,0,0">
+
+                    <Grid Grid.Row="3" Margin="0,10,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>

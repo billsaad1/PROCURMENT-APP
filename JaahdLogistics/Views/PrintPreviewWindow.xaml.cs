@@ -15,6 +15,16 @@ namespace JaahdLogistics.Views
             if (template != null)
             {
                 PreviewContent.Template = template;
+
+                // Set landscape for Bid Analysis
+                if (templateName == "BidAnalysisPrintTemplate")
+                {
+                    PreviewContent.Width = 1123;
+                    PreviewContent.Height = 794;
+                    PrintBorder.Width = 1123;
+                    PrintBorder.Height = 794;
+                    this.Width = 1200;
+                }
             }
         }
 

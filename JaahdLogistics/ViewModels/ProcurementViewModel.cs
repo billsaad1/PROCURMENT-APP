@@ -10,6 +10,18 @@ using JaahdLogistics.Helpers;
 
 namespace JaahdLogistics.ViewModels
 {
+    public class BidAnalysisMatrixRow : ObservableObject
+    {
+        public PRItem? SourceItem { get; set; }
+        public ObservableCollection<BidItem> BidderPrices { get; set; } = new();
+
+        public string Description => SourceItem?.Description ?? "";
+        public string Unit => SourceItem?.Unit ?? "";
+        public decimal Quantity => SourceItem?.Quantity ?? 0;
+        public decimal EstimativeUnitPrice => SourceItem?.UnitPrice ?? 0;
+        public decimal EstimativeTotal => Quantity * EstimativeUnitPrice;
+    }
+
     public partial class ProcurementViewModel : ViewModelBase
     {
         private readonly IDataService _dataService;
@@ -52,6 +64,9 @@ namespace JaahdLogistics.ViewModels
 
         [ObservableProperty]
         private ObservableCollection<Bidder> _bidders = new();
+
+        [ObservableProperty]
+        private ObservableCollection<BidAnalysisMatrixRow> _matrixRows = new();
 
         [ObservableProperty]
         private Settings _settings;
@@ -143,23 +158,62 @@ namespace JaahdLogistics.ViewModels
         private void CreateBidAnalysis()
         {
             if (CurrentRFQ.Id == 0) { MessageBox.Show("Please select an RFQ first."); return; }
-            CurrentBidAnalysis = new BidAnalysis { RFQId = CurrentRFQ.Id, Date = DateTime.Now };
+            CurrentBidAnalysis = new BidAnalysis {
+                RFQId = CurrentRFQ.Id,
+                Date = DateTime.Now,
+                Currency = SelectedPR?.Currency ?? "YER",
+                ExchangeRate = SelectedPR?.ExchangeRate ?? 1.0m
+            };
             Bidders = new ObservableCollection<Bidder>();
+            MatrixRows = new ObservableCollection<BidAnalysisMatrixRow>();
             AddBidder();
         }
 
         [RelayCommand]
         private void AddBidder()
         {
-            var bidder = new Bidder { Name = "New Bidder", BidAnalysisId = CurrentBidAnalysis.Id };
+            var bidderNumber = Bidders.Count + 1;
+            var bidder = new Bidder { Name = $"Bidder {bidderNumber}", BidAnalysisId = CurrentBidAnalysis.Id };
+
             if (SelectedPR != null)
             {
+                // If it's the first bidder, initialize matrix rows
+                bool isFirst = Bidders.Count == 0;
+
                 foreach(var item in SelectedPR.Items)
                 {
-                    bidder.Items.Add(new BidItem { Description = item.Description, Quantity = item.Quantity, Unit = item.Unit });
+                    var bidItem = new BidItem { Description = item.Description, Quantity = item.Quantity, Unit = item.Unit };
+                    bidder.Items.Add(bidItem);
+
+                    if (isFirst)
+                    {
+                        var row = new BidAnalysisMatrixRow { SourceItem = item };
+                        row.BidderPrices.Add(bidItem);
+                        MatrixRows.Add(row);
+                    }
+                    else
+                    {
+                        // Add to existing matrix rows
+                        var row = MatrixRows.FirstOrDefault(r => r.Description == item.Description);
+                        row?.BidderPrices.Add(bidItem);
+                    }
                 }
             }
             Bidders.Add(bidder);
+        }
+
+        [RelayCommand]
+        private void RemoveBidder()
+        {
+            if (Bidders.Count <= 1) return;
+            var lastBidder = Bidders.Last();
+
+            foreach(var row in MatrixRows)
+            {
+                if (row.BidderPrices.Count > 0)
+                    row.BidderPrices.RemoveAt(row.BidderPrices.Count - 1);
+            }
+            Bidders.Remove(lastBidder);
         }
 
         [RelayCommand]
@@ -274,7 +328,8 @@ namespace JaahdLogistics.ViewModels
             if (CurrentPO.Status == "Pending") CurrentPO.Status = "CheckedByLogistics";
             else if (CurrentPO.Status == "CheckedByLogistics") CurrentPO.Status = "ReviewedByFinance";
             else if (CurrentPO.Status == "ReviewedByFinance") CurrentPO.Status = "ApprovedByPM";
-            else if (CurrentPO.Status == "ApprovedByPM") CurrentPO.Status = "FinalApproved";
+            else if (CurrentPO.Status == "ApprovedByPM") CurrentPO.Status = "ApprovedByHead";
+            else if (CurrentPO.Status == "ApprovedByHead") CurrentPO.Status = "FinalApproved";
 
             _dataService.ApproveEntity("PO", CurrentPO.Id, user.Id, CurrentPO.Status);
             _dataService.SavePO(CurrentPO);
@@ -292,7 +347,8 @@ namespace JaahdLogistics.ViewModels
             if (CurrentBidAnalysis.Status == "Pending") CurrentBidAnalysis.Status = "CheckedByLogistics";
             else if (CurrentBidAnalysis.Status == "CheckedByLogistics") CurrentBidAnalysis.Status = "ReviewedByFinance";
             else if (CurrentBidAnalysis.Status == "ReviewedByFinance") CurrentBidAnalysis.Status = "ApprovedByPM";
-            else if (CurrentBidAnalysis.Status == "ApprovedByPM") CurrentBidAnalysis.Status = "FinalApproved";
+            else if (CurrentBidAnalysis.Status == "ApprovedByPM") CurrentBidAnalysis.Status = "ApprovedByHead";
+            else if (CurrentBidAnalysis.Status == "ApprovedByHead") CurrentBidAnalysis.Status = "FinalApproved";
 
             _dataService.ApproveEntity("BidAnalysis", CurrentBidAnalysis.Id, user.Id, CurrentBidAnalysis.Status);
             _dataService.SaveBidAnalysis(CurrentBidAnalysis);
@@ -350,6 +406,29 @@ namespace JaahdLogistics.ViewModels
             {
                 CurrentBidAnalysis = value;
                 Bidders = value.Bidders;
+
+                // Ensure PR is loaded for the matrix
+                var rfq = _dataService.GetRFQs().FirstOrDefault(r => r.Id == value.RFQId);
+                if (rfq != null)
+                {
+                    SelectedPR = _dataService.GetPRs().FirstOrDefault(p => p.Id == rfq.PRId);
+                }
+
+                // Rebuild MatrixRows
+                MatrixRows = new ObservableCollection<BidAnalysisMatrixRow>();
+                if (SelectedPR != null && Bidders.Count > 0)
+                {
+                    foreach (var item in SelectedPR.Items)
+                    {
+                        var row = new BidAnalysisMatrixRow { SourceItem = item };
+                        foreach (var bidder in Bidders)
+                        {
+                            var bidItem = bidder.Items.FirstOrDefault(bi => bi.Description == item.Description);
+                            if (bidItem != null) row.BidderPrices.Add(bidItem);
+                        }
+                        MatrixRows.Add(row);
+                    }
+                }
             }
         }
 

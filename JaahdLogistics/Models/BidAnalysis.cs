@@ -12,6 +12,8 @@ namespace JaahdLogistics.Models
         public int? RecommendedBidderId { get; set; }
         public string? Justification { get; set; }
         public string Status { get; set; } = "Pending";
+        public string? Currency { get; set; }
+        public decimal ExchangeRate { get; set; } = 1.0m;
         public ObservableCollection<Bidder> Bidders { get; set; } = new();
 
         public string RecommendedBidderName => Bidders.FirstOrDefault(b => b.Id == RecommendedBidderId)?.Name ?? "None";
@@ -24,7 +26,13 @@ namespace JaahdLogistics.Models
         public string Name { get; set; } = string.Empty;
         public string? Address { get; set; }
         public string? Contact { get; set; }
+        public decimal Discount { get; set; }
+        public decimal MiscCosts { get; set; }
+        public decimal TotalAmount { get; set; }
         public ObservableCollection<BidItem> Items { get; set; } = new();
+
+        public decimal CalculatedSubTotal => Items.Sum(i => i.TotalPrice);
+        public decimal CalculatedTotal => CalculatedSubTotal - Discount + MiscCosts;
     }
 
     public class BidItem

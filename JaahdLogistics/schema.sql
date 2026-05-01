@@ -74,6 +74,8 @@ CREATE TABLE IF NOT EXISTS BidAnalyses (
     RecommendedBidderId INTEGER,
     Justification TEXT,
     Status TEXT DEFAULT 'Pending', -- Pending, LogisticsApproved, FinanceApproved, PMApproved, FinalApproved, Rejected
+    Currency TEXT,
+    ExchangeRate DECIMAL(18, 4),
     Version INTEGER DEFAULT 1,
     LastModified DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (RFQId) REFERENCES RFQs(Id)
@@ -86,6 +88,9 @@ CREATE TABLE IF NOT EXISTS Bidders (
     Address TEXT,
     Contact TEXT,
     Email TEXT,
+    Discount DECIMAL(18, 2) DEFAULT 0,
+    MiscCosts DECIMAL(18, 2) DEFAULT 0,
+    TotalAmount DECIMAL(18, 2) DEFAULT 0,
     FOREIGN KEY (BidAnalysisId) REFERENCES BidAnalyses(Id)
 );
 

@@ -59,6 +59,15 @@ namespace JaahdLogistics.Data
 
                 // Repair PurchaseOrders table
                 AddColumnIfMissing(connection, "PurchaseOrders", "ProjectId", "INTEGER NOT NULL DEFAULT 0");
+
+                // Repair BidAnalyses table
+                AddColumnIfMissing(connection, "BidAnalyses", "Currency", "TEXT");
+                AddColumnIfMissing(connection, "BidAnalyses", "ExchangeRate", "DECIMAL(18, 4)");
+
+                // Repair Bidders table
+                AddColumnIfMissing(connection, "Bidders", "Discount", "DECIMAL(18, 2) DEFAULT 0");
+                AddColumnIfMissing(connection, "Bidders", "MiscCosts", "DECIMAL(18, 2) DEFAULT 0");
+                AddColumnIfMissing(connection, "Bidders", "TotalAmount", "DECIMAL(18, 2) DEFAULT 0");
             }
 
             var userCount = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Users");

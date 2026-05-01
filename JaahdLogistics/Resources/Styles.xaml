@@ -256,7 +256,7 @@
     </ControlTemplate>
 
     <ControlTemplate x:Key="BidAnalysisPrintTemplate">
-        <Border Background="White" Width="793" Height="1122" Padding="40">
+        <Border Background="White" Width="1122" Height="793" Padding="40">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -268,66 +268,121 @@
                 </Grid.RowDefinitions>
 
                 <!-- Header -->
-                <Grid Margin="0,0,0,20">
+                <Grid Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Image Source="{Binding Data.Settings.LogoImage, Source={StaticResource Proxy}, Converter={StaticResource ImageBytesConverter}}" Height="80" Width="80"/>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="20,0,0,0">
-                        <TextBlock Text="{Binding Data.Settings.AssociationName, Source={StaticResource Proxy}}" FontSize="20" FontWeight="Bold"/>
-                        <TextBlock Text="Bid Analysis / Comparison" FontSize="16" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding Data.Settings.AssociationName, Source={StaticResource Proxy}}" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Analysis of RFQs" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding CurrentBidAnalysis.Date, StringFormat='Date: {0:d}'}"/>
+                        <TextBlock Text="{Binding CurrentRFQ.RFQNumber, StringFormat='RFQ: {0}'}"/>
                     </StackPanel>
                 </Grid>
 
-                <Separator Grid.Row="1" Margin="0,0,0,20"/>
+                <Separator Grid.Row="1" Margin="0,0,0,10"/>
 
-                <Grid Grid.Row="2" Margin="0,0,0,10">
-                    <TextBlock Text="Analysis for RFQ: " FontWeight="Bold" HorizontalAlignment="Left"/>
-                    <TextBlock Text="{Binding CurrentRFQ.RFQNumber}" Margin="110,0,0,0"/>
+                <Border Grid.Row="2" Background="#EEE" Margin="0,0,0,10" Padding="5">
+                    <TextBlock Text="Justification For The Request" FontWeight="Bold" Foreground="#800000"/>
+                </Border>
+
+                <!-- Comparison Table (Matrix) -->
+                <Grid Grid.Row="3">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Matrix Content -->
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <DataGrid ItemsSource="{Binding MatrixRows}" AutoGenerateColumns="False" IsReadOnly="True" BorderBrush="Black" BorderThickness="1">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="NO" Binding="{Binding SourceItem.Id}" Width="30"/>
+                                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
+                                <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="50"/>
+                                <DataGridTextColumn Header="QTY" Binding="{Binding Quantity}" Width="50"/>
+                                <DataGridTextColumn Header="Est. Price" Binding="{Binding EstimativeUnitPrice}" Width="80"/>
+                                <DataGridTextColumn Header="Est. Total" Binding="{Binding EstimativeTotal}" Width="80"/>
+
+                                <!-- We can't easily do dynamic columns in XAML DataGrid for printing without code-behind or complex hacks,
+                                     so we'll show a summary matrix below or use a simplified view for the print -->
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </ScrollViewer>
                 </Grid>
 
-                <!-- Bidders Comparison -->
-                <ItemsControl Grid.Row="3" ItemsSource="{Binding Bidders}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Margin="0,0,0,15">
-                                <TextBlock Text="{Binding Name}" FontWeight="Bold" Background="#EEE" Padding="5"/>
-                                <DataGrid ItemsSource="{Binding Items}" AutoGenerateColumns="False" IsReadOnly="True" BorderThickness="0,0,0,1">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
-                                        <DataGridTextColumn Header="Qty" Binding="{Binding Quantity}" Width="50"/>
-                                        <DataGridTextColumn Header="Price" Binding="{Binding UnitPrice}" Width="80"/>
-                                        <DataGridTextColumn Header="Total" Binding="{Binding TotalPrice}" Width="80"/>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                <!-- Bidder Comparison Summary -->
+                <Grid Grid.Row="4" Margin="0,10">
+                    <ItemsControl ItemsSource="{Binding Bidders}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="Black" BorderThickness="1" Margin="2" Width="150">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" HorizontalAlignment="Center" Background="#DDD"/>
+                                        <Border Padding="5">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="4" Margin="0,10">
-                    <TextBlock Text="Justification:" FontWeight="Bold"/>
-                    <TextBlock Text="{Binding CurrentBidAnalysis.Justification}" TextWrapping="Wrap" Margin="5"/>
-                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                         <TextBlock Text="Recommended Bidder: " FontWeight="Bold"/>
-                         <TextBlock Text="{Binding CurrentBidAnalysis.RecommendedBidderName}"/>
-                    </StackPanel>
-                </StackPanel>
+                                                <TextBlock Text="Subtotal:"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding CalculatedSubTotal, StringFormat=N2}"/>
+
+                                                <TextBlock Grid.Row="1" Text="Discount:"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Discount, StringFormat=N2}"/>
+
+                                                <TextBlock Grid.Row="2" Text="Misc:"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding MiscCosts, StringFormat=N2}"/>
+
+                                                <TextBlock Grid.Row="3" Text="TOTAL:" FontWeight="Bold"/>
+                                                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding CalculatedTotal, StringFormat=N2}" FontWeight="Bold"/>
+                                            </Grid>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
 
                 <!-- Signatures -->
-                <UniformGrid Grid.Row="5" Columns="3" Margin="0,20,0,0">
+                <UniformGrid Grid.Row="5" Columns="4" Margin="0,20,0,0">
                     <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="Logistics" FontWeight="Bold"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="50" Width="120" Margin="5"/>
+                        <TextBlock Text="Checked By" FontWeight="Bold"/>
+                        <TextBlock Text="Logistics Manager" FontSize="10"/>
+                        <Border BorderBrush="Black" BorderThickness="1" Height="40" Width="150" Margin="5"/>
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="Finance" FontWeight="Bold"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="50" Width="120" Margin="5"/>
+                        <TextBlock Text="Reviewed By" FontWeight="Bold"/>
+                        <TextBlock Text="Finance Manager" FontSize="10"/>
+                        <Border BorderBrush="Black" BorderThickness="1" Height="40" Width="150" Margin="5"/>
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="Project Manager" FontWeight="Bold"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="50" Width="120" Margin="5"/>
+                        <TextBlock Text="Reviewed By" FontWeight="Bold"/>
+                        <TextBlock Text="Project Manager" FontSize="10"/>
+                        <Border BorderBrush="Black" BorderThickness="1" Height="40" Width="150" Margin="5"/>
+                    </StackPanel>
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="Approved By" FontWeight="Bold"/>
+                        <TextBlock Text="Head of Association" FontSize="10"/>
+                        <Border BorderBrush="Black" BorderThickness="1" Height="40" Width="150" Margin="5"/>
                     </StackPanel>
                 </UniformGrid>
             </Grid>
@@ -388,34 +443,39 @@
                     <TextBlock Text="{Binding CurrentPO.TotalAmount, StringFormat='Total: {0:N2}'}" FontSize="16" FontWeight="Bold"/>
                 </StackPanel>
 
-                <UniformGrid Grid.Row="5" Columns="4" Margin="0,40,0,0">
+                <UniformGrid Grid.Row="5" Columns="5" Margin="0,40,0,0">
                     <StackPanel HorizontalAlignment="Center">
                         <TextBlock Text="Logistics" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5">
+                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="100" Margin="5">
                              <Image Source="{Binding CurrentPO.LogisticsSignature, Converter={StaticResource ImageBytesConverter}}"/>
                         </Border>
-                        <TextBlock Text="{Binding CurrentPO.LogisticsName}" FontSize="10" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding CurrentPO.LogisticsName}" FontSize="8" HorizontalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Center">
                         <TextBlock Text="Finance" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5">
+                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="100" Margin="5">
                              <Image Source="{Binding CurrentPO.FinanceSignature, Converter={StaticResource ImageBytesConverter}}"/>
                         </Border>
-                        <TextBlock Text="{Binding CurrentPO.FinanceName}" FontSize="10" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding CurrentPO.FinanceName}" FontSize="8" HorizontalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Center">
                         <TextBlock Text="Project Manager" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5">
+                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="100" Margin="5">
                              <Image Source="{Binding CurrentPO.PMSignature, Converter={StaticResource ImageBytesConverter}}"/>
                         </Border>
-                        <TextBlock Text="{Binding CurrentPO.PMName}" FontSize="10" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding CurrentPO.PMName}" FontSize="8" HorizontalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="Approved By" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5">
+                        <TextBlock Text="Head of Assoc." FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="100" Margin="5">
+                             <!-- Signature image for Head of Association can be added here if you have a separate property or use the last one -->
                              <Image Source="{Binding CurrentPO.FinalSignature, Converter={StaticResource ImageBytesConverter}}"/>
                         </Border>
-                        <TextBlock Text="{Binding CurrentPO.FinalName}" FontSize="10" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding CurrentPO.FinalName}" FontSize="8" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="Final Approval" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="100" Margin="5"/>
                     </StackPanel>
                 </UniformGrid>
             </Grid>

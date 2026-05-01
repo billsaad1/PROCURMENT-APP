@@ -266,14 +266,14 @@ namespace JaahdLogistics.Services
                 if (analysis.Id == 0)
                 {
                     analysis.Id = connection.QuerySingle<int>(
-                        "INSERT INTO BidAnalyses (RFQId, Date, RecommendedBidderId, Justification, Status) " +
-                        "VALUES (@RFQId, @Date, @RecommendedBidderId, @Justification, @Status); SELECT last_insert_rowid();",
+                        "INSERT INTO BidAnalyses (RFQId, Date, RecommendedBidderId, Justification, Status, Currency, ExchangeRate) " +
+                        "VALUES (@RFQId, @Date, @RecommendedBidderId, @Justification, @Status, @Currency, @ExchangeRate); SELECT last_insert_rowid();",
                         analysis, transaction);
                 }
                 else
                 {
                     connection.Execute(
-                        "UPDATE BidAnalyses SET RecommendedBidderId=@RecommendedBidderId, Justification=@Justification, Status=@Status WHERE Id=@Id",
+                        "UPDATE BidAnalyses SET RecommendedBidderId=@RecommendedBidderId, Justification=@Justification, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate WHERE Id=@Id",
                         analysis, transaction);
                     connection.Execute("DELETE FROM BidItems WHERE BidderId IN (SELECT Id FROM Bidders WHERE BidAnalysisId = @Id)", new { analysis.Id }, transaction);
                     connection.Execute("DELETE FROM Bidders WHERE BidAnalysisId = @Id", new { analysis.Id }, transaction);
@@ -283,7 +283,8 @@ namespace JaahdLogistics.Services
                 {
                     bidder.BidAnalysisId = analysis.Id;
                     bidder.Id = connection.QuerySingle<int>(
-                        "INSERT INTO Bidders (BidAnalysisId, Name, Address, Contact) VALUES (@BidAnalysisId, @Name, @Address, @Contact); SELECT last_insert_rowid();",
+                        "INSERT INTO Bidders (BidAnalysisId, Name, Address, Contact, Discount, MiscCosts, TotalAmount) " +
+                        "VALUES (@BidAnalysisId, @Name, @Address, @Contact, @Discount, @MiscCosts, @TotalAmount); SELECT last_insert_rowid();",
                         bidder, transaction);
 
                     foreach (var item in bidder.Items)
