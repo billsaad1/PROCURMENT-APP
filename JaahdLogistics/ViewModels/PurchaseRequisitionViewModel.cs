@@ -113,7 +113,7 @@ namespace JaahdLogistics.ViewModels
             {
                 CurrentPR.ProjectId = value.Id;
                 BudgetLines = new ObservableCollection<BudgetLine>(_dataService.GetBudgetLines(value.Id));
-
+                
                 // Automatic Numbering (only for new PRs)
                 if (string.IsNullOrEmpty(CurrentPR.PRNumber))
                 {
@@ -178,9 +178,9 @@ namespace JaahdLogistics.ViewModels
 
                     var remaining = _dataService.GetRemainingBudget(item.BudgetLineId, CurrentPR.Id > 0 ? CurrentPR.Id : (int?)null);
                     var budgetLine = BudgetLines.FirstOrDefault(b => b.Id == item.BudgetLineId);
-
+                    
                     decimal itemPriceInBudgetCurrency = item.TotalPrice;
-
+                    
                     // If PR is YER and Budget is USD
                     if (CurrentPR.Currency == "YER" && budgetLine?.Currency == "USD" && CurrentPR.ExchangeRate > 0)
                     {
@@ -202,7 +202,7 @@ namespace JaahdLogistics.ViewModels
                 {
                     MessageBox.Show("Warning: One or more items exceed the budget limit.\n\n" + BudgetWarning, "Budget Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
-
+                
                 _dataService.SavePR(CurrentPR);
                 LoadPRs();
                 MessageBox.Show("PR Saved Successfully");
@@ -225,7 +225,7 @@ namespace JaahdLogistics.ViewModels
         private void SelectPR(PurchaseRequisition pr)
         {
             if (pr == null) return;
-
+            
             // Ensure OnBudgetLineChanged is set for loaded items
             foreach (var item in pr.Items)
             {
@@ -264,7 +264,7 @@ namespace JaahdLogistics.ViewModels
         [RelayCommand]
         private void Approve()
         {
-            try
+            try 
             {
                 var user = AuthService.CurrentUser;
                 if (user == null)

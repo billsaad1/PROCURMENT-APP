@@ -14,7 +14,7 @@ namespace JaahdLogistics.ViewModels
     {
         public PRItem? SourceItem { get; set; }
         public ObservableCollection<BidItem> BidderPrices { get; set; } = new();
-
+        
         public string Description => SourceItem?.Description ?? "";
         public string Unit => SourceItem?.Unit ?? "";
         public decimal Quantity => SourceItem?.Quantity ?? 0;
@@ -116,11 +116,11 @@ namespace JaahdLogistics.ViewModels
             {
                 var mainVM = Application.Current.MainWindow.DataContext as MainViewModel;
                 var helper = new NumberingHelper(mainVM?.ConnectionString ?? "Data Source=jaahd.db");
-                CurrentRFQ = new RFQ
-                {
-                    PRId = SelectedPR.Id,
+                CurrentRFQ = new RFQ 
+                { 
+                    PRId = SelectedPR.Id, 
                     Date = DateTime.Now,
-                    RFQNumber = helper.GenerateNumber("RFQ", SelectedPR.ProjectId)
+                    RFQNumber = helper.GenerateNumber("RFQ", SelectedPR.ProjectId) 
                 };
                 _dataService.SaveRFQ(CurrentRFQ);
                 LoadRFQs();
@@ -158,8 +158,8 @@ namespace JaahdLogistics.ViewModels
         private void CreateBidAnalysis()
         {
             if (CurrentRFQ.Id == 0) { MessageBox.Show("Please select an RFQ first."); return; }
-            CurrentBidAnalysis = new BidAnalysis {
-                RFQId = CurrentRFQ.Id,
+            CurrentBidAnalysis = new BidAnalysis { 
+                RFQId = CurrentRFQ.Id, 
                 Date = DateTime.Now,
                 Currency = SelectedPR?.Currency ?? "YER",
                 ExchangeRate = SelectedPR?.ExchangeRate ?? 1.0m
@@ -174,17 +174,17 @@ namespace JaahdLogistics.ViewModels
         {
             var bidderNumber = Bidders.Count + 1;
             var bidder = new Bidder { Name = $"Bidder {bidderNumber}", BidAnalysisId = CurrentBidAnalysis.Id };
-
+            
             if (SelectedPR != null)
             {
                 // If it's the first bidder, initialize matrix rows
                 bool isFirst = Bidders.Count == 0;
-
+                
                 foreach(var item in SelectedPR.Items)
                 {
                     var bidItem = new BidItem { Description = item.Description, Quantity = item.Quantity, Unit = item.Unit };
                     bidder.Items.Add(bidItem);
-
+                    
                     if (isFirst)
                     {
                         var row = new BidAnalysisMatrixRow { SourceItem = item };
@@ -206,7 +206,7 @@ namespace JaahdLogistics.ViewModels
         private void RemoveBidder(Bidder bidder)
         {
             if (bidder == null || Bidders.Count <= 1) return;
-
+            
             int index = Bidders.IndexOf(bidder);
             if (index < 0) return;
 
@@ -286,11 +286,11 @@ namespace JaahdLogistics.ViewModels
             foreach (var item in SelectedPR.Items)
             {
                 if (item.BudgetLineId == 0) continue;
-
+                
                 var budgetLines = _dataService.GetBudgetLines(SelectedPR.ProjectId);
                 var budgetLine = budgetLines.FirstOrDefault(b => b.Id == (int)item.BudgetLineId);
                 var remaining = _dataService.GetRemainingBudget((int)item.BudgetLineId, SelectedPR.Id);
-
+                
                 decimal itemPriceInBudgetCurrency = item.TotalPrice;
                 if (SelectedPR.Currency == "YER" && budgetLine?.Currency == "USD" && SelectedPR.ExchangeRate > 0)
                     itemPriceInBudgetCurrency = item.TotalPrice / SelectedPR.ExchangeRate;
@@ -324,9 +324,9 @@ namespace JaahdLogistics.ViewModels
             var mainVM = Application.Current.MainWindow.DataContext as MainViewModel;
             var helper = new NumberingHelper(mainVM?.ConnectionString ?? "Data Source=jaahd.db");
 
-            CurrentPO = new PurchaseOrder
-            {
-                PRId = SelectedPR.Id,
+            CurrentPO = new PurchaseOrder 
+            { 
+                PRId = SelectedPR.Id, 
                 ProjectId = SelectedPR.ProjectId,
                 BidAnalysisId = SkipBidAnalysis ? (int?)null : analysisToUse?.Id,
                 Date = DateTime.Now,
@@ -380,7 +380,7 @@ namespace JaahdLogistics.ViewModels
 
             _dataService.ApproveEntity("PO", CurrentPO.Id, user.Id, CurrentPO.Status);
             _dataService.SavePO(CurrentPO);
-
+            
             MessageBox.Show($"PO {CurrentPO.PONumber} status updated to: {CurrentPO.Status}");
         }
 
@@ -399,7 +399,7 @@ namespace JaahdLogistics.ViewModels
 
             _dataService.ApproveEntity("BidAnalysis", CurrentBidAnalysis.Id, user.Id, CurrentBidAnalysis.Status);
             _dataService.SaveBidAnalysis(CurrentBidAnalysis);
-
+            
             MessageBox.Show($"Bid Analysis status updated to: {CurrentBidAnalysis.Status}");
         }
 
@@ -460,7 +460,7 @@ namespace JaahdLogistics.ViewModels
                 {
                     SelectedPR = _dataService.GetPRs().FirstOrDefault(p => p.Id == rfq.PRId);
                 }
-
+                
                 // Rebuild MatrixRows
                 MatrixRows = new ObservableCollection<BidAnalysisMatrixRow>();
                 if (SelectedPR != null && Bidders.Count > 0)

@@ -82,7 +82,7 @@ namespace JaahdLogistics.ViewModels
         private void VerifyMatch()
         {
             if (SelectedPO == null) return;
-
+            
             var grn = _dataService.GetGRNs().FirstOrDefault(g => g.POId == SelectedPO.Id);
             if (grn == null)
             {
@@ -90,14 +90,14 @@ namespace JaahdLogistics.ViewModels
                 return;
             }
 
-            CurrentMatch = new ThreeWayMatch
-            {
-                POId = SelectedPO.Id,
+            CurrentMatch = new ThreeWayMatch 
+            { 
+                POId = SelectedPO.Id, 
                 GRNId = grn.Id,
                 Date = System.DateTime.Now,
-                Status = "Verified"
+                Status = "Verified" 
             };
-
+            
             _dataService.SaveThreeWayMatch(CurrentMatch);
             System.Windows.MessageBox.Show("Three-Way Match Verified Successfully");
         }

@@ -93,20 +93,20 @@ namespace JaahdLogistics.ViewModels
         private void CreateGRN()
         {
             if (SelectedPO == null) return;
-            CurrentGRN = new GoodsReceivingNotes
-            {
-                POId = SelectedPO.Id,
+            CurrentGRN = new GoodsReceivingNotes 
+            { 
+                POId = SelectedPO.Id, 
                 GRNNumber = "GRN-" + SelectedPO.PONumber,
                 ReceiverId = AuthService.CurrentUser?.Id ?? 0
             };
             GrnItems.Clear();
             foreach(var item in SelectedPO.Items)
             {
-                GrnItems.Add(new GRNItems
-                {
-                    POItemId = item.Id,
-                    Description = item.Description,
-                    OrderedQuantity = item.Quantity
+                GrnItems.Add(new GRNItems 
+                { 
+                    POItemId = item.Id, 
+                    Description = item.Description, 
+                    OrderedQuantity = item.Quantity 
                 });
             }
         }

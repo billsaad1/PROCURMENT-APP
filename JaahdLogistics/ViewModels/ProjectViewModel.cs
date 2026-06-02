@@ -65,13 +65,13 @@ namespace JaahdLogistics.ViewModels
             try
             {
                 if (SelectedProject == null) return;
-
+                
                 _dataService.SaveProject(SelectedProject);
                 foreach (var line in BudgetLines)
                 {
                     _dataService.SaveBudgetLine(line.Model);
                 }
-
+                
                 MessageBox.Show("Project and Budget Lines saved successfully.");
                 OnSelectedProjectChanged(SelectedProject); // Refresh to recalculate remaining
             }
@@ -120,7 +120,7 @@ namespace JaahdLogistics.ViewModels
     public partial class BudgetLineDisplay : ObservableObject
     {
         public BudgetLine Model { get; }
-
+        
         [ObservableProperty]
         private decimal _spent;
 
@@ -138,17 +138,17 @@ namespace JaahdLogistics.ViewModels
         public string Name { get => Model.Name; set { Model.Name = value; OnPropertyChanged(); } }
         public string? Description { get => Model.Description; set { Model.Description = value; OnPropertyChanged(); } }
         public string? Unit { get => Model.Unit; set { Model.Unit = value; OnPropertyChanged(); } }
-
-        public decimal Quantity
-        {
-            get => Model.Quantity;
-            set { Model.Quantity = value; Model.TotalAmount = Model.Quantity * Model.UnitPrice; OnPropertyChanged(); OnPropertyChanged(nameof(TotalAmount)); UpdateRemaining(); }
+        
+        public decimal Quantity 
+        { 
+            get => Model.Quantity; 
+            set { Model.Quantity = value; Model.TotalAmount = Model.Quantity * Model.UnitPrice; OnPropertyChanged(); OnPropertyChanged(nameof(TotalAmount)); UpdateRemaining(); } 
         }
-
-        public decimal UnitPrice
-        {
-            get => Model.UnitPrice;
-            set { Model.UnitPrice = value; Model.TotalAmount = Model.Quantity * Model.UnitPrice; OnPropertyChanged(); OnPropertyChanged(nameof(TotalAmount)); UpdateRemaining(); }
+        
+        public decimal UnitPrice 
+        { 
+            get => Model.UnitPrice; 
+            set { Model.UnitPrice = value; Model.TotalAmount = Model.Quantity * Model.UnitPrice; OnPropertyChanged(); OnPropertyChanged(nameof(TotalAmount)); UpdateRemaining(); } 
         }
 
         public decimal TotalAmount => Model.TotalAmount;

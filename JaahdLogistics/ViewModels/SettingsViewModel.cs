@@ -54,7 +54,7 @@ namespace JaahdLogistics.ViewModels
                 {
                     mainVM.ReloadSettings();
                 }
-
+                
                 System.Windows.MessageBox.Show("Settings saved successfully.");
             }
             catch (System.Exception ex)

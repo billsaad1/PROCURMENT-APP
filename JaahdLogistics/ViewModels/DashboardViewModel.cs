@@ -55,10 +55,10 @@ namespace JaahdLogistics.ViewModels
             if (user == null) return;
 
             var allPRs = _dataService.GetPRs();
-
+            
             // If user is PM/Officer, only show their PRs. Admins see all.
-            var filtered = (user.Role == "Admin" || user.Role == "FinanceManager")
-                ? allPRs
+            var filtered = (user.Role == "Admin" || user.Role == "FinanceManager") 
+                ? allPRs 
                 : allPRs.Where(p => p.RequesterId == user.Id);
 
             foreach (var pr in filtered)
