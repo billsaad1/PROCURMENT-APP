@@ -18,10 +18,10 @@ namespace JaahdLogistics.Helpers
             using var connection = new SqliteConnection(_connectionString);
             var project = connection.QuerySingleOrDefault<JaahdLogistics.Models.Project>("SELECT * FROM Projects WHERE Id = @projectId", new { projectId });
             if (project == null) return $"{prefix}-{DateTime.Now.Year}-001";
-
+            
             string projectCode = project.Code;
             int year = project.Year;
-
+            
             // Get current count for this type and project
             string countQuery = prefix switch {
                 "PR" => "SELECT COUNT(*) FROM PurchaseRequisitions WHERE ProjectId = @projectId",
@@ -33,7 +33,7 @@ namespace JaahdLogistics.Helpers
 
             // SQLite COUNT(*) returns Int64 (long)
             var count = connection.ExecuteScalar<long>(countQuery, new { projectId });
-
+            
             return $"{projectCode}-{year}-JAAHD-{prefix}-{(count + 1):D3}";
         }
     }

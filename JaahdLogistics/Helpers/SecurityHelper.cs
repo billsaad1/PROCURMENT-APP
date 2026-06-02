@@ -24,7 +24,7 @@ namespace JaahdLogistics.Helpers
             if (string.IsNullOrEmpty(hash)) return false;
 
             // Backward compatibility check for un-salted/un-prefixed hashes if any exist
-            if (hash.Length == 64 && !hash.StartsWith("$"))
+            if (hash.Length == 64 && !hash.StartsWith("$")) 
             {
                 using (var sha256 = SHA256.Create())
                 {
