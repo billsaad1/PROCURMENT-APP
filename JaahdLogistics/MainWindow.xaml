@@ -43,14 +43,14 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
+        
         <Border Grid.Row="0" Background="{StaticResource SecondaryBlueBrush}" Padding="5">
             <Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                     <Button Content="English" Command="{Binding SwitchLanguageCommand}" CommandParameter="en" Width="80" Margin="5" Background="Transparent" BorderThickness="1" BorderBrush="White"/>
                     <Button Content="العربية" Command="{Binding SwitchLanguageCommand}" CommandParameter="ar" Width="80" Margin="5" Background="Transparent" BorderThickness="1" BorderBrush="White"/>
                 </StackPanel>
-
+                
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button Content="{DynamicResource Dashboard}" Command="{Binding ShowViewCommand}" CommandParameter="Dashboard" Margin="5" Background="Transparent" FontWeight="SemiBold"/>
                     <Button Content="{DynamicResource Projects}" Command="{Binding ShowViewCommand}" CommandParameter="Projects" Margin="5" Background="Transparent" FontWeight="SemiBold"/>
