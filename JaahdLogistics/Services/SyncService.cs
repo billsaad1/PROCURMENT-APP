@@ -49,7 +49,7 @@ namespace JaahdLogistics.Services
                 // 2. Connect to cloud database using Dapper
                 // 3. Perform Upsert for Projects, PRs, POs, etc.
                 // 4. Download new data from cloud that isn't local.
-
+                
                 // For demonstration of the requested "Cloud Ready" architecture:
                 // using var cloudConn = new Microsoft.Data.Sqlite.SqliteConnection(_cloudConnectionString);
                 // ... sync logic ...

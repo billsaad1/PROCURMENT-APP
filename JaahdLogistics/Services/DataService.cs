@@ -102,7 +102,7 @@ namespace JaahdLogistics.Services
             connection.Open();
             using var transaction = connection.BeginTransaction();
             try {
-                // Cascading delete for demo purposes.
+                // Cascading delete for demo purposes. 
                 // In production, you'd usually restrict deletion of projects with active procurement.
                 connection.Execute("DELETE FROM PRItems WHERE PRId IN (SELECT Id FROM PurchaseRequisitions WHERE ProjectId = @id)", new { id }, transaction);
                 connection.Execute("DELETE FROM PurchaseRequisitions WHERE ProjectId = @id", new { id }, transaction);
@@ -286,7 +286,7 @@ namespace JaahdLogistics.Services
                         "INSERT INTO Bidders (BidAnalysisId, Name, Address, Contact, Discount, MiscCosts, TotalAmount, QuoteScan) " +
                         "VALUES (@BidAnalysisId, @Name, @Address, @Contact, @Discount, @MiscCosts, @TotalAmount, @QuoteScan); SELECT last_insert_rowid();",
                         bidder, transaction);
-
+                    
                     foreach (var item in bidder.Items)
                     {
                         item.BidderId = bidder.Id;
@@ -353,15 +353,15 @@ namespace JaahdLogistics.Services
                 {
                     pr.Id = connection.QuerySingle<int>(
                         "INSERT INTO PurchaseRequisitions (PRNumber, ProjectId, RequesterId, Date, Justification, Currency, ExchangeRate, Status) " +
-                        "VALUES (@PRNumber, @ProjectId, @RequesterId, @Date, @Justification, @Currency, @ExchangeRate, @Status); SELECT last_insert_rowid();",
+                        "VALUES (@PRNumber, @ProjectId, @RequesterId, @Date, @Justification, @Currency, @ExchangeRate, @Status); SELECT last_insert_rowid();", 
                         pr, transaction);
                 }
                 else
                 {
                     connection.Execute(
-                        "UPDATE PurchaseRequisitions SET PRNumber=@PRNumber, ProjectId=@ProjectId, Justification=@Justification, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate WHERE Id=@Id",
+                        "UPDATE PurchaseRequisitions SET PRNumber=@PRNumber, ProjectId=@ProjectId, Justification=@Justification, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate WHERE Id=@Id", 
                         pr, transaction);
-
+                    
                     try {
                         connection.Execute("DELETE FROM PRItems WHERE PRId = @Id", new { pr.Id }, transaction);
                     } catch (SqliteException ex) when (ex.SqliteErrorCode == 19) {
@@ -438,7 +438,7 @@ namespace JaahdLogistics.Services
             string sql = "SELECT pi.Quantity, pi.UnitPrice, pr.Currency, pr.ExchangeRate " +
                          "FROM PRItems pi JOIN PurchaseRequisitions pr ON pi.PRId = pr.Id " +
                          "WHERE pi.BudgetLineId = @budgetLineId AND pr.Status != 'Rejected'";
-
+            
             if (excludePRId.HasValue)
             {
                 sql += " AND pr.Id != @excludePRId";
@@ -475,7 +475,7 @@ namespace JaahdLogistics.Services
             using var connection = new SqliteConnection(_connectionString);
             var budgetLine = connection.QuerySingleOrDefault<BudgetLine>("SELECT * FROM BudgetLines WHERE Id = @budgetLineId", new { budgetLineId });
             if (budgetLine == null) return 0;
-
+            
             return budgetLine.TotalAmount - GetSpentBudget(budgetLineId, excludePRId);
         }
 
@@ -508,33 +508,33 @@ namespace JaahdLogistics.Services
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
             using var transaction = connection.BeginTransaction();
-
+            
             try {
                 var grnId = connection.QuerySingle<int>(
-                    "INSERT INTO GoodsReceivingNotes (GRNNumber, POId, ReceiverId) VALUES (@GRNNumber, @POId, @ReceiverId); SELECT last_insert_rowid();",
+                    "INSERT INTO GoodsReceivingNotes (GRNNumber, POId, ReceiverId) VALUES (@GRNNumber, @POId, @ReceiverId); SELECT last_insert_rowid();", 
                     grn, transaction);
-
+                
                 foreach(var item in items) {
                     item.GRNId = grnId;
                     connection.Execute(
                         "INSERT INTO GRNItems (GRNId, POItemId, ReceivedQuantity, AcceptedQuantity, RejectedQuantity, RejectReason) " +
-                        "VALUES (@GRNId, @POItemId, @ReceivedQuantity, @AcceptedQuantity, @RejectedQuantity, @RejectReason)",
+                        "VALUES (@GRNId, @POItemId, @ReceivedQuantity, @AcceptedQuantity, @RejectedQuantity, @RejectReason)", 
                         item, transaction);
-
+                    
                     var poItem = connection.QuerySingle<POItem>("SELECT * FROM POItems WHERE Id = @POItemId", new { item.POItemId }, transaction);
                     var po = connection.QuerySingle<PurchaseOrder>("SELECT * FROM PurchaseOrders WHERE Id = @POId", new { POId = poItem.POId }, transaction);
-
+                    
                     var existing = connection.QuerySingleOrDefault<int?>(
-                        "SELECT Id FROM Inventory WHERE ItemDescription = @Description AND ProjectId = @ProjectId",
+                        "SELECT Id FROM Inventory WHERE ItemDescription = @Description AND ProjectId = @ProjectId", 
                         new { Description = poItem.Description, ProjectId = po.ProjectId }, transaction);
-
+                    
                     if (existing.HasValue) {
                         connection.Execute(
-                            "UPDATE Inventory SET CurrentQuantity = CurrentQuantity + @AcceptedQuantity WHERE Id = @Id",
+                            "UPDATE Inventory SET CurrentQuantity = CurrentQuantity + @AcceptedQuantity WHERE Id = @Id", 
                             new { AcceptedQuantity = item.AcceptedQuantity, Id = existing.Value }, transaction);
                     } else {
                         connection.Execute(
-                            "INSERT INTO Inventory (ItemDescription, ProjectId, CurrentQuantity, Unit) VALUES (@Description, @ProjectId, @AcceptedQuantity, @Unit)",
+                            "INSERT INTO Inventory (ItemDescription, ProjectId, CurrentQuantity, Unit) VALUES (@Description, @ProjectId, @AcceptedQuantity, @Unit)", 
                             new { Description = poItem.Description, ProjectId = po.ProjectId, AcceptedQuantity = item.AcceptedQuantity, Unit = poItem.Unit }, transaction);
                     }
                 }

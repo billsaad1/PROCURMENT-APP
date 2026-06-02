@@ -24,8 +24,8 @@ namespace JaahdLogistics.Services
         public static bool CanApprovePR()
         {
             if (CurrentUser == null) return false;
-            return CurrentUser.Role == "LogisticsManager" ||
-                   CurrentUser.Role == "FinanceManager" ||
+            return CurrentUser.Role == "LogisticsManager" || 
+                   CurrentUser.Role == "FinanceManager" || 
                    CurrentUser.Role == "ProjectManager" ||
                    CurrentUser.Role == "HeadOfAssociation" ||
                    CurrentUser.Role == "Admin";
