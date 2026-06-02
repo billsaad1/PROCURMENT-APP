@@ -18,15 +18,15 @@ namespace JaahdLogistics.Data
         public void Setup()
         {
             using var connection = new SqliteConnection(_connectionString);
-
+            
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string schemaPath = Path.Combine(baseDir, "schema.sql");
-
+            
             if (File.Exists(schemaPath))
             {
                 string schema = File.ReadAllText(schemaPath);
                 connection.Execute(schema);
-
+                
                 // Repair Projects table
                 AddColumnIfMissing(connection, "Projects", "Name", "TEXT NOT NULL DEFAULT ''");
                 AddColumnIfMissing(connection, "Projects", "Code", "TEXT NOT NULL DEFAULT ''");
@@ -42,7 +42,7 @@ namespace JaahdLogistics.Data
                 // Repair PurchaseRequisitions table
                 AddColumnIfMissing(connection, "PurchaseRequisitions", "Currency", "TEXT NOT NULL DEFAULT 'USD'");
                 AddColumnIfMissing(connection, "PurchaseRequisitions", "ExchangeRate", "DECIMAL(18, 4) DEFAULT 1.0");
-
+                
                 // Repair Settings table
                 AddColumnIfMissing(connection, "Settings", "Address", "TEXT");
                 AddColumnIfMissing(connection, "Settings", "ContactInfo", "TEXT");
@@ -70,7 +70,7 @@ namespace JaahdLogistics.Data
                 AddColumnIfMissing(connection, "Bidders", "TotalAmount", "DECIMAL(18, 2) DEFAULT 0");
                 AddColumnIfMissing(connection, "Bidders", "QuoteScan", "BLOB");
             }
-
+            
             var userCount = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Users");
             if (userCount == 0)
             {
@@ -104,7 +104,7 @@ namespace JaahdLogistics.Data
         private void CreateUser(SqliteConnection connection, string username, string password, string role, string fullName)
         {
             string hash = JaahdLogistics.Helpers.SecurityHelper.HashPassword(password);
-            connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES (@username, @hash, @role, @fullName)",
+            connection.Execute("INSERT INTO Users (Username, PasswordHash, Role, FullName) VALUES (@username, @hash, @role, @fullName)", 
                 new { username, hash, role, fullName });
         }
 
@@ -112,15 +112,15 @@ namespace JaahdLogistics.Data
         {
             var user = connection.QuerySingleOrDefault<JaahdLogistics.Models.User>("SELECT * FROM Users WHERE Username = @username", new { username });
             string hash = JaahdLogistics.Helpers.SecurityHelper.HashPassword(password);
-
+            
             if (user == null)
             {
                 CreateUser(connection, username, password, role, fullName);
             }
-            else if (user.PasswordHash == password || !JaahdLogistics.Helpers.SecurityHelper.VerifyPassword(password, user.PasswordHash))
+            else if (user.PasswordHash == password || !JaahdLogistics.Helpers.SecurityHelper.VerifyPassword(password, user.PasswordHash)) 
             {
                 // Reset if it's plaintext OR if verification fails (might happen if salt changed or hash was corrupted)
-                connection.Execute("UPDATE Users SET PasswordHash = @hash, Role = @role, FullName = @fullName WHERE Username = @username",
+                connection.Execute("UPDATE Users SET PasswordHash = @hash, Role = @role, FullName = @fullName WHERE Username = @username", 
                     new { hash, username, role, fullName });
             }
         }
