@@ -32,7 +32,7 @@ namespace JaahdLogistics.Models
 
         private string _status = "Pending";
         public string Status { get => _status; set => SetProperty(ref _status, value); }
-
+        
         private byte[]? _requesterSignature;
         public byte[]? RequesterSignature { get => _requesterSignature; set => SetProperty(ref _requesterSignature, value); }
 
@@ -82,7 +82,7 @@ namespace JaahdLogistics.Models
     {
         public int Id { get; set; }
         public int PRId { get; set; }
-
+        
         private int _budgetLineId;
         public int BudgetLineId { get => _budgetLineId; set { if (SetProperty(ref _budgetLineId, value)) { OnBudgetLineChanged?.Invoke(this); } } }
 

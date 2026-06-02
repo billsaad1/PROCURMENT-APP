@@ -8,24 +8,24 @@ namespace JaahdLogistics.Models
     public class PurchaseOrder : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
     {
         public int Id { get; set; }
-
+        
         private string _poNumber = string.Empty;
         public string PONumber { get => _poNumber; set => SetProperty(ref _poNumber, value); }
-
+        
         public int PRId { get; set; }
-        public int ProjectId { get; set; }
+        public int ProjectId { get; set; } 
         public int? BidAnalysisId { get; set; }
         public int? VendorId { get; set; }
-
+        
         private DateTime _date;
         public DateTime Date { get => _date; set => SetProperty(ref _date, value); }
-
+        
         private string? _terms;
         public string? Terms { get => _terms; set => SetProperty(ref _terms, value); }
-
+        
         private string _status = "Pending";
         public string Status { get => _status; set => SetProperty(ref _status, value); }
-
+        
         public ObservableCollection<POItem> Items { get; set; } = new();
 
         private byte[]? _logisticsSignature;
@@ -69,7 +69,7 @@ namespace JaahdLogistics.Models
     {
         public int Id { get; set; }
         public int POId { get; set; }
-
+        
         private string _description = string.Empty;
         public string Description { get => _description; set => SetProperty(ref _description, value); }
 
