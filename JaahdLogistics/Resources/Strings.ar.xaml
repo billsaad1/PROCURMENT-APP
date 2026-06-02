@@ -81,6 +81,22 @@
     <s:String x:Key="OrderCount">عدد الطلبات</s:String>
     <s:String x:Key="TotalValue">القيمة الإجمالية</s:String>
     <s:String x:Key="Date">التاريخ</s:String>
+    <s:String x:Key="CheckedBy">تم الفحص بواسطة</s:String>
+    <s:String x:Key="ReviewedBy">تمت المراجعة بواسطة</s:String>
+    <s:String x:Key="ApprovedBy">تم الاعتماد بواسطة</s:String>
+    <s:String x:Key="Position">المنصب</s:String>
+    <s:String x:Key="LogisticManager">مدير الخدمات اللوجستية</s:String>
+    <s:String x:Key="FinanceManager">المدير المالي</s:String>
+    <s:String x:Key="ProjectManager">مدير المشروع</s:String>
+    <s:String x:Key="Signature">التوقيع</s:String>
+    <s:String x:Key="TotalCost">إجمالي التكلفة</s:String>
+    <s:String x:Key="SupplyTerms">شروط التوريد</s:String>
+    <s:String x:Key="Tel">الهاتف</s:String>
+    <s:String x:Key="Email">البريد الإلكتروني</s:String>
+    <s:String x:Key="Address">العنوان</s:String>
+    <s:String x:Key="Clause">الشرط/البند</s:String>
+    <s:String x:Key="Contact">جهة الاتصال</s:String>
+    <s:String x:Key="Vendor">المورد</s:String>
     <s:String x:Key="UserSignature">توقيعي</s:String>
     <s:String x:Key="UploadSignature">تحميل التوقيع</s:String>
 </ResourceDictionary>

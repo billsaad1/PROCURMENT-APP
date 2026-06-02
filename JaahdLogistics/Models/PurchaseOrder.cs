@@ -22,7 +22,13 @@ namespace JaahdLogistics.Models
         
         private string? _terms;
         public string? Terms { get => _terms; set => SetProperty(ref _terms, value); }
+
+        private string? _clause;
+        public string? Clause { get => _clause; set => SetProperty(ref _clause, value); }
         
+        private Bidder? _vendor;
+        public Bidder? Vendor { get => _vendor; set => SetProperty(ref _vendor, value); }
+
         private string _status = "Pending";
         public string Status { get => _status; set => SetProperty(ref _status, value); }
         

@@ -204,6 +204,11 @@ namespace JaahdLogistics.Services
                 var items = connection.Query<POItem>("SELECT * FROM POItems WHERE POId = @Id", new { po.Id }).ToList();
                 po.Items = new ObservableCollection<POItem>(items);
 
+                if (po.VendorId.HasValue)
+                {
+                    po.Vendor = connection.QuerySingleOrDefault<Bidder>("SELECT * FROM Bidders WHERE Id = @VendorId", new { po.VendorId });
+                }
+
                 // Load Approvals for PO
                 var approvals = GetApprovals("PO", po.Id);
                 foreach (var app in approvals)
@@ -283,8 +288,8 @@ namespace JaahdLogistics.Services
                 {
                     bidder.BidAnalysisId = analysis.Id;
                     bidder.Id = connection.QuerySingle<int>(
-                        "INSERT INTO Bidders (BidAnalysisId, Name, Address, Contact, Discount, MiscCosts, TotalAmount, QuoteScan) " +
-                        "VALUES (@BidAnalysisId, @Name, @Address, @Contact, @Discount, @MiscCosts, @TotalAmount, @QuoteScan); SELECT last_insert_rowid();",
+                        "INSERT INTO Bidders (BidAnalysisId, Name, Address, Contact, Tel, Email, Discount, MiscCosts, TotalAmount, QuoteScan) " +
+                        "VALUES (@BidAnalysisId, @Name, @Address, @Contact, @Tel, @Email, @Discount, @MiscCosts, @TotalAmount, @QuoteScan); SELECT last_insert_rowid();",
                         bidder, transaction);
                     
                     foreach (var item in bidder.Items)
@@ -314,14 +319,14 @@ namespace JaahdLogistics.Services
                 if (po.Id == 0)
                 {
                     po.Id = connection.QuerySingle<int>(
-                        "INSERT INTO PurchaseOrders (PONumber, PRId, ProjectId, BidAnalysisId, VendorId, Date, Terms, Status) " +
-                        "VALUES (@PONumber, @PRId, @ProjectId, @BidAnalysisId, @VendorId, @Date, @Terms, @Status); SELECT last_insert_rowid();",
+                        "INSERT INTO PurchaseOrders (PONumber, PRId, ProjectId, BidAnalysisId, VendorId, Date, Terms, Clause, Status) " +
+                        "VALUES (@PONumber, @PRId, @ProjectId, @BidAnalysisId, @VendorId, @Date, @Terms, @Clause, @Status); SELECT last_insert_rowid();",
                         po, transaction);
                 }
                 else
                 {
                     connection.Execute(
-                        "UPDATE PurchaseOrders SET PONumber=@PONumber, Terms=@Terms, Status=@Status WHERE Id=@Id",
+                        "UPDATE PurchaseOrders SET PONumber=@PONumber, Date=@Date, VendorId=@VendorId, Terms=@Terms, Clause=@Clause, Status=@Status WHERE Id=@Id",
                         po, transaction);
                     connection.Execute("DELETE FROM POItems WHERE POId = @Id", new { po.Id }, transaction);
                 }

@@ -40,8 +40,17 @@ namespace JaahdLogistics.Models
         private string _name = string.Empty;
         public string Name { get => _name; set => SetProperty(ref _name, value); }
         
-        public string? Address { get; set; }
-        public string? Contact { get; set; }
+        private string? _address;
+        public string? Address { get => _address; set => SetProperty(ref _address, value); }
+
+        private string? _contact;
+        public string? Contact { get => _contact; set => SetProperty(ref _contact, value); }
+
+        private string? _tel;
+        public string? Tel { get => _tel; set => SetProperty(ref _tel, value); }
+
+        private string? _email;
+        public string? Email { get => _email; set => SetProperty(ref _email, value); }
         
         private decimal _discount;
         public decimal Discount { get => _discount; set { if (SetProperty(ref _discount, value)) OnPropertyChanged(nameof(CalculatedTotal)); } }

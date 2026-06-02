@@ -331,7 +331,8 @@ namespace JaahdLogistics.ViewModels
                 BidAnalysisId = SkipBidAnalysis ? (int?)null : analysisToUse?.Id,
                 Date = DateTime.Now,
                 PONumber = helper.GenerateNumber("PO", SelectedPR.ProjectId),
-                Status = "Pending"
+                Status = "Pending",
+                Terms = Settings.POTerms
             };
 
             if (SkipBidAnalysis)
@@ -347,6 +348,7 @@ namespace JaahdLogistics.ViewModels
                 if (winner != null)
                 {
                     CurrentPO.VendorId = winner.Id;
+                    CurrentPO.Vendor = winner;
                     foreach(var item in winner.Items)
                     {
                         CurrentPO.Items.Add(new POItem { Description = item.Description, Quantity = item.Quantity, Unit = item.Unit, UnitPrice = item.UnitPrice });
@@ -435,6 +437,15 @@ namespace JaahdLogistics.ViewModels
         public void LoadPOs()
         {
             POs = new ObservableCollection<PurchaseOrder>(_dataService.GetPOs());
+        }
+
+        [RelayCommand]
+        private void SavePO()
+        {
+            if (CurrentPO == null) return;
+            _dataService.SavePO(CurrentPO);
+            LoadPOs();
+            MessageBox.Show("Purchase Order Saved Successfully");
         }
 
         partial void OnSelectedRFQChanged(RFQ? value)

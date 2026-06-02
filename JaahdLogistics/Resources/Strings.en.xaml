@@ -80,6 +80,22 @@
     <s:String x:Key="OrderCount">Order Count</s:String>
     <s:String x:Key="TotalValue">Total Value</s:String>
     <s:String x:Key="Date">Date</s:String>
+    <s:String x:Key="CheckedBy">Checked by</s:String>
+    <s:String x:Key="ReviewedBy">Reviewed by</s:String>
+    <s:String x:Key="ApprovedBy">Approved by</s:String>
+    <s:String x:Key="Position">Position</s:String>
+    <s:String x:Key="LogisticManager">Logistic Manager</s:String>
+    <s:String x:Key="FinanceManager">Finance Manager</s:String>
+    <s:String x:Key="ProjectManager">Project Manager</s:String>
+    <s:String x:Key="Signature">Signature</s:String>
+    <s:String x:Key="TotalCost">Total Cost</s:String>
+    <s:String x:Key="SupplyTerms">Terms of Supply</s:String>
+    <s:String x:Key="Tel">Tel</s:String>
+    <s:String x:Key="Email">Email</s:String>
+    <s:String x:Key="Address">Address</s:String>
+    <s:String x:Key="Clause">Clause</s:String>
+    <s:String x:Key="Contact">Contact</s:String>
+    <s:String x:Key="Vendor">Vendor</s:String>
     <s:String x:Key="UserSignature">My Signature</s:String>
     <s:String x:Key="UploadSignature">Upload Signature</s:String>
 </ResourceDictionary>

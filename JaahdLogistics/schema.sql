@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS Bidders (
     Name TEXT NOT NULL,
     Address TEXT,
     Contact TEXT,
+    Tel TEXT,
     Email TEXT,
     Discount DECIMAL(18, 2) DEFAULT 0,
     MiscCosts DECIMAL(18, 2) DEFAULT 0,
@@ -114,6 +115,7 @@ CREATE TABLE IF NOT EXISTS PurchaseOrders (
     VendorId INTEGER, -- Points to Bidders(Id)
     Date DATETIME DEFAULT CURRENT_TIMESTAMP,
     Terms TEXT,
+    Clause TEXT,
     Status TEXT DEFAULT 'Pending', -- Pending, LogisticsApproved, FinanceApproved, PMApproved, FinalApproved, Rejected
     Version INTEGER DEFAULT 1,
     LastModified DATETIME DEFAULT CURRENT_TIMESTAMP,
