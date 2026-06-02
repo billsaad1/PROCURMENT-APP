@@ -9,7 +9,7 @@ namespace JaahdLogistics.Views
         {
             InitializeComponent();
             DataContext = dataContext;
-
+            
             // Set the template based on the form type
             var template = Application.Current.TryFindResource(templateName) as ControlTemplate;
             if (template != null)

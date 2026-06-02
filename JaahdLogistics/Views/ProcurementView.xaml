@@ -1,10 +1,10 @@
 <UserControl x:Class="JaahdLogistics.Views.ProcurementView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:JaahdLogistics.Views"
-             mc:Ignorable="d"
+             mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="900">
     <TabControl Margin="10" SelectedIndex="{Binding SelectedTabIndex}">
         <TabItem Header="{DynamicResource RFQ}">
@@ -13,7 +13,7 @@
                     <ColumnDefinition Width="300"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-
+                
                 <!-- Left Side: List -->
                 <Grid Margin="0,0,10,0">
                     <Grid.RowDefinitions>
@@ -67,17 +67,17 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-
+                        
                         <TextBlock Text="{DynamicResource RFQNumber}" Margin="5" VerticalAlignment="Center"/>
                         <TextBox Grid.Column="1" Text="{Binding CurrentRFQ.RFQNumber}" Margin="5"/>
-
+                        
                         <TextBlock Grid.Column="2" Text="Closing Date" Margin="5" VerticalAlignment="Center"/>
                         <DatePicker Grid.Column="3" SelectedDate="{Binding CurrentRFQ.ClosingDate}" Margin="5"/>
-
+                        
                         <TextBlock Grid.Row="1" Text="Terms" Margin="5" VerticalAlignment="Top"/>
                         <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding CurrentRFQ.Terms}" TextWrapping="Wrap" AcceptsReturn="True" Height="60" Margin="5"/>
                     </Grid>
-
+                    
                     <GroupBox Grid.Row="3" Header="RFQ Items (from PR)" Margin="0,10,0,0">
                         <DataGrid ItemsSource="{Binding SelectedPR.Items}" AutoGenerateColumns="False" IsReadOnly="True">
                             <DataGrid.Columns>
@@ -123,7 +123,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-
+                    
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                         <TextBlock Text="Select RFQ" VerticalAlignment="Center" Margin="0,0,10,0"/>
                         <ComboBox ItemsSource="{Binding RFQs}" SelectedItem="{Binding SelectedRFQ}" DisplayMemberPath="RFQNumber" Width="150" Margin="0,0,10,0"/>
@@ -161,7 +161,7 @@
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                             </Grid>
-
+                            
                             <ItemsControl ItemsSource="{Binding MatrixRows}">
                                 <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -201,7 +201,7 @@
                         </ItemsControl>
                         </StackPanel>
                     </ScrollViewer>
-
+                    
                     <!-- Bidder Info & Totals Matrix -->
                     <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Auto" Margin="0,10">
                         <ItemsControl ItemsSource="{Binding Bidders}">
@@ -216,13 +216,13 @@
                                         <StackPanel>
                                             <TextBlock Text="Bidder Name" FontWeight="Bold"/>
                                             <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
-
+                                            
                                             <TextBlock Text="Discount"/>
                                             <TextBox Text="{Binding Discount, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,5"/>
-
+                                            
                                             <TextBlock Text="Misc Costs"/>
                                             <TextBox Text="{Binding MiscCosts, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,5"/>
-
+                                            
                                             <Separator Margin="0,5"/>
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock Text="Subtotal: "/>
@@ -232,7 +232,7 @@
                                                 <TextBlock Text="GRAND TOTAL: " Foreground="DarkRed"/>
                                                 <TextBlock Text="{Binding CalculatedTotal, StringFormat=N2}" FontWeight="Bold" Foreground="DarkRed"/>
                                             </StackPanel>
-
+                                            
                                             <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                                                 <Button Content="📁" Command="{Binding DataContext.UploadQuoteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" ToolTip="Upload Quote Scan" Padding="5,2" Margin="0,0,5,0"/>
                                                 <Button Content="👁" Command="{Binding DataContext.ViewQuoteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" ToolTip="View Quote Scan" Padding="5,2" Background="#34495E" Margin="0,0,5,0"/>
@@ -255,7 +255,7 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Justification" VerticalAlignment="Center" Margin="5"/>
                         <TextBox Grid.Column="1" Text="{Binding CurrentBidAnalysis.Justification}" Margin="5"/>
-
+                        
                         <TextBlock Grid.Column="2" Text="{DynamicResource RecommendedBidder}" VerticalAlignment="Center" Margin="5"/>
                         <ComboBox Grid.Column="3" ItemsSource="{Binding Bidders}" SelectedValue="{Binding CurrentBidAnalysis.RecommendedBidderId}" SelectedValuePath="Id" DisplayMemberPath="Name" Margin="5" Width="150"/>
                         <Button Grid.Column="4" Content="{DynamicResource Print}" Command="{Binding PrintCommand}" Margin="5" Background="#34495E"/>
@@ -311,7 +311,7 @@
                         <Button Content="{DynamicResource CreatePO}" Command="{Binding CreatePOCommand}"/>
                         <CheckBox Content="Direct Purchase (Skip RFQ/Bid Analysis)" IsChecked="{Binding SkipBidAnalysis}" VerticalAlignment="Center" Margin="20,0,0,0"/>
                     </StackPanel>
-
+                
                 <ScrollViewer Grid.Row="1" x:Name="POPrintRoot">
                     <Grid Margin="15" Background="White">
                         <Grid.RowDefinitions>
@@ -329,7 +329,7 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Image Source="{Binding DataContext.Settings.LogoImage, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource ImageBytesConverter}}"
+                            <Image Source="{Binding DataContext.Settings.LogoImage, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource ImageBytesConverter}}" 
                                    Height="60" Width="60" Margin="0,0,15,0"/>
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding DataContext.Settings.AssociationName, RelativeSource={RelativeSource AncestorType=UserControl}}" FontSize="16" FontWeight="Bold"/>
@@ -394,7 +394,7 @@
                         </UniformGrid>
                     </Grid>
                 </ScrollViewer>
-
+                
                 <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
                     <Button Content="{DynamicResource Approve}" Command="{Binding ApprovePOCommand}" Width="120" Margin="0,0,10,0"/>
                     <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" CommandParameter="{Binding ElementName=POPrintRoot}" Width="120"/>

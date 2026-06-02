@@ -19,13 +19,13 @@
         </Border>
 
         <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <Border x:Name="PrintBorder" Background="White" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Top"
+            <Border x:Name="PrintBorder" Background="White" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Top" 
                     BorderBrush="Black" BorderThickness="1">
                 <Border.LayoutTransform>
                     <ScaleTransform ScaleX="{Binding ElementName=ZoomSlider, Path=Value}" ScaleY="{Binding ElementName=ZoomSlider, Path=Value}"/>
                 </Border.LayoutTransform>
                 <!-- A4 Paper size in 96 DPI: 794 x 1123 -->
-                <Control x:Name="PreviewContent" Width="794" Height="1123"
+                <Control x:Name="PreviewContent" Width="794" Height="1123" 
                          Template="{StaticResource PrintFormTemplate}"/>
             </Border>
         </ScrollViewer>

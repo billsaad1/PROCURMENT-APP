@@ -8,18 +8,18 @@
         </Border.Effect>
         <StackPanel Width="300">
             <TextBlock Text="{DynamicResource Login}" FontSize="28" FontWeight="Bold" Foreground="{StaticResource SecondaryBlueBrush}" HorizontalAlignment="Center" Margin="0,0,0,30"/>
-
+            
             <TextBlock Text="{DynamicResource Username}" Margin="0,0,0,5" FontWeight="SemiBold"/>
             <TextBox Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" Height="35" Margin="0,0,0,15"/>
-
+            
             <TextBlock Text="{DynamicResource Password}" Margin="0,0,0,5" FontWeight="SemiBold"/>
             <PasswordBox x:Name="PassBox" Height="35" Margin="0,0,0,30"/>
-
-            <Button Content="{DynamicResource Login}"
-                    Command="{Binding LoginCommand}"
+            
+            <Button Content="{DynamicResource Login}" 
+                    Command="{Binding LoginCommand}" 
                     CommandParameter="{Binding ElementName=PassBox}"
                     Height="40" FontSize="16" FontWeight="Bold"/>
-
+            
             <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" HorizontalAlignment="Center" Margin="0,15,0,0" TextWrapping="Wrap"/>
         </StackPanel>
     </Border>
