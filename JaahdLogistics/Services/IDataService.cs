@@ -41,5 +41,9 @@ namespace JaahdLogistics.Services
         void DeleteThreeWayMatch(int id);
         IEnumerable<ThreeWayMatch> GetThreeWayMatches();
         IEnumerable<string> GetPreviousItemDescriptions();
+        IEnumerable<Vendor> GetVendors();
+        void SaveVendor(Vendor vendor);
+        void DeleteVendor(int id);
+        IEnumerable<PRItem> GetPRItemsForRFQ(int rfqId);
     }
 }

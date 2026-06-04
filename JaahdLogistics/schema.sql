@@ -73,12 +73,26 @@ CREATE TABLE IF NOT EXISTS BidAnalyses (
     Date DATETIME DEFAULT CURRENT_TIMESTAMP,
     RecommendedBidderId INTEGER,
     Justification TEXT,
+    RecommendationReasons TEXT,
     Status TEXT DEFAULT 'Pending', -- Pending, LogisticsApproved, FinanceApproved, PMApproved, FinalApproved, Rejected
     Currency TEXT,
     ExchangeRate DECIMAL(18, 4),
     Version INTEGER DEFAULT 1,
     LastModified DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (RFQId) REFERENCES RFQs(Id)
+);
+
+CREATE TABLE IF NOT EXISTS Vendors (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name TEXT NOT NULL,
+    Address TEXT,
+    Contact TEXT,
+    Tel TEXT,
+    Email TEXT,
+    Category TEXT,
+    TaxId TEXT,
+    BankInfo TEXT,
+    IsActive INTEGER DEFAULT 1
 );
 
 CREATE TABLE IF NOT EXISTS Bidders (

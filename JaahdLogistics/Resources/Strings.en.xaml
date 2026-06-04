@@ -98,4 +98,7 @@
     <s:String x:Key="Vendor">Vendor</s:String>
     <s:String x:Key="UserSignature">My Signature</s:String>
     <s:String x:Key="UploadSignature">Upload Signature</s:String>
+    <s:String x:Key="Vendors">Vendors</s:String>
+    <s:String x:Key="RecommendationReasons">Recommendation Reasons</s:String>
+    <s:String x:Key="RecommendedBidder">Recommended Bidder</s:String>
 </ResourceDictionary>

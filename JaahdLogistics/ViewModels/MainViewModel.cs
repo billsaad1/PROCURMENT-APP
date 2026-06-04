@@ -85,6 +85,9 @@ namespace JaahdLogistics.ViewModels
                 case "Match":
                     CurrentViewModel = new ThreeWayMatchViewModel(_dataService);
                     break;
+                case "Vendors":
+                    CurrentViewModel = new VendorViewModel(_dataService);
+                    break;
                 case "Settings":
                     CurrentViewModel = new SettingsViewModel(_dataService);
                     break;

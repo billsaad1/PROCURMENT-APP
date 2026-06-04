@@ -280,182 +280,349 @@
     </ControlTemplate>
 
     <ControlTemplate x:Key="BidAnalysisPrintTemplate">
-        <Border Background="White" Width="1122" Height="793" Padding="40">
+        <Border Background="White" Width="1122" Height="793" Padding="20">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/> <!-- Header -->
+                    <RowDefinition Height="Auto"/> <!-- Title -->
+                    <RowDefinition Height="Auto"/> <!-- Info Bar -->
+                    <RowDefinition Height="Auto"/> <!-- Justification -->
+                    <RowDefinition Height="*"/>    <!-- Comparison Matrix -->
+                    <RowDefinition Height="Auto"/> <!-- Recommendation -->
+                    <RowDefinition Height="Auto"/> <!-- Signatures -->
                 </Grid.RowDefinitions>
 
                 <!-- Header -->
-                <Grid Margin="0,0,0,10">
+                <Grid Margin="0,0,5,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Source="{Binding Data.Settings.LogoImage, Source={StaticResource Proxy}, Converter={StaticResource ImageBytesConverter}}" Height="50" Width="50"/>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="{Binding Data.Settings.AssociationName, Source={StaticResource Proxy}}" FontSize="14" FontWeight="Bold" TextDecorations="Underline"/>
+                        <TextBlock Text="Logistics Management" FontSize="12" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+
+                <Border Grid.Row="1" Background="#1B4F72" Margin="0,5">
+                    <TextBlock Text="Analysis of RFQs" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" Margin="5"/>
+                </Border>
+
+                <!-- Info Bar -->
+                <Grid Grid.Row="2" Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Image Source="{Binding Data.Settings.LogoImage, Source={StaticResource Proxy}, Converter={StaticResource ImageBytesConverter}}" Height="80" Width="80"/>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="20,0,0,0">
-                        <TextBlock Text="{Binding Data.Settings.AssociationName, Source={StaticResource Proxy}}" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        <TextBlock Text="Analysis of RFQs" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                    </StackPanel>
-                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding CurrentBidAnalysis.Date, StringFormat='Date: {0:d}'}"/>
-                        <TextBlock Text="{Binding CurrentRFQ.RFQNumber, StringFormat='RFQ: {0}'}"/>
-                    </StackPanel>
+                    <Border BorderBrush="Black" BorderThickness="1" Padding="5">
+                        <TextBlock Text="RFQ or Tender reference number" FontWeight="Bold" FontSize="9"/>
+                    </Border>
+                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
+                        <TextBlock Text="{Binding CurrentRFQ.RFQNumber}" HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
+                        <TextBlock Text="Date of Analysis:" FontWeight="Bold" FontSize="9"/>
+                    </Border>
+                    <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5" Width="100">
+                        <TextBlock Text="{Binding CurrentBidAnalysis.Date, StringFormat=MM/dd/yyyy}" HorizontalAlignment="Center"/>
+                    </Border>
                 </Grid>
 
-                <Separator Grid.Row="1" Margin="0,0,0,10"/>
+                <!-- Justification -->
+                <Grid Grid.Row="3" Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Background="#922B21" Padding="5" Width="250">
+                        <TextBlock Text="Justification For The Request" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Padding="5">
+                        <TextBlock Text="{Binding CurrentBidAnalysis.Justification}" FontSize="9"/>
+                    </Border>
+                </Grid>
 
-                <Border Grid.Row="2" Background="#EEE" Margin="0,0,0,10" Padding="5">
-                    <TextBlock Text="Justification For The Request" FontWeight="Bold" Foreground="#800000"/>
-                </Border>
-
-                <!-- Comparison Table (Matrix) -->
-                <Grid Grid.Row="3">
+                <!-- Matrix -->
+                <Grid Grid.Row="4">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/> <!-- Bidders header rows -->
+                        <RowDefinition Height="*"/>    <!-- Items rows -->
                     </Grid.RowDefinitions>
-                    
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <StackPanel>
-                            <!-- Header -->
-                            <Grid Background="#EEE">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="200"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Description / Unit / Qty" FontWeight="Bold" Margin="5"/>
-                                <ItemsControl Grid.Column="1" ItemsSource="{Binding Bidders}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border BorderBrush="Black" BorderThickness="1,0,1,0" Width="100">
-                                                <TextBlock Text="{Binding Name}" FontWeight="Bold" HorizontalAlignment="Center"/>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </Grid>
-                            
-                            <ItemsControl ItemsSource="{Binding MatrixRows}">
+
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="30"/> <!-- NO -->
+                            <ColumnDefinition Width="200"/> <!-- Description -->
+                            <ColumnDefinition Width="50"/> <!-- Unit -->
+                            <ColumnDefinition Width="50"/> <!-- QTY -->
+                            <ColumnDefinition Width="120"/> <!-- Estimative -->
+                            <ColumnDefinition Width="*"/> <!-- Bidders -->
+                        </Grid.ColumnDefinitions>
+
+                        <!-- BIDDER labels -->
+                        <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,1,1,1">
+                            <ItemsControl ItemsSource="{Binding Bidders}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="200"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Border BorderBrush="Gray" BorderThickness="0,0,0,1">
-                                                <StackPanel Margin="5">
-                                                    <TextBlock Text="{Binding Description}" FontWeight="Bold"/>
-                                                    <TextBlock Text="{Binding Unit, StringFormat='Unit: \{0\}'}" FontSize="10"/>
-                                                    <TextBlock Text="{Binding Quantity, StringFormat='Qty: \{0\}'}" FontSize="10"/>
-                                                </StackPanel>
-                                            </Border>
-                                            <ItemsControl Grid.Column="1" ItemsSource="{Binding BidderPrices}">
-                                                <ItemsControl.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <StackPanel Orientation="Horizontal"/>
-                                                    </ItemsPanelTemplate>
-                                                </ItemsControl.ItemsPanel>
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <Border BorderBrush="Gray" BorderThickness="1" Width="100">
-                                                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                                                <TextBlock Text="{Binding UnitPrice, StringFormat=N2}" FontSize="10"/>
-                                                                <TextBlock Text="{Binding TotalPrice, StringFormat=N2}" FontWeight="Bold"/>
-                                                            </StackPanel>
-                                                        </Border>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
+                                        <Border BorderBrush="Black" BorderThickness="0,0,1,0" Width="120">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Name, StringFormat='BIDDER \{0\}'}" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center" Margin="2"/>
+                                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                                                <TextBlock Text="{Binding Address}" FontSize="8" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+
+                        <Border Grid.Row="0" Grid.Column="0" BorderBrush="Black" BorderThickness="1,1,1,1" Padding="2"><TextBlock Text="NO" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="2"><TextBlock Text="Description" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
+                        <Border Grid.Row="0" Grid.Column="2" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="2"><TextBlock Text="Unit" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
+                        <Border Grid.Row="0" Grid.Column="3" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="2"><TextBlock Text="QTY" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
+                        <Border Grid.Row="0" Grid.Column="4" BorderBrush="Black" BorderThickness="0,1,1,1">
+                             <StackPanel>
+                                 <Border Background="#FAD7A0" Padding="2"><TextBlock Text="Estimative Cost" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
+                                 <Grid>
+                                     <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                     <Border BorderBrush="Black" BorderThickness="0,1,1,0"><TextBlock Text="Unit Price" FontSize="7" HorizontalAlignment="Center"/></Border>
+                                     <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,0,0"><TextBlock Text="Total" FontSize="7" HorizontalAlignment="Center"/></Border>
+                                 </Grid>
+                             </StackPanel>
+                        </Border>
+                        <!-- Bidder Sub-headers (Price/Total) -->
+                        <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,0,0,1">
+                            <ItemsControl ItemsSource="{Binding Bidders}">
+                                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Width="120">
+                                            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                            <Border BorderBrush="Black" BorderThickness="0,0,1,0"><TextBlock Text="Unit Price" FontSize="7" HorizontalAlignment="Center"/></Border>
+                                            <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,0"><TextBlock Text="Total" FontSize="7" HorizontalAlignment="Center"/></Border>
                                         </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                        </StackPanel>
-                    </ScrollViewer>
-                </Grid>
+                        </Border>
+                    </Grid>
 
-                <!-- Bidder Comparison Summary -->
-                <Grid Grid.Row="4" Margin="0,10">
-                    <ItemsControl ItemsSource="{Binding Bidders}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
+                    <ItemsControl Grid.Row="1" ItemsSource="{Binding MatrixRows}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border BorderBrush="Black" BorderThickness="1" Margin="2" Width="150">
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" HorizontalAlignment="Center" Background="#DDD"/>
-                                        <Border Padding="5">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto"/>
-                                                    <RowDefinition Height="Auto"/>
-                                                    <RowDefinition Height="Auto"/>
-                                                    <RowDefinition Height="Auto"/>
-                                                </Grid.RowDefinitions>
-                                                
-                                                <TextBlock Text="Subtotal:"/>
-                                                <TextBlock Grid.Column="1" Text="{Binding CalculatedSubTotal, StringFormat=N2}"/>
-                                                
-                                                <TextBlock Grid.Row="1" Text="Discount:"/>
-                                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Discount, StringFormat=N2}"/>
-                                                
-                                                <TextBlock Grid.Row="2" Text="Misc:"/>
-                                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding MiscCosts, StringFormat=N2}"/>
-                                                
-                                                <TextBlock Grid.Row="3" Text="TOTAL:" FontWeight="Bold"/>
-                                                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding CalculatedTotal, StringFormat=N2}" FontWeight="Bold"/>
-                                            </Grid>
-                                        </Border>
-                                    </StackPanel>
-                                </Border>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="30"/>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition Width="120"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border BorderBrush="Black" BorderThickness="1,0,1,1"><TextBlock Text="{Binding Index}" FontSize="8" HorizontalAlignment="Center"/></Border>
+                                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1"><TextBlock Text="{Binding Description}" FontSize="8" Margin="2" TextWrapping="Wrap"/></Border>
+                                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,0,1,1"><TextBlock Text="{Binding Unit}" FontSize="8" HorizontalAlignment="Center"/></Border>
+                                    <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,1,1"><TextBlock Text="{Binding Quantity}" FontSize="8" HorizontalAlignment="Center"/></Border>
+                                    <Border Grid.Column="4" BorderBrush="Black" BorderThickness="0,0,1,1">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                            <Border BorderBrush="Black" BorderThickness="0,0,1,0"><TextBlock Text="{Binding EstimativeUnitPrice, StringFormat=N2}" FontSize="8" HorizontalAlignment="Center"/></Border>
+                                            <Border Grid.Column="1"><TextBlock Text="{Binding EstimativeTotal, StringFormat=N2}" FontSize="8" HorizontalAlignment="Center"/></Border>
+                                        </Grid>
+                                    </Border>
+                                    <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,0,0,1">
+                                        <ItemsControl ItemsSource="{Binding BidderPrices}">
+                                            <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Width="120">
+                                                        <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                                        <Border BorderBrush="Black" BorderThickness="0,0,1,0"><TextBlock Text="{Binding UnitPrice, StringFormat=N2}" FontSize="8" HorizontalAlignment="Center"/></Border>
+                                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,0"><TextBlock Text="{Binding TotalPrice, StringFormat=N2}" FontSize="8" HorizontalAlignment="Center"/></Border>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </Border>
+                                </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </Grid>
 
+                <!-- Footer section: Totals -->
+                <Grid Grid.Row="5" Margin="0,5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="450"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border BorderBrush="Black" BorderThickness="1" Background="#EBF5FB" Padding="2"><TextBlock Text="Sub : Total" FontWeight="Bold" FontSize="9" HorizontalAlignment="Right"/></Border>
+                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1">
+                             <ItemsControl ItemsSource="{Binding Bidders}">
+                                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="Black" BorderThickness="0,0,1,0" Width="120" Padding="2">
+                                            <TextBlock Text="{Binding CalculatedSubTotal, StringFormat=N2}" FontSize="9" HorizontalAlignment="Center" FontWeight="Bold" Foreground="Blue"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+                    </Grid>
+
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="450"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#EBF5FB" Padding="2"><TextBlock Text="Discount" FontWeight="Bold" FontSize="9" HorizontalAlignment="Right"/></Border>
+                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1">
+                             <ItemsControl ItemsSource="{Binding Bidders}">
+                                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="Black" BorderThickness="0,0,1,0" Width="120" Padding="2">
+                                            <TextBlock Text="{Binding Discount, StringFormat=N2}" FontSize="9" HorizontalAlignment="Center"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+                    </Grid>
+
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="450"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#EBF5FB" Padding="2"><TextBlock Text="Misc/other costs" FontWeight="Bold" FontSize="9" HorizontalAlignment="Right"/></Border>
+                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1">
+                             <ItemsControl ItemsSource="{Binding Bidders}">
+                                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="Black" BorderThickness="0,0,1,0" Width="120" Padding="2">
+                                            <TextBlock Text="{Binding MiscCosts, StringFormat=N2}" FontSize="9" HorizontalAlignment="Center"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+                    </Grid>
+
+                    <Grid Grid.Row="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="450"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#EBF5FB" Padding="2"><TextBlock Text="Genaral Total" FontWeight="Bold" FontSize="9" HorizontalAlignment="Right"/></Border>
+                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1">
+                             <ItemsControl ItemsSource="{Binding Bidders}">
+                                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="Black" BorderThickness="0,0,1,0" Width="120" Padding="2">
+                                            <TextBlock Text="{Binding CalculatedTotal, StringFormat=N2}" FontSize="9" HorizontalAlignment="Center" FontWeight="Bold"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+                    </Grid>
+
+                    <Grid Grid.Row="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="300"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#D5F5E3" Padding="2"><TextBlock Text="Recommend to award to:" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
+                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2"><TextBlock Text="{Binding CurrentBidAnalysis.RecommendedBidderName}" FontWeight="Bold" FontSize="11" HorizontalAlignment="Center"/></Border>
+                    </Grid>
+
+                    <Grid Grid.Row="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="300"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#FCF3CF" Padding="2"><TextBlock Text="Reasons for recommendation:" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
+                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2"><TextBlock Text="{Binding CurrentBidAnalysis.RecommendationReasons}" FontSize="9" HorizontalAlignment="Center" FontWeight="Bold"/></Border>
+                    </Grid>
+
+                    <Border Grid.Row="6" BorderBrush="Black" BorderThickness="1,0,1,1" Background="#D5D8DC" Padding="5">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Total in Words: " FontWeight="Bold" FontSize="9"/>
+                            <TextBlock Text="{Binding CurrentBidAnalysis.RecommendedBidderTotal, Converter={StaticResource CurrencyWordsConverter}, ConverterParameter='YER'}" FontWeight="Bold" FontSize="9"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
                 <!-- Signatures -->
-                <UniformGrid Grid.Row="5" Columns="4" Margin="0,20,0,0">
-                    <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="Checked By" FontWeight="Bold"/>
-                        <TextBlock Text="Logistics Manager" FontSize="10"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="40" Width="150" Margin="5"/>
-                    </StackPanel>
-                    <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="Reviewed By" FontWeight="Bold"/>
-                        <TextBlock Text="Finance Manager" FontSize="10"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="40" Width="150" Margin="5"/>
-                    </StackPanel>
-                    <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="Reviewed By" FontWeight="Bold"/>
-                        <TextBlock Text="Project Manager" FontSize="10"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="40" Width="150" Margin="5"/>
-                    </StackPanel>
-                    <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="Approved By" FontWeight="Bold"/>
-                        <TextBlock Text="Head of Association" FontSize="10"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="40" Width="150" Margin="5"/>
-                    </StackPanel>
-                </UniformGrid>
+                <Grid Grid.Row="6" Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border BorderBrush="Black" BorderThickness="1" Margin="0,0,5,0">
+                        <StackPanel>
+                            <Border Background="#D5D8DC" Padding="2"><TextBlock Text="Checked by :" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
+                            <Grid Margin="5">
+                                <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                <TextBlock Text="POSITION :" FontWeight="Bold" FontSize="8"/> <TextBlock Grid.Column="1" Text="Logistic Manager" FontSize="8" Margin="5,0"/>
+                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="" FontSize="8" Margin="5,0"/>
+                                <TextBlock Grid.Row="2" Text="Date :" FontSize="8"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentBidAnalysis.Date, StringFormat=d}" FontSize="8" Margin="5,0"/>
+                                <TextBlock Grid.Row="3" Text="Signature" FontSize="8"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="0,0,5,0">
+                        <StackPanel>
+                            <Border Background="#D5D8DC" Padding="2"><TextBlock Text="Reviewed by :" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
+                            <Grid Margin="5">
+                                <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                <TextBlock Text="POSITION :" FontWeight="Bold" FontSize="8"/> <TextBlock Grid.Column="1" Text="Finance Manager" FontSize="8" Margin="5,0"/>
+                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="" FontSize="8" Margin="5,0"/>
+                                <TextBlock Grid.Row="2" Text="Date :" FontSize="8"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentBidAnalysis.Date, StringFormat=d}" FontSize="8" Margin="5,0"/>
+                                <TextBlock Grid.Row="3" Text="Signature" FontSize="8"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="1">
+                        <StackPanel>
+                            <Border Background="#D5D8DC" Padding="2"><TextBlock Text="Approved by :" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
+                            <Grid Margin="5">
+                                <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                <TextBlock Text="POSITION :" FontWeight="Bold" FontSize="8"/> <TextBlock Grid.Column="1" Text="Project Manager" FontSize="8" Margin="5,0"/>
+                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="" FontSize="8" Margin="5,0"/>
+                                <TextBlock Grid.Row="2" Text="Date :" FontSize="8"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentBidAnalysis.Date, StringFormat=d}" FontSize="8" Margin="5,0"/>
+                                <TextBlock Grid.Row="3" Text="Signature" FontSize="8"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
             </Grid>
         </Border>
     </ControlTemplate>

@@ -13,10 +13,13 @@ namespace JaahdLogistics.Models
         public DateTime Date { get => _date; set => SetProperty(ref _date, value); }
         
         private int? _recommendedBidderId;
-        public int? RecommendedBidderId { get => _recommendedBidderId; set { if (SetProperty(ref _recommendedBidderId, value)) OnPropertyChanged(nameof(RecommendedBidderName)); } }
+        public int? RecommendedBidderId { get => _recommendedBidderId; set { if (SetProperty(ref _recommendedBidderId, value)) { OnPropertyChanged(nameof(RecommendedBidderName)); OnPropertyChanged(nameof(RecommendedBidderTotal)); } } }
         
         private string? _justification;
         public string? Justification { get => _justification; set => SetProperty(ref _justification, value); }
+
+        private string? _recommendationReasons;
+        public string? RecommendationReasons { get => _recommendationReasons; set => SetProperty(ref _recommendationReasons, value); }
         
         private string _status = "Pending";
         public string Status { get => _status; set => SetProperty(ref _status, value); }
@@ -30,12 +33,14 @@ namespace JaahdLogistics.Models
         public ObservableCollection<Bidder> Bidders { get; set; } = new();
 
         public string RecommendedBidderName => Bidders.FirstOrDefault(b => b.Id == RecommendedBidderId)?.Name ?? "None";
+        public decimal RecommendedBidderTotal => Bidders.FirstOrDefault(b => b.Id == RecommendedBidderId)?.CalculatedTotal ?? 0;
     }
 
     public class Bidder : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
     {
         public int Id { get; set; }
         public int BidAnalysisId { get; set; }
+        public int? VendorId { get; set; }
         
         private string _name = string.Empty;
         public string Name { get => _name; set => SetProperty(ref _name, value); }

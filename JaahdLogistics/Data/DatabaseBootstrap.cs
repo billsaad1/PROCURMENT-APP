@@ -63,6 +63,7 @@ namespace JaahdLogistics.Data
                 // Repair BidAnalyses table
                 AddColumnIfMissing(connection, "BidAnalyses", "Currency", "TEXT");
                 AddColumnIfMissing(connection, "BidAnalyses", "ExchangeRate", "DECIMAL(18, 4)");
+                AddColumnIfMissing(connection, "BidAnalyses", "RecommendationReasons", "TEXT");
 
                 // Repair Bidders table
                 AddColumnIfMissing(connection, "Bidders", "Tel", "TEXT");

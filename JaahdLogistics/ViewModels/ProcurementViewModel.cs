@@ -12,6 +12,7 @@ namespace JaahdLogistics.ViewModels
 {
     public class BidAnalysisMatrixRow : ObservableObject
     {
+        public int Index { get; set; }
         public PRItem? SourceItem { get; set; }
         public ObservableCollection<BidItem> BidderPrices { get; set; } = new();
         
@@ -69,6 +70,9 @@ namespace JaahdLogistics.ViewModels
         private ObservableCollection<BidAnalysisMatrixRow> _matrixRows = new();
 
         [ObservableProperty]
+        private ObservableCollection<Vendor> _vendors = new();
+
+        [ObservableProperty]
         private Settings _settings;
 
         [ObservableProperty]
@@ -78,6 +82,7 @@ namespace JaahdLogistics.ViewModels
         {
             _dataService = dataService;
             _settings = _dataService.GetSettings();
+            Vendors = new ObservableCollection<Vendor>(_dataService.GetVendors());
             RefreshAll();
         }
 
@@ -162,7 +167,8 @@ namespace JaahdLogistics.ViewModels
                 RFQId = CurrentRFQ.Id, 
                 Date = DateTime.Now,
                 Currency = SelectedPR?.Currency ?? "YER",
-                ExchangeRate = SelectedPR?.ExchangeRate ?? 1.0m
+                ExchangeRate = SelectedPR?.ExchangeRate ?? 1.0m,
+                Justification = SelectedPR?.Justification
             };
             Bidders = new ObservableCollection<Bidder>();
             MatrixRows = new ObservableCollection<BidAnalysisMatrixRow>();
@@ -174,6 +180,19 @@ namespace JaahdLogistics.ViewModels
         {
             var bidderNumber = Bidders.Count + 1;
             var bidder = new Bidder { Name = $"Bidder {bidderNumber}", BidAnalysisId = CurrentBidAnalysis.Id };
+            bidder.PropertyChanged += (s, e) => {
+                if (e.PropertyName == nameof(bidder.VendorId) && bidder.VendorId.HasValue)
+                {
+                    var vendor = Vendors.FirstOrDefault(v => v.Id == bidder.VendorId);
+                    if (vendor != null)
+                    {
+                        bidder.Name = vendor.Name;
+                        bidder.Address = vendor.Address;
+                        bidder.Tel = vendor.Tel;
+                        bidder.Email = vendor.Email;
+                    }
+                }
+            };
             
             if (SelectedPR != null)
             {
@@ -412,6 +431,7 @@ namespace JaahdLogistics.ViewModels
             LoadRFQs();
             LoadBidAnalyses();
             LoadPOs();
+            Vendors = new ObservableCollection<Vendor>(_dataService.GetVendors());
         }
 
         [RelayCommand]
@@ -476,9 +496,10 @@ namespace JaahdLogistics.ViewModels
                 MatrixRows = new ObservableCollection<BidAnalysisMatrixRow>();
                 if (SelectedPR != null && Bidders.Count > 0)
                 {
+                    int i = 1;
                     foreach (var item in SelectedPR.Items)
                     {
-                        var row = new BidAnalysisMatrixRow { SourceItem = item };
+                        var row = new BidAnalysisMatrixRow { Index = i++, SourceItem = item };
                         foreach (var bidder in Bidders)
                         {
                             var bidItem = bidder.Items.FirstOrDefault(bi => bi.Description == item.Description);
