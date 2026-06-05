@@ -98,11 +98,13 @@ CREATE TABLE IF NOT EXISTS Vendors (
 CREATE TABLE IF NOT EXISTS Bidders (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
     BidAnalysisId INTEGER NOT NULL,
+    VendorId INTEGER,
     Name TEXT NOT NULL,
     Address TEXT,
     Contact TEXT,
     Tel TEXT,
     Email TEXT,
+    Justification TEXT,
     Discount DECIMAL(18, 2) DEFAULT 0,
     MiscCosts DECIMAL(18, 2) DEFAULT 0,
     TotalAmount DECIMAL(18, 2) DEFAULT 0,

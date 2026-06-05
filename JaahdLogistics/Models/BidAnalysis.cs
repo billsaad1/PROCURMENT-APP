@@ -56,6 +56,12 @@ namespace JaahdLogistics.Models
 
         private string? _email;
         public string? Email { get => _email; set => SetProperty(ref _email, value); }
+
+        private string? _justification;
+        public string? Justification { get => _justification; set => SetProperty(ref _justification, value); }
+
+        private bool _isWinner;
+        public bool IsWinner { get => _isWinner; set => SetProperty(ref _isWinner, value); }
         
         private decimal _discount;
         public decimal Discount { get => _discount; set { if (SetProperty(ref _discount, value)) OnPropertyChanged(nameof(CalculatedTotal)); } }

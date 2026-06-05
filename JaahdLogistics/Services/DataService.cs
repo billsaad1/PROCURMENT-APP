@@ -288,8 +288,8 @@ namespace JaahdLogistics.Services
                 {
                     bidder.BidAnalysisId = analysis.Id;
                     bidder.Id = connection.QuerySingle<int>(
-                        "INSERT INTO Bidders (BidAnalysisId, VendorId, Name, Address, Contact, Tel, Email, Discount, MiscCosts, TotalAmount, QuoteScan) " +
-                        "VALUES (@BidAnalysisId, @VendorId, @Name, @Address, @Contact, @Tel, @Email, @Discount, @MiscCosts, @TotalAmount, @QuoteScan); SELECT last_insert_rowid();",
+                        "INSERT INTO Bidders (BidAnalysisId, VendorId, Name, Address, Contact, Tel, Email, Justification, Discount, MiscCosts, TotalAmount, QuoteScan) " +
+                        "VALUES (@BidAnalysisId, @VendorId, @Name, @Address, @Contact, @Tel, @Email, @Justification, @Discount, @MiscCosts, @TotalAmount, @QuoteScan); SELECT last_insert_rowid();",
                         bidder, transaction);
                     
                     foreach (var item in bidder.Items)

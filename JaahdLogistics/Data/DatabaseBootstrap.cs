@@ -53,6 +53,21 @@ namespace JaahdLogistics.Data
                 // Repair Users
                 AddColumnIfMissing(connection, "Users", "SignatureImage", "BLOB");
 
+                // Ensure Vendors table exists
+                connection.Execute(@"
+                    CREATE TABLE IF NOT EXISTS Vendors (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        Name TEXT NOT NULL,
+                        Address TEXT,
+                        Contact TEXT,
+                        Tel TEXT,
+                        Email TEXT,
+                        Category TEXT,
+                        TaxId TEXT,
+                        BankInfo TEXT,
+                        IsActive INTEGER DEFAULT 1
+                    )");
+
                 // Repair ThreeWayMatch table
                 AddColumnIfMissing(connection, "ThreeWayMatch", "InvoiceDetails", "TEXT");
                 AddColumnIfMissing(connection, "ThreeWayMatch", "InvoiceScan", "BLOB");
@@ -66,8 +81,10 @@ namespace JaahdLogistics.Data
                 AddColumnIfMissing(connection, "BidAnalyses", "RecommendationReasons", "TEXT");
 
                 // Repair Bidders table
+                AddColumnIfMissing(connection, "Bidders", "VendorId", "INTEGER");
                 AddColumnIfMissing(connection, "Bidders", "Tel", "TEXT");
                 AddColumnIfMissing(connection, "Bidders", "Email", "TEXT");
+                AddColumnIfMissing(connection, "Bidders", "Justification", "TEXT");
                 AddColumnIfMissing(connection, "Bidders", "Discount", "DECIMAL(18, 2) DEFAULT 0");
                 AddColumnIfMissing(connection, "Bidders", "MiscCosts", "DECIMAL(18, 2) DEFAULT 0");
                 AddColumnIfMissing(connection, "Bidders", "TotalAmount", "DECIMAL(18, 2) DEFAULT 0");

@@ -561,8 +561,8 @@
                             <ColumnDefinition Width="300"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#FCF3CF" Padding="2"><TextBlock Text="Reasons for recommendation:" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
-                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2"><TextBlock Text="{Binding CurrentBidAnalysis.RecommendationReasons}" FontSize="9" HorizontalAlignment="Center" FontWeight="Bold"/></Border>
+                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#FCF3CF" Padding="2"><TextBlock Text="Justification/Reasons for recommendation:" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
+                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2"><TextBlock Text="{Binding CurrentBidAnalysis.RecommendationReasons}" FontSize="10" HorizontalAlignment="Center" FontWeight="Bold" TextWrapping="Wrap"/></Border>
                     </Grid>
 
                     <Border Grid.Row="6" BorderBrush="Black" BorderThickness="1,0,1,1" Background="#D5D8DC" Padding="5">

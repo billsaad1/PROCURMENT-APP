@@ -87,6 +87,19 @@ namespace JaahdLogistics.ViewModels
         }
 
         [RelayCommand]
+        private void SetRecommendedBidder(Bidder bidder)
+        {
+            if (bidder == null) return;
+
+            foreach (var b in Bidders) b.IsWinner = false;
+            bidder.IsWinner = true;
+
+            CurrentBidAnalysis.RecommendedBidderId = bidder.Id;
+            CurrentBidAnalysis.RecommendationReasons = bidder.Justification;
+            MessageBox.Show($"Selected {bidder.Name} as the winner.");
+        }
+
+        [RelayCommand]
         private void NewRFQ()
         {
             CurrentRFQ = new RFQ();
@@ -246,7 +259,17 @@ namespace JaahdLogistics.ViewModels
             {
                 bidder.TotalAmount = bidder.CalculatedTotal;
             }
+
             _dataService.SaveBidAnalysis(CurrentBidAnalysis);
+
+            // If the winner was selected before save (ID was 0), re-sync RecommendedBidderId
+            var winningBidder = CurrentBidAnalysis.Bidders.FirstOrDefault(b => b.IsWinner);
+            if (winningBidder != null && CurrentBidAnalysis.RecommendedBidderId != winningBidder.Id)
+            {
+                CurrentBidAnalysis.RecommendedBidderId = winningBidder.Id;
+                _dataService.SaveBidAnalysis(CurrentBidAnalysis);
+            }
+
             LoadBidAnalyses();
             MessageBox.Show("Bid Analysis Saved Successfully");
         }
