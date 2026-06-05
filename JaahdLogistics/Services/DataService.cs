@@ -280,17 +280,35 @@ namespace JaahdLogistics.Services
                     connection.Execute(
                         "UPDATE BidAnalyses SET RecommendedBidderId=@RecommendedBidderId, Justification=@Justification, RecommendationReasons=@RecommendationReasons, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate WHERE Id=@Id",
                         analysis, transaction);
-                    connection.Execute("DELETE FROM BidItems WHERE BidderId IN (SELECT Id FROM Bidders WHERE BidAnalysisId = @Id)", new { analysis.Id }, transaction);
-                    connection.Execute("DELETE FROM Bidders WHERE BidAnalysisId = @Id", new { analysis.Id }, transaction);
+
+                    var existingBidders = connection.Query<int>("SELECT Id FROM Bidders WHERE BidAnalysisId = @Id", new { analysis.Id }, transaction).ToList();
+                    var currentBidderIds = analysis.Bidders.Where(b => b.Id != 0).Select(b => b.Id).ToList();
+                    var biddersToDelete = existingBidders.Except(currentBidderIds).ToList();
+
+                    foreach (var bId in biddersToDelete)
+                    {
+                        connection.Execute("DELETE FROM BidItems WHERE BidderId = @bId", new { bId }, transaction);
+                        connection.Execute("DELETE FROM Bidders WHERE Id = @bId", new { bId }, transaction);
+                    }
                 }
 
                 foreach (var bidder in analysis.Bidders)
                 {
                     bidder.BidAnalysisId = analysis.Id;
-                    bidder.Id = connection.QuerySingle<int>(
-                        "INSERT INTO Bidders (BidAnalysisId, VendorId, Name, Address, Contact, Tel, Email, Justification, Discount, MiscCosts, TotalAmount, QuoteScan) " +
-                        "VALUES (@BidAnalysisId, @VendorId, @Name, @Address, @Contact, @Tel, @Email, @Justification, @Discount, @MiscCosts, @TotalAmount, @QuoteScan); SELECT last_insert_rowid();",
-                        bidder, transaction);
+                    if (bidder.Id == 0)
+                    {
+                        bidder.Id = connection.QuerySingle<int>(
+                            "INSERT INTO Bidders (BidAnalysisId, VendorId, Name, Address, Contact, Tel, Email, Justification, Discount, MiscCosts, TotalAmount, QuoteScan) " +
+                            "VALUES (@BidAnalysisId, @VendorId, @Name, @Address, @Contact, @Tel, @Email, @Justification, @Discount, @MiscCosts, @TotalAmount, @QuoteScan); SELECT last_insert_rowid();",
+                            bidder, transaction);
+                    }
+                    else
+                    {
+                        connection.Execute(
+                            "UPDATE Bidders SET VendorId=@VendorId, Name=@Name, Address=@Address, Contact=@Contact, Tel=@Tel, Email=@Email, Justification=@Justification, Discount=@Discount, MiscCosts=@MiscCosts, TotalAmount=@TotalAmount, QuoteScan=@QuoteScan WHERE Id=@Id",
+                            bidder, transaction);
+                        connection.Execute("DELETE FROM BidItems WHERE BidderId = @Id", new { bidder.Id }, transaction);
+                    }
                     
                     foreach (var item in bidder.Items)
                     {
