@@ -298,14 +298,14 @@ namespace JaahdLogistics.Services
                     if (bidder.Id == 0)
                     {
                         bidder.Id = connection.QuerySingle<int>(
-                            "INSERT INTO Bidders (BidAnalysisId, VendorId, Name, Address, Contact, Tel, Email, Justification, Discount, MiscCosts, TotalAmount, QuoteScan) " +
-                            "VALUES (@BidAnalysisId, @VendorId, @Name, @Address, @Contact, @Tel, @Email, @Justification, @Discount, @MiscCosts, @TotalAmount, @QuoteScan); SELECT last_insert_rowid();",
+                            "INSERT INTO Bidders (BidAnalysisId, VendorId, Name, Address, Contact, Tel, Email, Justification, IsWinner, Discount, MiscCosts, TotalAmount, QuoteScan) " +
+                            "VALUES (@BidAnalysisId, @VendorId, @Name, @Address, @Contact, @Tel, @Email, @Justification, @IsWinner, @Discount, @MiscCosts, @TotalAmount, @QuoteScan); SELECT last_insert_rowid();",
                             bidder, transaction);
                     }
                     else
                     {
                         connection.Execute(
-                            "UPDATE Bidders SET VendorId=@VendorId, Name=@Name, Address=@Address, Contact=@Contact, Tel=@Tel, Email=@Email, Justification=@Justification, Discount=@Discount, MiscCosts=@MiscCosts, TotalAmount=@TotalAmount, QuoteScan=@QuoteScan WHERE Id=@Id",
+                            "UPDATE Bidders SET VendorId=@VendorId, Name=@Name, Address=@Address, Contact=@Contact, Tel=@Tel, Email=@Email, Justification=@Justification, IsWinner=@IsWinner, Discount=@Discount, MiscCosts=@MiscCosts, TotalAmount=@TotalAmount, QuoteScan=@QuoteScan WHERE Id=@Id",
                             bidder, transaction);
                         connection.Execute("DELETE FROM BidItems WHERE BidderId = @Id", new { bidder.Id }, transaction);
                     }

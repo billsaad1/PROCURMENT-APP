@@ -85,6 +85,7 @@ namespace JaahdLogistics.Data
                 AddColumnIfMissing(connection, "Bidders", "Tel", "TEXT");
                 AddColumnIfMissing(connection, "Bidders", "Email", "TEXT");
                 AddColumnIfMissing(connection, "Bidders", "Justification", "TEXT");
+                AddColumnIfMissing(connection, "Bidders", "IsWinner", "INTEGER DEFAULT 0");
                 AddColumnIfMissing(connection, "Bidders", "Discount", "DECIMAL(18, 2) DEFAULT 0");
                 AddColumnIfMissing(connection, "Bidders", "MiscCosts", "DECIMAL(18, 2) DEFAULT 0");
                 AddColumnIfMissing(connection, "Bidders", "TotalAmount", "DECIMAL(18, 2) DEFAULT 0");
@@ -92,6 +93,7 @@ namespace JaahdLogistics.Data
 
                 // Repair PurchaseOrders table
                 AddColumnIfMissing(connection, "PurchaseOrders", "ProjectId", "INTEGER NOT NULL DEFAULT 0");
+                AddColumnIfMissing(connection, "PurchaseOrders", "VendorId", "INTEGER");
                 AddColumnIfMissing(connection, "PurchaseOrders", "Clause", "TEXT");
             }
             

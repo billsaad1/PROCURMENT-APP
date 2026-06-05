@@ -105,6 +105,7 @@ CREATE TABLE IF NOT EXISTS Bidders (
     Tel TEXT,
     Email TEXT,
     Justification TEXT,
+    IsWinner INTEGER DEFAULT 0,
     Discount DECIMAL(18, 2) DEFAULT 0,
     MiscCosts DECIMAL(18, 2) DEFAULT 0,
     TotalAmount DECIMAL(18, 2) DEFAULT 0,

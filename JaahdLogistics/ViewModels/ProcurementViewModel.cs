@@ -253,6 +253,8 @@ namespace JaahdLogistics.ViewModels
         [RelayCommand]
         private void SaveBidAnalysis()
         {
+            if (CurrentBidAnalysis == null) return;
+
             CurrentBidAnalysis.Bidders = new ObservableCollection<Bidder>(Bidders.ToList());
             // Sync TotalAmount for DB
             foreach (var bidder in CurrentBidAnalysis.Bidders)
@@ -267,10 +269,19 @@ namespace JaahdLogistics.ViewModels
             if (winningBidder != null && CurrentBidAnalysis.RecommendedBidderId != winningBidder.Id)
             {
                 CurrentBidAnalysis.RecommendedBidderId = winningBidder.Id;
+                // Double save to persist the RecommendedBidderId after we have the real database Id for the bidder
                 _dataService.SaveBidAnalysis(CurrentBidAnalysis);
             }
 
             LoadBidAnalyses();
+
+            // Re-select to refresh UI and ensure IDs are synced
+            if (SelectedBidAnalysis != null)
+            {
+                var reloaded = BidAnalyses.FirstOrDefault(b => b.Id == CurrentBidAnalysis.Id);
+                if (reloaded != null) SelectedBidAnalysis = reloaded;
+            }
+
             MessageBox.Show("Bid Analysis Saved Successfully");
         }
 
