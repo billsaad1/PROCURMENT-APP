@@ -372,7 +372,7 @@
                                     <DataTemplate>
                                         <Border BorderBrush="Black" BorderThickness="0,0,1,0" Width="120">
                                             <StackPanel>
-                                                <TextBlock Text="{Binding Name, StringFormat='BIDDER \{0\}'}" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center" Margin="2"/>
+                                                <TextBlock Text="BIDDER / المورد" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center" Margin="2"/>
                                                 <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center" TextWrapping="Wrap"/>
                                                 <TextBlock Text="{Binding Address}" FontSize="8" HorizontalAlignment="Center" TextWrapping="Wrap"/>
                                             </StackPanel>

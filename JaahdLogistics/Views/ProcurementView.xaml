@@ -356,6 +356,8 @@
                         <ComboBox ItemsSource="{Binding ApprovedPRs}" SelectedItem="{Binding SelectedPR}" DisplayMemberPath="PRNumber" Width="150" Margin="0,0,10,0"/>
                         <TextBlock Text="Select Bid Analysis" VerticalAlignment="Center" Margin="10,0,10,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
                         <ComboBox ItemsSource="{Binding BidAnalyses}" SelectedItem="{Binding SelectedBidAnalysis}" DisplayMemberPath="Id" Width="100" Margin="0,0,10,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                        <TextBlock Text="Vendor" VerticalAlignment="Center" Margin="10,0,5,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        <ComboBox ItemsSource="{Binding Vendors}" SelectedValue="{Binding CurrentPO.VendorId}" SelectedValuePath="Id" DisplayMemberPath="Name" Width="150" Margin="0,0,10,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                         <Button Content="{DynamicResource CreatePO}" Command="{Binding CreatePOCommand}"/>
                         <CheckBox Content="Direct Purchase (Skip RFQ/Bid Analysis)" IsChecked="{Binding SkipBidAnalysis}" VerticalAlignment="Center" Margin="20,0,0,0"/>
                     </StackPanel>

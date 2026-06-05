@@ -129,7 +129,8 @@ CREATE TABLE IF NOT EXISTS PurchaseOrders (
     PRId INTEGER NOT NULL,
     ProjectId INTEGER NOT NULL DEFAULT 0,
     BidAnalysisId INTEGER,
-    VendorId INTEGER, -- Points to Bidders(Id)
+    BidderId INTEGER, -- Points to Bidders(Id)
+    VendorId INTEGER, -- Points to Vendors(Id)
     Date DATETIME DEFAULT CURRENT_TIMESTAMP,
     Terms TEXT,
     Clause TEXT,

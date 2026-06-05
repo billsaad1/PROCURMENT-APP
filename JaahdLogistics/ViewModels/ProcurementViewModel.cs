@@ -194,7 +194,7 @@ namespace JaahdLogistics.ViewModels
             var bidderNumber = Bidders.Count + 1;
             var bidder = new Bidder { Name = $"Bidder {bidderNumber}", BidAnalysisId = CurrentBidAnalysis.Id };
             bidder.PropertyChanged += (s, e) => {
-                if (e.PropertyName == nameof(bidder.VendorId) && bidder.VendorId.HasValue)
+                if ((e.PropertyName == nameof(bidder.VendorId) || e.PropertyName == "VendorId") && bidder.VendorId.HasValue)
                 {
                     var vendor = Vendors.FirstOrDefault(v => v.Id == bidder.VendorId);
                     if (vendor != null)
@@ -335,6 +335,12 @@ namespace JaahdLogistics.ViewModels
         {
             if (SelectedPR == null) { MessageBox.Show("Please select a Purchase Requisition first."); return; }
 
+            if (SkipBidAnalysis && (CurrentPO.VendorId == null || CurrentPO.VendorId == 0))
+            {
+                MessageBox.Show("Please select a Vendor for this direct purchase.");
+                return;
+            }
+
             // Budget Check for PO
             foreach (var item in SelectedPR.Items)
             {
@@ -390,6 +396,7 @@ namespace JaahdLogistics.ViewModels
 
             if (SkipBidAnalysis)
             {
+                CurrentPO.Vendor = Vendors.FirstOrDefault(v => v.Id == CurrentPO.VendorId);
                 foreach(var item in SelectedPR.Items)
                 {
                     CurrentPO.Items.Add(new POItem { Description = item.Description, Quantity = item.Quantity, Unit = item.Unit, UnitPrice = item.UnitPrice });
@@ -400,8 +407,9 @@ namespace JaahdLogistics.ViewModels
                 var winner = analysisToUse.Bidders.FirstOrDefault(b => b.Id == (analysisToUse.RecommendedBidderId ?? 0));
                 if (winner != null)
                 {
-                    CurrentPO.VendorId = winner.Id;
-                    CurrentPO.Vendor = winner;
+                    CurrentPO.BidderId = winner.Id;
+                    CurrentPO.VendorId = winner.VendorId;
+                    CurrentPO.Vendor = Vendors.FirstOrDefault(v => v.Id == winner.VendorId);
                     foreach(var item in winner.Items)
                     {
                         CurrentPO.Items.Add(new POItem { Description = item.Description, Quantity = item.Quantity, Unit = item.Unit, UnitPrice = item.UnitPrice });

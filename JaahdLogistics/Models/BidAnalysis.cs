@@ -36,12 +36,14 @@ namespace JaahdLogistics.Models
         public decimal RecommendedBidderTotal => Bidders.FirstOrDefault(b => b.Id == RecommendedBidderId)?.CalculatedTotal ?? 0;
     }
 
-    public class Bidder : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
+    public partial class Bidder : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
     {
         public int Id { get; set; }
         public int BidAnalysisId { get; set; }
-        public int? VendorId { get; set; }
         
+        [CommunityToolkit.Mvvm.ComponentModel.ObservableProperty]
+        private int? _vendorId;
+
         private string _name = string.Empty;
         public string Name { get => _name; set => SetProperty(ref _name, value); }
         

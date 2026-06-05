@@ -15,6 +15,7 @@ namespace JaahdLogistics.Models
         public int PRId { get; set; }
         public int ProjectId { get; set; } 
         public int? BidAnalysisId { get; set; }
+        public int? BidderId { get; set; }
         public int? VendorId { get; set; }
         
         private DateTime _date;
@@ -26,8 +27,8 @@ namespace JaahdLogistics.Models
         private string? _clause;
         public string? Clause { get => _clause; set => SetProperty(ref _clause, value); }
         
-        private Bidder? _vendor;
-        public Bidder? Vendor { get => _vendor; set => SetProperty(ref _vendor, value); }
+        private Vendor? _vendor;
+        public Vendor? Vendor { get => _vendor; set => SetProperty(ref _vendor, value); }
 
         private string _status = "Pending";
         public string Status { get => _status; set => SetProperty(ref _status, value); }
