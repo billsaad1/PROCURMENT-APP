@@ -543,7 +543,7 @@
                             <ColumnDefinition Width="450"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#EBF5FB" Padding="2"><TextBlock Text="Genaral Total" FontWeight="Bold" FontSize="9" HorizontalAlignment="Right"/></Border>
+                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#EBF5FB" Padding="2"><TextBlock Text="General Total" FontWeight="Bold" FontSize="9" HorizontalAlignment="Right"/></Border>
                         <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1">
                              <ItemsControl ItemsSource="{Binding Bidders}">
                                 <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
@@ -822,7 +822,7 @@
                                 <TextBlock Text="ADDRESS / العنوان:" FontWeight="Bold" HorizontalAlignment="Right" FontSize="9"/>
                             </Border>
                             <Border Grid.Row="5" Grid.Column="1" Padding="5">
-                                <TextBlock Text="{Binding CurrentPO.Vendor.Address}" HorizontalAlignment="Center" FontSize="9"/>
+                                <TextBlock Text="{Binding CurrentPO.Vendor.Address}" HorizontalAlignment="Center" FontSize="9" TextWrapping="Wrap"/>
                             </Border>
                         </Grid>
                     </Border>
@@ -884,12 +884,16 @@
 
                 <!-- 6. Terms Section -->
                 <Border Grid.Row="5" BorderBrush="Black" BorderThickness="1" Margin="0,10,0,10">
-                    <StackPanel>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
                         <Border Background="#D5D8DC" Padding="5">
                             <TextBlock Text="{DynamicResource SupplyTerms}" FontWeight="Bold" HorizontalAlignment="Center"/>
                         </Border>
-                        <TextBlock Text="{Binding CurrentPO.Terms}" TextWrapping="Wrap" Margin="10" FontSize="10" HorizontalAlignment="Right"/>
-                    </StackPanel>
+                        <TextBlock Grid.Row="1" Text="{Binding CurrentPO.Terms}" TextWrapping="Wrap" Margin="10" FontSize="10" HorizontalAlignment="Right"/>
+                    </Grid>
                 </Border>
 
                 <!-- 7. Signatures Section -->

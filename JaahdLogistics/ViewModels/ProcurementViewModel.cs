@@ -84,15 +84,31 @@ namespace JaahdLogistics.ViewModels
             _settings = _dataService.GetSettings();
             Vendors = new ObservableCollection<Vendor>(_dataService.GetVendors());
 
-            // Subscribe to PO vendor changes
-            _currentPO.PropertyChanged += (s, e) => {
-                if ((e.PropertyName == nameof(PurchaseOrder.VendorId) || e.PropertyName == "VendorId") && _currentPO.VendorId.HasValue)
+            SubscribeToCurrentPO();
+            RefreshAll();
+        }
+
+        private void SubscribeToCurrentPO()
+        {
+            if (CurrentPO == null) return;
+            CurrentPO.PropertyChanged += (s, e) => {
+                if ((e.PropertyName == nameof(PurchaseOrder.VendorId) || e.PropertyName == "VendorId"))
                 {
-                    _currentPO.Vendor = Vendors.FirstOrDefault(v => v.Id == _currentPO.VendorId);
+                    if (CurrentPO.VendorId.HasValue && CurrentPO.VendorId != 0)
+                    {
+                        CurrentPO.Vendor = Vendors.FirstOrDefault(v => v.Id == CurrentPO.VendorId);
+                    }
+                    else
+                    {
+                        CurrentPO.Vendor = null;
+                    }
                 }
             };
+        }
 
-            RefreshAll();
+        partial void OnCurrentPOChanged(PurchaseOrder value)
+        {
+            SubscribeToCurrentPO();
         }
 
         [RelayCommand]
@@ -105,6 +121,21 @@ namespace JaahdLogistics.ViewModels
 
             CurrentBidAnalysis.RecommendedBidderId = bidder.Id;
             CurrentBidAnalysis.RecommendationReasons = bidder.Justification;
+
+            // Ensure winner info is fully updated from Vendor if available
+            if (bidder.VendorId.HasValue && bidder.VendorId != 0)
+            {
+                var vendor = Vendors.FirstOrDefault(v => v.Id == bidder.VendorId);
+                if (vendor != null)
+                {
+                    if (string.IsNullOrWhiteSpace(bidder.Name)) bidder.Name = vendor.Name;
+                    if (string.IsNullOrWhiteSpace(bidder.Address)) bidder.Address = vendor.Address;
+                    if (string.IsNullOrWhiteSpace(bidder.Tel)) bidder.Tel = vendor.Tel;
+                    if (string.IsNullOrWhiteSpace(bidder.Email)) bidder.Email = vendor.Email;
+                    if (string.IsNullOrWhiteSpace(bidder.Contact)) bidder.Contact = vendor.Contact;
+                }
+            }
+
             MessageBox.Show($"Selected {bidder.Name} as the winner.");
         }
 
@@ -430,11 +461,24 @@ namespace JaahdLogistics.ViewModels
                 else if (analysisToUse != null)
                 {
                     var winner = analysisToUse.Bidders.FirstOrDefault(b => b.Id == (analysisToUse.RecommendedBidderId ?? 0));
+                    if (winner == null) winner = analysisToUse.Bidders.FirstOrDefault(b => b.IsWinner);
+
                     if (winner != null)
                     {
                         newPO.BidderId = winner.Id;
                         newPO.VendorId = winner.VendorId;
                         newPO.Vendor = Vendors.FirstOrDefault(v => v.Id == winner.VendorId);
+
+                        // If winner vendor info was partially missing in Bidder model, fall back to master Vendor record
+                        if (newPO.Vendor != null)
+                        {
+                            if (string.IsNullOrWhiteSpace(winner.Name)) winner.Name = newPO.Vendor.Name;
+                            if (string.IsNullOrWhiteSpace(winner.Address)) winner.Address = newPO.Vendor.Address;
+                            if (string.IsNullOrWhiteSpace(winner.Tel)) winner.Tel = newPO.Vendor.Tel;
+                            if (string.IsNullOrWhiteSpace(winner.Email)) winner.Email = newPO.Vendor.Email;
+                            if (string.IsNullOrWhiteSpace(winner.Contact)) winner.Contact = newPO.Vendor.Contact;
+                        }
+
                         foreach(var item in winner.Items)
                         {
                             newPO.Items.Add(new POItem { Description = item.Description, Quantity = item.Quantity, Unit = item.Unit, UnitPrice = item.UnitPrice });
