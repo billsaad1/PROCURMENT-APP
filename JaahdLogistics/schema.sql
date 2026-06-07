@@ -205,6 +205,8 @@ CREATE TABLE IF NOT EXISTS Settings (
     AssociationName TEXT,
     Address TEXT,
     ContactInfo TEXT,
+    Tel TEXT,
+    Email TEXT,
     LogoImage BLOB,
     PRTerms TEXT,
     RFQTerms TEXT,

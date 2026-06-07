@@ -83,6 +83,15 @@ namespace JaahdLogistics.ViewModels
             _dataService = dataService;
             _settings = _dataService.GetSettings();
             Vendors = new ObservableCollection<Vendor>(_dataService.GetVendors());
+
+            // Subscribe to PO vendor changes
+            _currentPO.PropertyChanged += (s, e) => {
+                if ((e.PropertyName == nameof(PurchaseOrder.VendorId) || e.PropertyName == "VendorId") && _currentPO.VendorId.HasValue)
+                {
+                    _currentPO.Vendor = Vendors.FirstOrDefault(v => v.Id == _currentPO.VendorId);
+                }
+            };
+
             RefreshAll();
         }
 
@@ -142,6 +151,10 @@ namespace JaahdLogistics.ViewModels
                 };
                 _dataService.SaveRFQ(CurrentRFQ);
                 LoadRFQs();
+
+                // Select the newly created RFQ
+                SelectedRFQ = RFQs.FirstOrDefault(r => r.RFQNumber == CurrentRFQ.RFQNumber);
+
                 MessageBox.Show($"RFQ {CurrentRFQ.RFQNumber} created successfully.");
             }
             catch (Exception ex)
@@ -188,24 +201,27 @@ namespace JaahdLogistics.ViewModels
             AddBidder();
         }
 
+        private void Bidder_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (sender is Bidder bidder && (e.PropertyName == nameof(Bidder.VendorId) || e.PropertyName == "VendorId") && bidder.VendorId.HasValue)
+            {
+                var vendor = Vendors.FirstOrDefault(v => v.Id == bidder.VendorId);
+                if (vendor != null)
+                {
+                    bidder.Name = vendor.Name;
+                    bidder.Address = vendor.Address;
+                    bidder.Tel = vendor.Tel;
+                    bidder.Email = vendor.Email;
+                }
+            }
+        }
+
         [RelayCommand]
         private void AddBidder()
         {
             var bidderNumber = Bidders.Count + 1;
             var bidder = new Bidder { Name = $"Bidder {bidderNumber}", BidAnalysisId = CurrentBidAnalysis.Id };
-            bidder.PropertyChanged += (s, e) => {
-                if ((e.PropertyName == nameof(bidder.VendorId) || e.PropertyName == "VendorId") && bidder.VendorId.HasValue)
-                {
-                    var vendor = Vendors.FirstOrDefault(v => v.Id == bidder.VendorId);
-                    if (vendor != null)
-                    {
-                        bidder.Name = vendor.Name;
-                        bidder.Address = vendor.Address;
-                        bidder.Tel = vendor.Tel;
-                        bidder.Email = vendor.Email;
-                    }
-                }
-            };
+            bidder.PropertyChanged += Bidder_PropertyChanged;
             
             if (SelectedPR != null)
             {
@@ -255,34 +271,39 @@ namespace JaahdLogistics.ViewModels
         {
             if (CurrentBidAnalysis == null) return;
 
-            CurrentBidAnalysis.Bidders = new ObservableCollection<Bidder>(Bidders.ToList());
-            // Sync TotalAmount for DB
-            foreach (var bidder in CurrentBidAnalysis.Bidders)
+            try
             {
-                bidder.TotalAmount = bidder.CalculatedTotal;
-            }
+                CurrentBidAnalysis.Bidders = new ObservableCollection<Bidder>(Bidders.ToList());
+                // Sync TotalAmount for DB
+                foreach (var bidder in CurrentBidAnalysis.Bidders)
+                {
+                    bidder.TotalAmount = bidder.CalculatedTotal;
+                }
 
-            _dataService.SaveBidAnalysis(CurrentBidAnalysis);
-
-            // If the winner was selected before save (ID was 0), re-sync RecommendedBidderId
-            var winningBidder = CurrentBidAnalysis.Bidders.FirstOrDefault(b => b.IsWinner);
-            if (winningBidder != null && CurrentBidAnalysis.RecommendedBidderId != winningBidder.Id)
-            {
-                CurrentBidAnalysis.RecommendedBidderId = winningBidder.Id;
-                // Double save to persist the RecommendedBidderId after we have the real database Id for the bidder
                 _dataService.SaveBidAnalysis(CurrentBidAnalysis);
-            }
 
-            LoadBidAnalyses();
+                // If the winner was selected before save (ID was 0), re-sync RecommendedBidderId
+                var winningBidder = CurrentBidAnalysis.Bidders.FirstOrDefault(b => b.IsWinner);
+                if (winningBidder != null && (CurrentBidAnalysis.RecommendedBidderId == null || CurrentBidAnalysis.RecommendedBidderId == 0 || CurrentBidAnalysis.RecommendedBidderId != winningBidder.Id))
+                {
+                    CurrentBidAnalysis.RecommendedBidderId = winningBidder.Id;
+                    // Double save to persist the RecommendedBidderId after we have the real database Id for the bidder
+                    _dataService.SaveBidAnalysis(CurrentBidAnalysis);
+                }
 
-            // Re-select to refresh UI and ensure IDs are synced
-            if (SelectedBidAnalysis != null)
-            {
-                var reloaded = BidAnalyses.FirstOrDefault(b => b.Id == CurrentBidAnalysis.Id);
+                int currentId = CurrentBidAnalysis.Id;
+                LoadBidAnalyses();
+
+                // Re-select to refresh UI and ensure IDs are synced
+                var reloaded = BidAnalyses.FirstOrDefault(b => b.Id == currentId);
                 if (reloaded != null) SelectedBidAnalysis = reloaded;
-            }
 
-            MessageBox.Show("Bid Analysis Saved Successfully");
+                MessageBox.Show("Bid Analysis Saved Successfully");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error saving Bid Analysis: {ex.Message}");
+            }
         }
 
         [RelayCommand]
@@ -335,99 +356,110 @@ namespace JaahdLogistics.ViewModels
         {
             if (SelectedPR == null) { MessageBox.Show("Please select a Purchase Requisition first."); return; }
 
-            if (SkipBidAnalysis && (CurrentPO.VendorId == null || CurrentPO.VendorId == 0))
+            try
             {
-                MessageBox.Show("Please select a Vendor for this direct purchase.");
-                return;
-            }
-
-            // Budget Check for PO
-            foreach (var item in SelectedPR.Items)
-            {
-                if (item.BudgetLineId == 0) continue;
-                
-                var budgetLines = _dataService.GetBudgetLines(SelectedPR.ProjectId);
-                var budgetLine = budgetLines.FirstOrDefault(b => b.Id == (int)item.BudgetLineId);
-                var remaining = _dataService.GetRemainingBudget((int)item.BudgetLineId, SelectedPR.Id);
-                
-                decimal itemPriceInBudgetCurrency = item.TotalPrice;
-                if (SelectedPR.Currency == "YER" && budgetLine?.Currency == "USD" && SelectedPR.ExchangeRate > 0)
-                    itemPriceInBudgetCurrency = item.TotalPrice / SelectedPR.ExchangeRate;
-                else if (SelectedPR.Currency == "USD" && budgetLine?.Currency == "YER")
-                    itemPriceInBudgetCurrency = item.TotalPrice * SelectedPR.ExchangeRate;
-
-                if (itemPriceInBudgetCurrency > remaining)
+                if (SkipBidAnalysis && (CurrentPO.VendorId == null || CurrentPO.VendorId == 0))
                 {
-                    MessageBox.Show($"Cannot create PO: Item '{item.Description}' exceeds remaining budget ({remaining:N2} {budgetLine?.Currency}).", "Budget Violation", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Please select a Vendor for this direct purchase.");
                     return;
                 }
-            }
 
-            var analysisToUse = SkipBidAnalysis ? null : SelectedBidAnalysis;
-
-            if (!SkipBidAnalysis)
-            {
-                if (analysisToUse == null)
+                // Budget Check for PO
+                foreach (var item in SelectedPR.Items)
                 {
-                    MessageBox.Show("Please select an approved Bid Analysis first.");
-                    return;
-                }
-                if (analysisToUse.Status != "FinalApproved")
-                {
-                    MessageBox.Show("Cannot create a Purchase Order unless the selected Bid Analysis is approved.");
-                    return;
-                }
-            }
-            if (SelectedPR == null) return;
+                    if (item.BudgetLineId == 0) continue;
 
-            var mainVM = Application.Current.MainWindow.DataContext as MainViewModel;
-            var helper = new NumberingHelper(mainVM?.ConnectionString ?? "Data Source=jaahd.db");
+                    var budgetLines = _dataService.GetBudgetLines(SelectedPR.ProjectId);
+                    var budgetLine = budgetLines.FirstOrDefault(b => b.Id == (int)item.BudgetLineId);
+                    var remaining = _dataService.GetRemainingBudget((int)item.BudgetLineId, SelectedPR.Id);
 
-            CurrentPO = new PurchaseOrder 
-            { 
-                PRId = SelectedPR.Id, 
-                ProjectId = SelectedPR.ProjectId,
-                BidAnalysisId = SkipBidAnalysis ? (int?)null : analysisToUse?.Id,
-                Date = DateTime.Now,
-                PONumber = helper.GenerateNumber("PO", SelectedPR.ProjectId),
-                Status = "Pending",
-                Terms = Settings.POTerms,
-                Currency = SelectedPR.Currency,
-                ExchangeRate = SelectedPR.ExchangeRate
-            };
+                    decimal itemPriceInBudgetCurrency = item.TotalPrice;
+                    if (SelectedPR.Currency == "YER" && budgetLine?.Currency == "USD" && SelectedPR.ExchangeRate > 0)
+                        itemPriceInBudgetCurrency = item.TotalPrice / SelectedPR.ExchangeRate;
+                    else if (SelectedPR.Currency == "USD" && budgetLine?.Currency == "YER")
+                        itemPriceInBudgetCurrency = item.TotalPrice * SelectedPR.ExchangeRate;
 
-            if (SkipBidAnalysis)
-            {
-                CurrentPO.Vendor = Vendors.FirstOrDefault(v => v.Id == CurrentPO.VendorId);
-                foreach(var item in SelectedPR.Items)
-                {
-                    CurrentPO.Items.Add(new POItem { Description = item.Description, Quantity = item.Quantity, Unit = item.Unit, UnitPrice = item.UnitPrice });
-                }
-            }
-            else if (analysisToUse != null)
-            {
-                var winner = analysisToUse.Bidders.FirstOrDefault(b => b.Id == (analysisToUse.RecommendedBidderId ?? 0));
-                if (winner != null)
-                {
-                    CurrentPO.BidderId = winner.Id;
-                    CurrentPO.VendorId = winner.VendorId;
-                    CurrentPO.Vendor = Vendors.FirstOrDefault(v => v.Id == winner.VendorId);
-                    foreach(var item in winner.Items)
+                    if (itemPriceInBudgetCurrency > remaining)
                     {
-                        CurrentPO.Items.Add(new POItem { Description = item.Description, Quantity = item.Quantity, Unit = item.Unit, UnitPrice = item.UnitPrice });
+                        MessageBox.Show($"Cannot create PO: Item '{item.Description}' exceeds remaining budget ({remaining:N2} {budgetLine?.Currency}).", "Budget Violation", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
                     }
                 }
-                else
-                {
-                    MessageBox.Show("The selected Bid Analysis does not have a Recommended Bidder set.");
-                    return;
-                }
-            }
 
-            _dataService.SavePO(CurrentPO);
-            MessageBox.Show("Purchase Order Created Successfully");
-            LoadPOs();
-            LoadApprovedPRs(); // Refresh list to remove the PR we just processed (if we implement exclusion)
+                var analysisToUse = SkipBidAnalysis ? null : SelectedBidAnalysis;
+
+                if (!SkipBidAnalysis)
+                {
+                    if (analysisToUse == null)
+                    {
+                        MessageBox.Show("Please select an approved Bid Analysis first.");
+                        return;
+                    }
+                    if (analysisToUse.Status != "FinalApproved")
+                    {
+                        MessageBox.Show("Cannot create a Purchase Order unless the selected Bid Analysis is approved.");
+                        return;
+                    }
+                }
+
+                var mainVM = Application.Current.MainWindow.DataContext as MainViewModel;
+                var helper = new NumberingHelper(mainVM?.ConnectionString ?? "Data Source=jaahd.db");
+
+                var newPO = new PurchaseOrder
+                {
+                    PRId = SelectedPR.Id,
+                    ProjectId = SelectedPR.ProjectId,
+                    BidAnalysisId = SkipBidAnalysis ? (int?)null : analysisToUse?.Id,
+                    Date = DateTime.Now,
+                    PONumber = helper.GenerateNumber("PO", SelectedPR.ProjectId),
+                    Status = "Pending",
+                    Terms = Settings.POTerms,
+                    Currency = SelectedPR.Currency,
+                    ExchangeRate = SelectedPR.ExchangeRate
+                };
+
+                if (SkipBidAnalysis)
+                {
+                    newPO.VendorId = CurrentPO.VendorId;
+                    newPO.Vendor = Vendors.FirstOrDefault(v => v.Id == newPO.VendorId);
+                    foreach(var item in SelectedPR.Items)
+                    {
+                        newPO.Items.Add(new POItem { Description = item.Description, Quantity = item.Quantity, Unit = item.Unit, UnitPrice = item.UnitPrice });
+                    }
+                }
+                else if (analysisToUse != null)
+                {
+                    var winner = analysisToUse.Bidders.FirstOrDefault(b => b.Id == (analysisToUse.RecommendedBidderId ?? 0));
+                    if (winner != null)
+                    {
+                        newPO.BidderId = winner.Id;
+                        newPO.VendorId = winner.VendorId;
+                        newPO.Vendor = Vendors.FirstOrDefault(v => v.Id == winner.VendorId);
+                        foreach(var item in winner.Items)
+                        {
+                            newPO.Items.Add(new POItem { Description = item.Description, Quantity = item.Quantity, Unit = item.Unit, UnitPrice = item.UnitPrice });
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("The selected Bid Analysis does not have a Recommended Bidder set.");
+                        return;
+                    }
+                }
+
+                _dataService.SavePO(newPO);
+                LoadPOs();
+
+                // Select the newly created PO
+                SelectedPO = POs.FirstOrDefault(p => p.PONumber == newPO.PONumber);
+
+                MessageBox.Show("Purchase Order Created Successfully");
+                LoadApprovedPRs();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error creating Purchase Order: {ex.Message}");
+            }
         }
 
         [RelayCommand]
@@ -488,19 +520,25 @@ namespace JaahdLogistics.ViewModels
         [RelayCommand]
         public void LoadRFQs()
         {
-            RFQs = new ObservableCollection<RFQ>(_dataService.GetRFQs());
+            var items = _dataService.GetRFQs().ToList();
+            RFQs.Clear();
+            foreach (var item in items) RFQs.Add(item);
         }
 
         [RelayCommand]
         public void LoadBidAnalyses()
         {
-            BidAnalyses = new ObservableCollection<BidAnalysis>(_dataService.GetBidAnalyses());
+            var items = _dataService.GetBidAnalyses().ToList();
+            BidAnalyses.Clear();
+            foreach (var item in items) BidAnalyses.Add(item);
         }
 
         [RelayCommand]
         public void LoadPOs()
         {
-            POs = new ObservableCollection<PurchaseOrder>(_dataService.GetPOs());
+            var items = _dataService.GetPOs().ToList();
+            POs.Clear();
+            foreach (var item in items) POs.Add(item);
         }
 
         [RelayCommand]
@@ -543,6 +581,13 @@ namespace JaahdLogistics.ViewModels
             {
                 CurrentBidAnalysis = value;
                 Bidders = value.Bidders;
+
+                // Re-attach PropertyChanged handlers for bidders to handle VendorId selection
+                foreach(var bidder in Bidders)
+                {
+                    bidder.PropertyChanged -= Bidder_PropertyChanged; // Prevent multiple subscriptions
+                    bidder.PropertyChanged += Bidder_PropertyChanged;
+                }
 
                 // Ensure PR is loaded for the matrix
                 var rfq = _dataService.GetRFQs().FirstOrDefault(r => r.Id == value.RFQId);

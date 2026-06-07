@@ -46,6 +46,8 @@ namespace JaahdLogistics.Data
                 // Repair Settings table
                 AddColumnIfMissing(connection, "Settings", "Address", "TEXT");
                 AddColumnIfMissing(connection, "Settings", "ContactInfo", "TEXT");
+                AddColumnIfMissing(connection, "Settings", "Tel", "TEXT");
+                AddColumnIfMissing(connection, "Settings", "Email", "TEXT");
                 AddColumnIfMissing(connection, "Settings", "PRTerms", "TEXT");
                 AddColumnIfMissing(connection, "Settings", "RFQTerms", "TEXT");
                 AddColumnIfMissing(connection, "Settings", "POTerms", "TEXT");

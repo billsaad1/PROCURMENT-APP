@@ -467,7 +467,7 @@ namespace JaahdLogistics.Services
             using var connection = new SqliteConnection(_connectionString);
             connection.Execute(
                 "UPDATE Settings SET AssociationName=@AssociationName, Address=@Address, " +
-                "ContactInfo=@ContactInfo, LogoImage=@LogoImage, " +
+                "ContactInfo=@ContactInfo, Tel=@Tel, Email=@Email, LogoImage=@LogoImage, " +
                 "PRTerms=@PRTerms, RFQTerms=@RFQTerms, POTerms=@POTerms WHERE Id=1", settings);
         }
 
