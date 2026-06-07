@@ -568,7 +568,14 @@
                     <Border Grid.Row="6" BorderBrush="Black" BorderThickness="1,0,1,1" Background="#D5D8DC" Padding="5">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Total in Words: " FontWeight="Bold" FontSize="9"/>
-                            <TextBlock Text="{Binding CurrentBidAnalysis.RecommendedBidderTotal, Converter={StaticResource CurrencyWordsConverter}, ConverterParameter='YER'}" FontWeight="Bold" FontSize="9"/>
+                            <TextBlock FontWeight="Bold" FontSize="9">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource CurrencyWordsConverter}">
+                                        <Binding Path="CurrentBidAnalysis.RecommendedBidderTotal"/>
+                                        <Binding Path="CurrentBidAnalysis.Currency"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -712,42 +719,41 @@
                             </Grid.ColumnDefinitions>
 
                             <Border Grid.ColumnSpan="2" Background="#922B21" Padding="5">
-                                <TextBlock Text="DETAILS:" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="DETAILS: JAAHD" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
                             </Border>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="JAAHD" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-                            <Border Grid.Row="1" BorderBrush="Black" BorderThickness="0,1,1,0" Padding="5">
+                            <Border Grid.Row="1" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
                                 <TextBlock Text="NAME :" FontWeight="Bold" HorizontalAlignment="Right"/>
                             </Border>
-                            <Border Grid.Row="1" Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,0,0" Padding="5">
+                            <Border Grid.Row="1" Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,0,1" Padding="5">
                                 <TextBlock Text="{Binding Data.Settings.AssociationName, Source={StaticResource Proxy}}" FontWeight="Bold" HorizontalAlignment="Center"/>
                             </Border>
 
-                            <Border Grid.Row="2" BorderBrush="Black" BorderThickness="0,1,1,0" Padding="5">
+                            <Border Grid.Row="2" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5">
                                 <TextBlock Text="Contact :" FontWeight="Bold" HorizontalAlignment="Right"/>
                             </Border>
-                            <Border Grid.Row="2" Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,0,0" Padding="5">
+                            <Border Grid.Row="2" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="5">
                                 <TextBlock Text="{Binding Data.Settings.ContactInfo, Source={StaticResource Proxy}}" HorizontalAlignment="Center"/>
                             </Border>
 
-                            <Border Grid.Row="3" BorderBrush="Black" BorderThickness="0,1,1,0" Padding="5">
+                            <Border Grid.Row="3" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5">
                                 <TextBlock Text="Tel. :" FontWeight="Bold" HorizontalAlignment="Right"/>
                             </Border>
-                            <Border Grid.Row="3" Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,0,0" Padding="5">
+                            <Border Grid.Row="3" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="5">
                                 <TextBlock Text="" HorizontalAlignment="Center"/>
                             </Border>
 
-                            <Border Grid.Row="4" BorderBrush="Black" BorderThickness="0,1,1,0" Padding="5">
+                            <Border Grid.Row="4" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5">
                                 <TextBlock Text="Email :" FontWeight="Bold" HorizontalAlignment="Right"/>
                             </Border>
-                            <Border Grid.Row="4" Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,0,0" Padding="5">
+                            <Border Grid.Row="4" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="5">
                                 <TextBlock Text="" Foreground="Blue" TextDecorations="Underline" HorizontalAlignment="Center"/>
                             </Border>
 
-                            <Border Grid.Row="5" BorderBrush="Black" BorderThickness="0,1,1,0" Padding="5">
+                            <Border Grid.Row="5" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="5">
                                 <TextBlock Text="ADDRESS" FontWeight="Bold" HorizontalAlignment="Right"/>
                             </Border>
-                            <Border Grid.Row="5" Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,0,0" Padding="5">
+                            <Border Grid.Row="5" Grid.Column="1" Padding="5">
                                 <TextBlock Text="{Binding Data.Settings.Address, Source={StaticResource Proxy}}" FontWeight="Bold" HorizontalAlignment="Center"/>
                             </Border>
                         </Grid>
@@ -765,31 +771,46 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
                             <Border Grid.ColumnSpan="2" Background="#AED6F1" Padding="5">
-                                <TextBlock Text="VENDOR" Foreground="Black" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="VENDOR / المورد" Foreground="Black" FontWeight="Bold" HorizontalAlignment="Center"/>
                             </Border>
 
-                            <Border Grid.Row="1" Grid.Column="0" BorderBrush="Black" BorderThickness="0,1,1,0" Padding="5">
+                            <Border Grid.Row="1" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
+                                <TextBlock Text="NAME :" FontWeight="Bold" HorizontalAlignment="Right"/>
+                            </Border>
+                            <Border Grid.Row="1" Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,0,1" Padding="5">
                                 <TextBlock Text="{Binding CurrentPO.Vendor.Name}" FontWeight="Bold" HorizontalAlignment="Center"/>
                             </Border>
 
-                            <Border Grid.Row="2" Grid.Column="0" BorderBrush="Black" BorderThickness="0,1,1,0" Padding="5">
+                            <Border Grid.Row="2" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5">
+                                <TextBlock Text="Contact :" FontWeight="Bold" HorizontalAlignment="Right"/>
+                            </Border>
+                            <Border Grid.Row="2" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="5">
                                 <TextBlock Text="{Binding CurrentPO.Vendor.Contact}" FontWeight="Bold" HorizontalAlignment="Center"/>
                             </Border>
 
-                            <Border Grid.Row="3" Grid.Column="0" BorderBrush="Black" BorderThickness="0,1,1,0" Padding="5">
+                            <Border Grid.Row="3" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5">
+                                <TextBlock Text="Tel. :" FontWeight="Bold" HorizontalAlignment="Right"/>
+                            </Border>
+                            <Border Grid.Row="3" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="5">
                                 <TextBlock Text="{Binding CurrentPO.Vendor.Tel}" FontWeight="Bold" HorizontalAlignment="Center"/>
                             </Border>
 
-                            <Border Grid.Row="4" Grid.Column="0" BorderBrush="Black" BorderThickness="0,1,1,0" Padding="5">
+                            <Border Grid.Row="4" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5">
+                                <TextBlock Text="Email :" FontWeight="Bold" HorizontalAlignment="Right"/>
+                            </Border>
+                            <Border Grid.Row="4" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="5">
                                 <TextBlock Text="{Binding CurrentPO.Vendor.Email}" Foreground="Blue" TextDecorations="Underline" HorizontalAlignment="Center"/>
                             </Border>
 
-                            <Border Grid.Row="5" Grid.Column="0" BorderBrush="Black" BorderThickness="0,1,1,0" Padding="5">
+                            <Border Grid.Row="5" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="5">
+                                <TextBlock Text="ADDRESS" FontWeight="Bold" HorizontalAlignment="Right"/>
+                            </Border>
+                            <Border Grid.Row="5" Grid.Column="1" Padding="5">
                                 <TextBlock Text="{Binding CurrentPO.Vendor.Address}" FontWeight="Bold" HorizontalAlignment="Center"/>
                             </Border>
                         </Grid>
@@ -834,7 +855,14 @@
                         <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#D5D8DC" Padding="10">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="{DynamicResource TotalCost}" FontWeight="Bold" Margin="0,0,20,0"/>
-                                <TextBlock Text="{Binding CurrentPO.TotalAmount, Converter={StaticResource CurrencyWordsConverter}, ConverterParameter='YER'}" FontWeight="Bold"/>
+                                <TextBlock FontWeight="Bold">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource CurrencyWordsConverter}">
+                                            <Binding Path="CurrentPO.TotalAmount"/>
+                                            <Binding Path="CurrentPO.Currency"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
                             </StackPanel>
                         </Border>
                         <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Background="#D5D8DC" Padding="10">

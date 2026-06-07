@@ -32,6 +32,12 @@ namespace JaahdLogistics.Models
 
         private string _status = "Pending";
         public string Status { get => _status; set => SetProperty(ref _status, value); }
+
+        private string? _currency;
+        public string? Currency { get => _currency; set => SetProperty(ref _currency, value); }
+
+        private decimal _exchangeRate = 1.0m;
+        public decimal ExchangeRate { get => _exchangeRate; set => SetProperty(ref _exchangeRate, value); }
         
         public ObservableCollection<POItem> Items { get; set; } = new();
 

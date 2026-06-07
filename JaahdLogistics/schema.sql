@@ -135,11 +135,14 @@ CREATE TABLE IF NOT EXISTS PurchaseOrders (
     Terms TEXT,
     Clause TEXT,
     Status TEXT DEFAULT 'Pending', -- Pending, LogisticsApproved, FinanceApproved, PMApproved, FinalApproved, Rejected
+    Currency TEXT,
+    ExchangeRate DECIMAL(18, 4),
     Version INTEGER DEFAULT 1,
     LastModified DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (PRId) REFERENCES PurchaseRequisitions(Id),
     FOREIGN KEY (BidAnalysisId) REFERENCES BidAnalyses(Id),
-    FOREIGN KEY (VendorId) REFERENCES Bidders(Id)
+    FOREIGN KEY (BidderId) REFERENCES Bidders(Id),
+    FOREIGN KEY (VendorId) REFERENCES Vendors(Id)
 );
 
 CREATE TABLE IF NOT EXISTS POItems (

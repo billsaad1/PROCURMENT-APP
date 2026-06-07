@@ -391,7 +391,9 @@ namespace JaahdLogistics.ViewModels
                 Date = DateTime.Now,
                 PONumber = helper.GenerateNumber("PO", SelectedPR.ProjectId),
                 Status = "Pending",
-                Terms = Settings.POTerms
+                Terms = Settings.POTerms,
+                Currency = SelectedPR.Currency,
+                ExchangeRate = SelectedPR.ExchangeRate
             };
 
             if (SkipBidAnalysis)
@@ -505,8 +507,23 @@ namespace JaahdLogistics.ViewModels
         private void SavePO()
         {
             if (CurrentPO == null) return;
+
+            // Ensure vendor is loaded if VendorId exists
+            if (CurrentPO.VendorId.HasValue && CurrentPO.Vendor == null)
+            {
+                CurrentPO.Vendor = Vendors.FirstOrDefault(v => v.Id == CurrentPO.VendorId);
+            }
+
             _dataService.SavePO(CurrentPO);
             LoadPOs();
+
+            // Re-select to refresh UI
+            if (CurrentPO != null)
+            {
+                var reloaded = POs.FirstOrDefault(p => p.Id == CurrentPO.Id);
+                if (reloaded != null) SelectedPO = reloaded;
+            }
+
             MessageBox.Show("Purchase Order Saved Successfully");
         }
 

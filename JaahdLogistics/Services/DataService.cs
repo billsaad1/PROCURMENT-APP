@@ -337,14 +337,14 @@ namespace JaahdLogistics.Services
                 if (po.Id == 0)
                 {
                     po.Id = connection.QuerySingle<int>(
-                        "INSERT INTO PurchaseOrders (PONumber, PRId, ProjectId, BidAnalysisId, BidderId, VendorId, Date, Terms, Clause, Status) " +
-                        "VALUES (@PONumber, @PRId, @ProjectId, @BidAnalysisId, @BidderId, @VendorId, @Date, @Terms, @Clause, @Status); SELECT last_insert_rowid();",
+                        "INSERT INTO PurchaseOrders (PONumber, PRId, ProjectId, BidAnalysisId, BidderId, VendorId, Date, Terms, Clause, Status, Currency, ExchangeRate) " +
+                        "VALUES (@PONumber, @PRId, @ProjectId, @BidAnalysisId, @BidderId, @VendorId, @Date, @Terms, @Clause, @Status, @Currency, @ExchangeRate); SELECT last_insert_rowid();",
                         po, transaction);
                 }
                 else
                 {
                     connection.Execute(
-                        "UPDATE PurchaseOrders SET PONumber=@PONumber, Date=@Date, BidderId=@BidderId, VendorId=@VendorId, Terms=@Terms, Clause=@Clause, Status=@Status WHERE Id=@Id",
+                        "UPDATE PurchaseOrders SET PONumber=@PONumber, Date=@Date, BidderId=@BidderId, VendorId=@VendorId, Terms=@Terms, Clause=@Clause, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate WHERE Id=@Id",
                         po, transaction);
                     connection.Execute("DELETE FROM POItems WHERE POId = @Id", new { po.Id }, transaction);
                 }
