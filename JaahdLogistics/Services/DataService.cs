@@ -287,8 +287,12 @@ namespace JaahdLogistics.Services
 
                     foreach (var bId in biddersToDelete)
                     {
-                        connection.Execute("DELETE FROM BidItems WHERE BidderId = @bId", new { bId }, transaction);
-                        connection.Execute("DELETE FROM Bidders WHERE Id = @bId", new { bId }, transaction);
+                        try {
+                            connection.Execute("DELETE FROM BidItems WHERE BidderId = @bId", new { bId }, transaction);
+                            connection.Execute("DELETE FROM Bidders WHERE Id = @bId", new { bId }, transaction);
+                        } catch (SqliteException ex) when (ex.SqliteErrorCode == 19) {
+                            // Skip bidders already used in POs
+                        }
                     }
                 }
 
@@ -332,6 +336,16 @@ namespace JaahdLogistics.Services
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
             using var transaction = connection.BeginTransaction();
+
+            // Fix: Dapper might send 0 for int? if it came from a binding that didn't distinguish null/0
+            var param = new {
+                po.Id, po.PONumber, po.PRId, po.ProjectId,
+                BidAnalysisId = po.BidAnalysisId == 0 ? null : po.BidAnalysisId,
+                BidderId = po.BidderId == 0 ? null : po.BidderId,
+                VendorId = po.VendorId == 0 ? null : po.VendorId,
+                po.Date, po.Terms, po.Clause, po.Status, po.Currency, po.ExchangeRate
+            };
+
             try
             {
                 if (po.Id == 0)
@@ -339,14 +353,19 @@ namespace JaahdLogistics.Services
                     po.Id = connection.QuerySingle<int>(
                         "INSERT INTO PurchaseOrders (PONumber, PRId, ProjectId, BidAnalysisId, BidderId, VendorId, Date, Terms, Clause, Status, Currency, ExchangeRate) " +
                         "VALUES (@PONumber, @PRId, @ProjectId, @BidAnalysisId, @BidderId, @VendorId, @Date, @Terms, @Clause, @Status, @Currency, @ExchangeRate); SELECT last_insert_rowid();",
-                        po, transaction);
+                        param, transaction);
                 }
                 else
                 {
                     connection.Execute(
                         "UPDATE PurchaseOrders SET PONumber=@PONumber, Date=@Date, BidderId=@BidderId, VendorId=@VendorId, Terms=@Terms, Clause=@Clause, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate WHERE Id=@Id",
-                        po, transaction);
-                    connection.Execute("DELETE FROM POItems WHERE POId = @Id", new { po.Id }, transaction);
+                        param, transaction);
+
+                    try {
+                        connection.Execute("DELETE FROM POItems WHERE POId = @Id", new { po.Id }, transaction);
+                    } catch (SqliteException ex) when (ex.SqliteErrorCode == 19) {
+                        throw new Exception("Cannot update PO items because they are already referenced in a Goods Receiving Note (GRN).");
+                    }
                 }
 
                 foreach (var item in po.Items)

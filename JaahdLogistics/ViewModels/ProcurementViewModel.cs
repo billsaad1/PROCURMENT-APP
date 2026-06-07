@@ -575,6 +575,10 @@ namespace JaahdLogistics.ViewModels
             if (value != null)
             {
                 CurrentPO = value;
+                if (CurrentPO.VendorId.HasValue && CurrentPO.Vendor == null)
+                {
+                    CurrentPO.Vendor = Vendors.FirstOrDefault(v => v.Id == CurrentPO.VendorId);
+                }
             }
         }
 
