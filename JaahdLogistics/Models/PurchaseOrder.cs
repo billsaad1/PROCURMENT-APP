@@ -12,11 +12,20 @@ namespace JaahdLogistics.Models
         private string _poNumber = string.Empty;
         public string PONumber { get => _poNumber; set => SetProperty(ref _poNumber, value); }
         
-        public int PRId { get; set; }
-        public int ProjectId { get; set; } 
-        public int? BidAnalysisId { get; set; }
-        public int? BidderId { get; set; }
-        public int? VendorId { get; set; }
+        private int _pRId;
+        public int PRId { get => _pRId; set => SetProperty(ref _pRId, value); }
+
+        private int _projectId;
+        public int ProjectId { get => _projectId; set => SetProperty(ref _projectId, value); }
+
+        private int? _bidAnalysisId;
+        public int? BidAnalysisId { get => _bidAnalysisId; set => SetProperty(ref _bidAnalysisId, value); }
+
+        private int? _bidderId;
+        public int? BidderId { get => _bidderId; set => SetProperty(ref _bidderId, value); }
+
+        private int? _vendorId;
+        public int? VendorId { get => _vendorId; set => SetProperty(ref _vendorId, value); }
         
         private DateTime _date;
         public DateTime Date { get => _date; set => SetProperty(ref _date, value); }
