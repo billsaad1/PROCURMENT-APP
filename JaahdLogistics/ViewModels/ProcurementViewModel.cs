@@ -60,6 +60,12 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private PurchaseOrder _currentPO = new();
 
+        partial void OnCurrentPOChanged(PurchaseOrder value)
+        {
+            if (value == null) CurrentPO = new PurchaseOrder();
+            SubscribeToCurrentPO();
+        }
+
         [ObservableProperty]
         private bool _skipBidAnalysis;
 
@@ -106,10 +112,6 @@ namespace JaahdLogistics.ViewModels
             };
         }
 
-        partial void OnCurrentPOChanged(PurchaseOrder value)
-        {
-            SubscribeToCurrentPO();
-        }
 
         [RelayCommand]
         private void SetRecommendedBidder(Bidder bidder)
@@ -440,7 +442,7 @@ namespace JaahdLogistics.ViewModels
                 {
                     PRId = SelectedPR.Id,
                     ProjectId = SelectedPR.ProjectId,
-                    BidAnalysisId = SkipBidAnalysis ? (int?)null : analysisToUse?.Id,
+                    BidAnalysisId = (SkipBidAnalysis || analysisToUse?.Id == 0) ? (int?)null : analysisToUse?.Id,
                     Date = DateTime.Now,
                     PONumber = helper.GenerateNumber("PO", SelectedPR.ProjectId),
                     Status = "Pending",
@@ -460,14 +462,20 @@ namespace JaahdLogistics.ViewModels
                 }
                 else if (analysisToUse != null)
                 {
-                    var winner = analysisToUse.Bidders.FirstOrDefault(b => b.Id == (analysisToUse.RecommendedBidderId ?? 0));
+                    // Find winner by ID first, then by IsWinner flag
+                    var winner = analysisToUse.Bidders.FirstOrDefault(b => b.Id > 0 && b.Id == (analysisToUse.RecommendedBidderId ?? 0));
                     if (winner == null) winner = analysisToUse.Bidders.FirstOrDefault(b => b.IsWinner);
 
                     if (winner != null)
                     {
-                        newPO.BidderId = winner.Id;
-                        newPO.VendorId = winner.VendorId;
-                        newPO.Vendor = Vendors.FirstOrDefault(v => v.Id == winner.VendorId);
+                        newPO.BidderId = winner.Id == 0 ? (int?)null : winner.Id;
+                        newPO.VendorId = (winner.VendorId == null || winner.VendorId == 0) ? (int?)null : winner.VendorId;
+
+                        // Re-fetch vendor details to ensure CurrentPO.Vendor is populated
+                        if (newPO.VendorId.HasValue)
+                        {
+                            newPO.Vendor = Vendors.FirstOrDefault(v => v.Id == newPO.VendorId);
+                        }
 
                         // If winner vendor info was partially missing in Bidder model, fall back to master Vendor record
                         if (newPO.Vendor != null)
@@ -531,6 +539,13 @@ namespace JaahdLogistics.ViewModels
             if (CurrentBidAnalysis.Id == 0) return;
             var user = AuthService.CurrentUser;
             if (user == null) return;
+
+            // Ensure winner is synced before approval
+            var winner = Bidders.FirstOrDefault(b => b.IsWinner);
+            if (winner != null && (CurrentBidAnalysis.RecommendedBidderId == null || CurrentBidAnalysis.RecommendedBidderId == 0))
+            {
+                CurrentBidAnalysis.RecommendedBidderId = winner.Id;
+            }
 
             if (CurrentBidAnalysis.Status == "Pending") CurrentBidAnalysis.Status = "CheckedByLogistics";
             else if (CurrentBidAnalysis.Status == "CheckedByLogistics") CurrentBidAnalysis.Status = "ReviewedByFinance";

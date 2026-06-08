@@ -100,4 +100,5 @@
     <s:String x:Key="UploadSignature">Upload Signature</s:String>
     <s:String x:Key="Vendors">Vendors</s:String>
     <s:String x:Key="RecommendationReasons">Recommendation Reasons</s:String>
+    <s:String x:Key="FinalApproved">Final Approval</s:String>
 </ResourceDictionary>

@@ -1,34 +1,38 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace JaahdLogistics.Models
 {
-    public class BidAnalysis : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
+    public partial class BidAnalysis : ObservableObject
     {
         public int Id { get; set; }
         public int RFQId { get; set; }
         
+        [ObservableProperty]
         private DateTime _date = DateTime.Now;
-        public DateTime Date { get => _date; set => SetProperty(ref _date, value); }
         
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(RecommendedBidderName))]
+        [NotifyPropertyChangedFor(nameof(RecommendedBidderTotal))]
         private int? _recommendedBidderId;
-        public int? RecommendedBidderId { get => _recommendedBidderId; set { if (SetProperty(ref _recommendedBidderId, value)) { OnPropertyChanged(nameof(RecommendedBidderName)); OnPropertyChanged(nameof(RecommendedBidderTotal)); } } }
         
+        [ObservableProperty]
         private string? _justification;
-        public string? Justification { get => _justification; set => SetProperty(ref _justification, value); }
 
+        [ObservableProperty]
         private string? _recommendationReasons;
-        public string? RecommendationReasons { get => _recommendationReasons; set => SetProperty(ref _recommendationReasons, value); }
         
+        [ObservableProperty]
         private string _status = "Pending";
-        public string Status { get => _status; set => SetProperty(ref _status, value); }
         
+        [ObservableProperty]
         private string? _currency;
-        public string? Currency { get => _currency; set => SetProperty(ref _currency, value); }
         
+        [ObservableProperty]
         private decimal _exchangeRate = 1.0m;
-        public decimal ExchangeRate { get => _exchangeRate; set => SetProperty(ref _exchangeRate, value); }
         
         public ObservableCollection<Bidder> Bidders { get; set; } = new();
 
@@ -36,44 +40,47 @@ namespace JaahdLogistics.Models
         public decimal RecommendedBidderTotal => Bidders.FirstOrDefault(b => b.Id == RecommendedBidderId)?.CalculatedTotal ?? 0;
     }
 
-    public partial class Bidder : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
+    public partial class Bidder : ObservableObject
     {
         public int Id { get; set; }
         public int BidAnalysisId { get; set; }
         
-        [CommunityToolkit.Mvvm.ComponentModel.ObservableProperty]
+        [ObservableProperty]
         private int? _vendorId;
 
+        [ObservableProperty]
         private string _name = string.Empty;
-        public string Name { get => _name; set => SetProperty(ref _name, value); }
         
+        [ObservableProperty]
         private string? _address;
-        public string? Address { get => _address; set => SetProperty(ref _address, value); }
 
+        [ObservableProperty]
         private string? _contact;
-        public string? Contact { get => _contact; set => SetProperty(ref _contact, value); }
 
+        [ObservableProperty]
         private string? _tel;
-        public string? Tel { get => _tel; set => SetProperty(ref _tel, value); }
 
+        [ObservableProperty]
         private string? _email;
-        public string? Email { get => _email; set => SetProperty(ref _email, value); }
 
+        [ObservableProperty]
         private string? _justification;
-        public string? Justification { get => _justification; set => SetProperty(ref _justification, value); }
 
+        [ObservableProperty]
         private bool _isWinner;
-        public bool IsWinner { get => _isWinner; set => SetProperty(ref _isWinner, value); }
         
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(CalculatedTotal))]
         private decimal _discount;
-        public decimal Discount { get => _discount; set { if (SetProperty(ref _discount, value)) OnPropertyChanged(nameof(CalculatedTotal)); } }
         
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(CalculatedTotal))]
         private decimal _miscCosts;
-        public decimal MiscCosts { get => _miscCosts; set { if (SetProperty(ref _miscCosts, value)) OnPropertyChanged(nameof(CalculatedTotal)); } }
         
         public decimal TotalAmount { get; set; }
+
+        [ObservableProperty]
         private byte[]? _quoteScan;
-        public byte[]? QuoteScan { get => _quoteScan; set => SetProperty(ref _quoteScan, value); }
         public ObservableCollection<BidItem> Items { get; set; } = new();
 
         public decimal CalculatedSubTotal => Items.Sum(i => i.TotalPrice);

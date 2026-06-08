@@ -390,6 +390,10 @@
                         <TextBlock Grid.Row="1" Text="{DynamicResource PO}" FontSize="22" FontWeight="Bold" Margin="0,0,0,15" HorizontalAlignment="Center"/>
 
                         <Grid Grid.Row="2" Margin="0,0,0,10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
                              <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
@@ -412,6 +416,23 @@
                                  <TextBlock Text=":" FontWeight="Bold"/>
                              </StackPanel>
                              <DatePicker Grid.Column="5" SelectedDate="{Binding CurrentPO.Date}" Margin="5"/>
+
+                             <!-- Vendor Details Summary -->
+                             <Border Grid.Row="1" Grid.ColumnSpan="6" BorderBrush="SteelBlue" BorderThickness="1" Background="#F0F8FF" Padding="10" Margin="5">
+                                 <Grid>
+                                     <Grid.ColumnDefinitions>
+                                         <ColumnDefinition Width="Auto"/>
+                                         <ColumnDefinition Width="*"/>
+                                         <ColumnDefinition Width="Auto"/>
+                                         <ColumnDefinition Width="*"/>
+                                     </Grid.ColumnDefinitions>
+                                     <TextBlock Text="Vendor Name:" FontWeight="Bold" Margin="0,0,10,0"/>
+                                     <TextBlock Grid.Column="1" Text="{Binding CurrentPO.Vendor.Name}" FontWeight="Bold" Foreground="DarkBlue"/>
+
+                                     <TextBlock Grid.Column="2" Text="Contact:" FontWeight="Bold" Margin="20,0,10,0"/>
+                                     <TextBlock Grid.Column="3" Text="{Binding CurrentPO.Vendor.Tel}" Foreground="DarkBlue"/>
+                                 </Grid>
+                             </Border>
                         </Grid>
 
                         <DataGrid Grid.Row="3" ItemsSource="{Binding CurrentPO.Items}" AutoGenerateColumns="False" IsReadOnly="True" Margin="0,10">

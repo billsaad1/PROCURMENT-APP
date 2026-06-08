@@ -268,18 +268,31 @@ namespace JaahdLogistics.Services
             using var transaction = connection.BeginTransaction();
             try
             {
+                var analysisParam = new
+                {
+                    analysis.Id,
+                    analysis.RFQId,
+                    analysis.Date,
+                    RecommendedBidderId = (analysis.RecommendedBidderId == 0) ? (int?)null : analysis.RecommendedBidderId,
+                    analysis.Justification,
+                    analysis.RecommendationReasons,
+                    analysis.Status,
+                    analysis.Currency,
+                    analysis.ExchangeRate
+                };
+
                 if (analysis.Id == 0)
                 {
                     analysis.Id = connection.QuerySingle<int>(
                         "INSERT INTO BidAnalyses (RFQId, Date, RecommendedBidderId, Justification, RecommendationReasons, Status, Currency, ExchangeRate) " +
                         "VALUES (@RFQId, @Date, @RecommendedBidderId, @Justification, @RecommendationReasons, @Status, @Currency, @ExchangeRate); SELECT last_insert_rowid();",
-                        analysis, transaction);
+                        analysisParam, transaction);
                 }
                 else
                 {
                     connection.Execute(
                         "UPDATE BidAnalyses SET RecommendedBidderId=@RecommendedBidderId, Justification=@Justification, RecommendationReasons=@RecommendationReasons, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate WHERE Id=@Id",
-                        analysis, transaction);
+                        analysisParam, transaction);
                 }
 
                 var existingBiddersInDb = connection.Query<Bidder>("SELECT * FROM Bidders WHERE BidAnalysisId = @Id", new { analysis.Id }, transaction).ToList();
@@ -305,18 +318,36 @@ namespace JaahdLogistics.Services
                 foreach (var bidder in analysis.Bidders)
                 {
                     bidder.BidAnalysisId = analysis.Id;
+                    var bidderParam = new
+                    {
+                        bidder.Id,
+                        bidder.BidAnalysisId,
+                        VendorId = (bidder.VendorId == 0) ? (int?)null : bidder.VendorId,
+                        bidder.Name,
+                        bidder.Address,
+                        bidder.Contact,
+                        bidder.Tel,
+                        bidder.Email,
+                        bidder.Justification,
+                        bidder.IsWinner,
+                        bidder.Discount,
+                        bidder.MiscCosts,
+                        bidder.TotalAmount,
+                        bidder.QuoteScan
+                    };
+
                     if (bidder.Id == 0)
                     {
                         bidder.Id = connection.QuerySingle<int>(
                             "INSERT INTO Bidders (BidAnalysisId, VendorId, Name, Address, Contact, Tel, Email, Justification, IsWinner, Discount, MiscCosts, TotalAmount, QuoteScan) " +
                             "VALUES (@BidAnalysisId, @VendorId, @Name, @Address, @Contact, @Tel, @Email, @Justification, @IsWinner, @Discount, @MiscCosts, @TotalAmount, @QuoteScan); SELECT last_insert_rowid();",
-                            bidder, transaction);
+                            bidderParam, transaction);
                     }
                     else
                     {
                         connection.Execute(
                             "UPDATE Bidders SET VendorId=@VendorId, Name=@Name, Address=@Address, Contact=@Contact, Tel=@Tel, Email=@Email, Justification=@Justification, IsWinner=@IsWinner, Discount=@Discount, MiscCosts=@MiscCosts, TotalAmount=@TotalAmount, QuoteScan=@QuoteScan WHERE Id=@Id",
-                            bidder, transaction);
+                            bidderParam, transaction);
                     }
 
                     var existingItemsInDb = connection.Query<BidItem>("SELECT * FROM BidItems WHERE BidderId = @Id", new { bidder.Id }, transaction).ToList();
@@ -360,15 +391,19 @@ namespace JaahdLogistics.Services
 
         public void SavePO(PurchaseOrder po)
         {
+            if (po.PRId == 0) throw new Exception("Purchase Order must be linked to a valid Purchase Requisition (PRId is 0).");
+            if (po.ProjectId == 0) throw new Exception("Purchase Order must be linked to a valid Project (ProjectId is 0).");
+
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
             using var transaction = connection.BeginTransaction();
 
+            // Explicitly map 0 to null for optional Foreign Keys to avoid SQLite Error 19
             var param = new {
                 po.Id, po.PONumber, po.PRId, po.ProjectId,
-                BidAnalysisId = po.BidAnalysisId == 0 ? null : po.BidAnalysisId,
-                BidderId = po.BidderId == 0 ? null : po.BidderId,
-                VendorId = po.VendorId == 0 ? null : po.VendorId,
+                BidAnalysisId = (po.BidAnalysisId == null || po.BidAnalysisId == 0) ? (int?)null : po.BidAnalysisId,
+                BidderId = (po.BidderId == null || po.BidderId == 0) ? (int?)null : po.BidderId,
+                VendorId = (po.VendorId == null || po.VendorId == 0) ? (int?)null : po.VendorId,
                 po.Date, po.Terms, po.Clause, po.Status, po.Currency, po.ExchangeRate
             };
 
@@ -384,7 +419,7 @@ namespace JaahdLogistics.Services
                 else
                 {
                     connection.Execute(
-                        "UPDATE PurchaseOrders SET PONumber=@PONumber, Date=@Date, BidderId=@BidderId, VendorId=@VendorId, Terms=@Terms, Clause=@Clause, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate WHERE Id=@Id",
+                        "UPDATE PurchaseOrders SET PONumber=@PONumber, Date=@Date, BidAnalysisId=@BidAnalysisId, BidderId=@BidderId, VendorId=@VendorId, Terms=@Terms, Clause=@Clause, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate WHERE Id=@Id",
                         param, transaction);
                 }
 

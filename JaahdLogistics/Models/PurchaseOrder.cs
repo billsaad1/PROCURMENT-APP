@@ -3,81 +3,85 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
+using CommunityToolkit.Mvvm.ComponentModel;
+
 namespace JaahdLogistics.Models
 {
-    public class PurchaseOrder : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
+    public partial class PurchaseOrder : ObservableObject
     {
         public int Id { get; set; }
         
-        private string _poNumber = string.Empty;
-        public string PONumber { get => _poNumber; set => SetProperty(ref _poNumber, value); }
+        [ObservableProperty]
+        private string _pONumber = string.Empty;
         
+        [ObservableProperty]
         private int _pRId;
-        public int PRId { get => _pRId; set => SetProperty(ref _pRId, value); }
 
+        [ObservableProperty]
         private int _projectId;
-        public int ProjectId { get => _projectId; set => SetProperty(ref _projectId, value); }
 
+        [ObservableProperty]
         private int? _bidAnalysisId;
-        public int? BidAnalysisId { get => _bidAnalysisId; set => SetProperty(ref _bidAnalysisId, value); }
 
+        [ObservableProperty]
         private int? _bidderId;
-        public int? BidderId { get => _bidderId; set => SetProperty(ref _bidderId, value); }
 
+        [ObservableProperty]
         private int? _vendorId;
-        public int? VendorId { get => _vendorId; set => SetProperty(ref _vendorId, value); }
         
+        [ObservableProperty]
         private DateTime _date;
-        public DateTime Date { get => _date; set => SetProperty(ref _date, value); }
         
+        [ObservableProperty]
         private string? _terms;
-        public string? Terms { get => _terms; set => SetProperty(ref _terms, value); }
 
+        [ObservableProperty]
         private string? _clause;
-        public string? Clause { get => _clause; set => SetProperty(ref _clause, value); }
         
+        [ObservableProperty]
         private Vendor? _vendor;
-        public Vendor? Vendor { get => _vendor; set => SetProperty(ref _vendor, value); }
 
+        [ObservableProperty]
         private string _status = "Pending";
-        public string Status { get => _status; set => SetProperty(ref _status, value); }
 
+        [ObservableProperty]
         private string? _currency;
-        public string? Currency { get => _currency; set => SetProperty(ref _currency, value); }
 
+        [ObservableProperty]
         private decimal _exchangeRate = 1.0m;
-        public decimal ExchangeRate { get => _exchangeRate; set => SetProperty(ref _exchangeRate, value); }
         
         public ObservableCollection<POItem> Items { get; set; } = new();
 
+        [ObservableProperty]
         private byte[]? _logisticsSignature;
-        public byte[]? LogisticsSignature { get => _logisticsSignature; set => SetProperty(ref _logisticsSignature, value); }
 
+        [ObservableProperty]
         private byte[]? _financeSignature;
-        public byte[]? FinanceSignature { get => _financeSignature; set => SetProperty(ref _financeSignature, value); }
 
+        [ObservableProperty]
         private byte[]? _pmSignature;
-        public byte[]? PMSignature { get => _pmSignature; set => SetProperty(ref _pmSignature, value); }
 
+        [ObservableProperty]
         private byte[]? _finalSignature;
-        public byte[]? FinalSignature { get => _finalSignature; set => SetProperty(ref _finalSignature, value); }
 
+        [ObservableProperty]
         private string? _logisticsName;
-        public string? LogisticsName { get => _logisticsName; set => SetProperty(ref _logisticsName, value); }
 
+        [ObservableProperty]
         private string? _financeName;
-        public string? FinanceName { get => _financeName; set => SetProperty(ref _financeName, value); }
 
+        [ObservableProperty]
         private string? _pmName;
-        public string? PMName { get => _pmName; set => SetProperty(ref _pmName, value); }
 
+        [ObservableProperty]
         private string? _finalName;
-        public string? FinalName { get => _finalName; set => SetProperty(ref _finalName, value); }
 
         public decimal TotalAmount => Items.Sum(i => i.TotalPrice);
 
         public PurchaseOrder()
         {
+            Date = DateTime.Now;
+            Status = "Pending";
             Items.CollectionChanged += (s, e) => {
                 OnPropertyChanged(nameof(TotalAmount));
                 if (e.NewItems != null) {

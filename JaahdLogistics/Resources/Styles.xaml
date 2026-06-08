@@ -661,19 +661,20 @@
                 <!-- 1. Logo and Header -->
                 <Grid Margin="0,0,0,5">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="60"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="60"/>
                     </Grid.ColumnDefinitions>
                     <Image Source="{Binding Data.Settings.LogoImage, Source={StaticResource Proxy}, Converter={StaticResource ImageBytesConverter}}" Height="60" Width="60"/>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
                         <TextBlock Text="{Binding Data.Settings.AssociationName, Source={StaticResource Proxy}}" FontSize="14" FontWeight="Bold" TextDecorations="Underline"/>
-                        <TextBlock Text="Logistics Management" FontSize="12" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Logistics Management / إدارة اللوجستيات" FontSize="12" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
 
                 <!-- 2. Title -->
                 <Border Grid.Row="1" Background="#1B4F72" Margin="0,0,0,10">
-                    <TextBlock Text="PURCHASE ORDER" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" Margin="5"/>
+                    <TextBlock Text="PURCHASE ORDER / أمر شراء" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" Margin="5"/>
                 </Border>
 
                 <!-- 3. PO No / Clause / Date -->
@@ -687,19 +688,19 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Border BorderBrush="Black" BorderThickness="1" Padding="5">
-                        <TextBlock Text="PO NUMBER :" FontWeight="Bold"/>
+                        <TextBlock Text="PO NUMBER / رقم الأمر :" FontWeight="Bold" FontSize="9"/>
                     </Border>
                     <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
-                        <TextBlock Text="{Binding CurrentPO.PONumber}" FontSize="10"/>
+                        <TextBlock Text="{Binding CurrentPO.PONumber}" FontSize="10" FontWeight="Bold"/>
                     </Border>
                     <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
-                        <TextBlock Text="CLAUSE :" FontWeight="Bold"/>
+                        <TextBlock Text="CLAUSE / البند :" FontWeight="Bold" FontSize="9"/>
                     </Border>
                     <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
                         <TextBlock Text="{Binding CurrentPO.Clause}" FontSize="10"/>
                     </Border>
                     <Border Grid.Column="4" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
-                        <TextBlock Text="DATE :" FontWeight="Bold"/>
+                        <TextBlock Text="DATE / التاريخ :" FontWeight="Bold" FontSize="9"/>
                     </Border>
                     <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5" Width="100">
                         <TextBlock Text="{Binding CurrentPO.Date, StringFormat=MM/dd/yyyy}" FontWeight="Bold" HorizontalAlignment="Center"/>
@@ -725,26 +726,26 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="100"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
                             <Border Grid.ColumnSpan="2" Background="#922B21" Padding="5">
-                                <TextBlock Text="DETAILS: JAAHD / تفاصيل جهة الطلب" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="DETAILS: JAAHD / تفاصيل جهة الطلب" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" FontSize="10"/>
                             </Border>
 
-                            <Border Grid.Row="1" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
+                            <Border Grid.Row="1" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5" Background="#F2F3F4">
                                 <TextBlock Text="NAME / الاسم:" FontWeight="Bold" HorizontalAlignment="Right" FontSize="9"/>
                             </Border>
                             <Border Grid.Row="1" Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,0,1" Padding="5">
-                                <TextBlock Text="{Binding Data.Settings.AssociationName, Source={StaticResource Proxy}}" FontWeight="Bold" HorizontalAlignment="Center" FontSize="9"/>
+                                <TextBlock Text="{Binding Data.Settings.AssociationName, Source={StaticResource Proxy}}" FontWeight="Bold" HorizontalAlignment="Center" FontSize="9" TextWrapping="Wrap"/>
                             </Border>
 
                             <Border Grid.Row="2" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5">
                                 <TextBlock Text="Contact / التواصل:" FontWeight="Bold" HorizontalAlignment="Right" FontSize="9"/>
                             </Border>
                             <Border Grid.Row="2" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="5">
-                                <TextBlock Text="{Binding Data.Settings.ContactInfo, Source={StaticResource Proxy}}" HorizontalAlignment="Center" FontSize="9"/>
+                                <TextBlock Text="{Binding Data.Settings.ContactInfo, Source={StaticResource Proxy}}" HorizontalAlignment="Center" FontSize="9" TextWrapping="Wrap"/>
                             </Border>
 
                             <Border Grid.Row="3" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5">
@@ -758,14 +759,14 @@
                                 <TextBlock Text="Email / البريد:" FontWeight="Bold" HorizontalAlignment="Right" FontSize="9"/>
                             </Border>
                             <Border Grid.Row="4" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="5">
-                                <TextBlock Text="{Binding Data.Settings.Email, Source={StaticResource Proxy}}" HorizontalAlignment="Center" FontSize="9"/>
+                                <TextBlock Text="{Binding Data.Settings.Email, Source={StaticResource Proxy}}" HorizontalAlignment="Center" FontSize="9" TextWrapping="Wrap"/>
                             </Border>
 
                             <Border Grid.Row="5" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="5">
                                 <TextBlock Text="ADDRESS / العنوان:" FontWeight="Bold" HorizontalAlignment="Right" FontSize="9"/>
                             </Border>
                             <Border Grid.Row="5" Grid.Column="1" Padding="5">
-                                <TextBlock Text="{Binding Data.Settings.Address, Source={StaticResource Proxy}}" HorizontalAlignment="Center" FontSize="9"/>
+                                <TextBlock Text="{Binding Data.Settings.Address, Source={StaticResource Proxy}}" HorizontalAlignment="Center" FontSize="9" TextWrapping="Wrap"/>
                             </Border>
                         </Grid>
                     </Border>
@@ -782,26 +783,26 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="100"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
                             <Border Grid.ColumnSpan="2" Background="#AED6F1" Padding="5">
-                                <TextBlock Text="VENDOR / المورد" Foreground="Black" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="VENDOR / تفاصيل المورد" Foreground="Black" FontWeight="Bold" HorizontalAlignment="Center" FontSize="10"/>
                             </Border>
 
-                            <Border Grid.Row="1" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
+                            <Border Grid.Row="1" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5" Background="#F2F3F4">
                                 <TextBlock Text="NAME / الاسم:" FontWeight="Bold" HorizontalAlignment="Right" FontSize="9"/>
                             </Border>
                             <Border Grid.Row="1" Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,0,1" Padding="5">
-                                <TextBlock Text="{Binding CurrentPO.Vendor.Name}" FontWeight="Bold" HorizontalAlignment="Center" FontSize="9"/>
+                                <TextBlock Text="{Binding CurrentPO.Vendor.Name}" FontWeight="Bold" HorizontalAlignment="Center" FontSize="9" TextWrapping="Wrap"/>
                             </Border>
 
                             <Border Grid.Row="2" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5">
                                 <TextBlock Text="Contact / التواصل:" FontWeight="Bold" HorizontalAlignment="Right" FontSize="9"/>
                             </Border>
                             <Border Grid.Row="2" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="5">
-                                <TextBlock Text="{Binding CurrentPO.Vendor.Contact}" HorizontalAlignment="Center" FontSize="9"/>
+                                <TextBlock Text="{Binding CurrentPO.Vendor.Contact}" HorizontalAlignment="Center" FontSize="9" TextWrapping="Wrap"/>
                             </Border>
 
                             <Border Grid.Row="3" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5">
@@ -815,7 +816,7 @@
                                 <TextBlock Text="Email / البريد:" FontWeight="Bold" HorizontalAlignment="Right" FontSize="9"/>
                             </Border>
                             <Border Grid.Row="4" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="5">
-                                <TextBlock Text="{Binding CurrentPO.Vendor.Email}" HorizontalAlignment="Center" FontSize="9"/>
+                                <TextBlock Text="{Binding CurrentPO.Vendor.Email}" HorizontalAlignment="Center" FontSize="9" TextWrapping="Wrap"/>
                             </Border>
 
                             <Border Grid.Row="5" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="5">
@@ -849,12 +850,50 @@
                             </Style>
                         </DataGrid.Resources>
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Item الصنف" Binding="{Binding Description}" Width="100"/>
-                            <DataGridTextColumn Header="Description المواصفات" Binding="{Binding Description}" Width="*"/>
-                            <DataGridTextColumn Header="Unit الوحدة" Binding="{Binding Unit}" Width="80"/>
-                            <DataGridTextColumn Header="Quantity الكمية" Binding="{Binding Quantity}" Width="80"/>
-                            <DataGridTextColumn Header="Unit Price سعر الوحدة" Binding="{Binding UnitPrice, StringFormat=N2}" Width="100"/>
-                            <DataGridTextColumn Header="Total Price إجمالي السعر" Binding="{Binding TotalPrice, StringFormat=N2}" Width="120"/>
+                            <DataGridTextColumn Header="Description / المواصفات" Binding="{Binding Description}" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextWrapping" Value="Wrap"/>
+                                        <Setter Property="Padding" Value="2"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Unit / الوحدة" Binding="{Binding Unit}" Width="70">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Qty / الكمية" Binding="{Binding Quantity}" Width="70">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="U.Price / السعر" Binding="{Binding UnitPrice, StringFormat=N2}" Width="90">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="HorizontalAlignment" Value="Right"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Margin" Value="0,0,5,0"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Total / الإجمالي" Binding="{Binding TotalPrice, StringFormat=N2}" Width="110">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="HorizontalAlignment" Value="Right"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="Margin" Value="0,0,5,0"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
                         </DataGrid.Columns>
                     </DataGrid>
 
@@ -864,9 +903,9 @@
                             <ColumnDefinition Width="120"/>
                         </Grid.ColumnDefinitions>
                         <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#D5D8DC" Padding="10">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{DynamicResource TotalCost}" FontWeight="Bold" Margin="0,0,20,0"/>
-                                <TextBlock FontWeight="Bold">
+                            <StackPanel>
+                                <TextBlock Text="{DynamicResource TotalCost}" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBlock FontWeight="Bold" TextWrapping="Wrap" FontSize="10">
                                     <TextBlock.Text>
                                         <MultiBinding Converter="{StaticResource CurrencyWordsConverter}">
                                             <Binding Path="CurrentPO.TotalAmount"/>
@@ -877,7 +916,7 @@
                             </StackPanel>
                         </Border>
                         <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Background="#D5D8DC" Padding="10">
-                            <TextBlock Text="{Binding CurrentPO.TotalAmount, StringFormat=N2}" FontWeight="Bold" HorizontalAlignment="Right"/>
+                            <TextBlock Text="{Binding CurrentPO.TotalAmount, StringFormat=N2}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                         </Border>
                     </Grid>
                 </Grid>
@@ -892,7 +931,7 @@
                         <Border Background="#D5D8DC" Padding="5">
                             <TextBlock Text="{DynamicResource SupplyTerms}" FontWeight="Bold" HorizontalAlignment="Center"/>
                         </Border>
-                        <TextBlock Grid.Row="1" Text="{Binding CurrentPO.Terms}" TextWrapping="Wrap" Margin="10" FontSize="10" HorizontalAlignment="Right"/>
+                        <TextBlock Grid.Row="1" Text="{Binding CurrentPO.Terms}" TextWrapping="Wrap" Margin="10" FontSize="10"/>
                     </Grid>
                 </Border>
 
@@ -902,83 +941,58 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
                     <!-- Logistics -->
-                    <Border BorderBrush="Black" BorderThickness="1" Margin="0,0,5,0" Padding="5">
+                    <Border BorderBrush="Black" BorderThickness="1" Margin="0,0,2,0" Padding="5">
                         <StackPanel>
                             <Border Background="#AED6F1" Margin="-5,-5,-5,5">
-                                <TextBlock Text="{DynamicResource CheckedBy}" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{DynamicResource CheckedBy}" FontWeight="Bold" HorizontalAlignment="Center" FontSize="9"/>
                             </Border>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{DynamicResource Position}" FontSize="10" FontWeight="Bold"/>
-                                <TextBlock Text=" : " FontSize="10" FontWeight="Bold"/>
-                                <TextBlock Text="{DynamicResource LogisticManager}" FontSize="10" FontWeight="Bold"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{DynamicResource Name}" FontSize="10"/>
-                                <TextBlock Text=" : " FontSize="10"/>
-                                <TextBlock Text="{Binding CurrentPO.LogisticsName}" FontSize="10" FontWeight="Bold"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{DynamicResource Date}" FontSize="10"/>
-                                <TextBlock Text=" : " FontSize="10"/>
-                                <TextBlock Text="{Binding CurrentPO.Date, StringFormat=d}" FontSize="10" FontWeight="Bold"/>
-                            </StackPanel>
-                            <TextBlock Text="{DynamicResource Signature}" FontSize="10" Margin="0,5,0,0"/>
-                            <Image Source="{Binding CurrentPO.LogisticsSignature, Converter={StaticResource ImageBytesConverter}}" Height="40" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{DynamicResource LogisticManager}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <Separator Margin="0,2"/>
+                            <TextBlock Text="{Binding CurrentPO.LogisticsName}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                            <Image Source="{Binding CurrentPO.LogisticsSignature, Converter={StaticResource ImageBytesConverter}}" Height="35" HorizontalAlignment="Center" Margin="0,2"/>
                         </StackPanel>
                     </Border>
 
                     <!-- Finance -->
-                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="0,0,5,0" Padding="5">
+                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="0,0,2,0" Padding="5">
                         <StackPanel>
                             <Border Background="#D5D8DC" Margin="-5,-5,-5,5">
-                                <TextBlock Text="{DynamicResource ReviewedBy}" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{DynamicResource ReviewedBy}" FontWeight="Bold" HorizontalAlignment="Center" FontSize="9"/>
                             </Border>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{DynamicResource Position}" FontSize="10" FontWeight="Bold"/>
-                                <TextBlock Text=" : " FontSize="10" FontWeight="Bold"/>
-                                <TextBlock Text="{DynamicResource FinanceManager}" FontSize="10" FontWeight="Bold"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{DynamicResource Name}" FontSize="10"/>
-                                <TextBlock Text=" : " FontSize="10"/>
-                                <TextBlock Text="{Binding CurrentPO.FinanceName}" FontSize="10" FontWeight="Bold"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{DynamicResource Date}" FontSize="10"/>
-                                <TextBlock Text=" : " FontSize="10"/>
-                                <TextBlock Text="{Binding CurrentPO.Date, StringFormat=d}" FontSize="10" FontWeight="Bold"/>
-                            </StackPanel>
-                            <TextBlock Text="{DynamicResource Signature}" FontSize="10" Margin="0,5,0,0"/>
-                            <Image Source="{Binding CurrentPO.FinanceSignature, Converter={StaticResource ImageBytesConverter}}" Height="40" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{DynamicResource FinanceManager}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <Separator Margin="0,2"/>
+                            <TextBlock Text="{Binding CurrentPO.FinanceName}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                            <Image Source="{Binding CurrentPO.FinanceSignature, Converter={StaticResource ImageBytesConverter}}" Height="35" HorizontalAlignment="Center" Margin="0,2"/>
                         </StackPanel>
                     </Border>
 
                     <!-- PM -->
-                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="1" Padding="5">
+                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="1" Margin="0,0,2,0" Padding="5">
                         <StackPanel>
                             <Border Background="#AED6F1" Margin="-5,-5,-5,5">
-                                <TextBlock Text="{DynamicResource ApprovedBy}" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{DynamicResource ApprovedBy}" FontWeight="Bold" HorizontalAlignment="Center" FontSize="9"/>
                             </Border>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{DynamicResource Position}" FontSize="10" FontWeight="Bold"/>
-                                <TextBlock Text=" : " FontSize="10" FontWeight="Bold"/>
-                                <TextBlock Text="{DynamicResource ProjectManager}" FontSize="10" FontWeight="Bold"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{DynamicResource Name}" FontSize="10"/>
-                                <TextBlock Text=" : " FontSize="10"/>
-                                <TextBlock Text="{Binding CurrentPO.PMName}" FontSize="10" FontWeight="Bold"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{DynamicResource Date}" FontSize="10"/>
-                                <TextBlock Text=" : " FontSize="10"/>
-                                <TextBlock Text="{Binding CurrentPO.Date, StringFormat=d}" FontSize="10" FontWeight="Bold"/>
-                            </StackPanel>
-                            <TextBlock Text="{DynamicResource Signature}" FontSize="10" Margin="0,5,0,0"/>
-                            <Image Source="{Binding CurrentPO.PMSignature, Converter={StaticResource ImageBytesConverter}}" Height="40" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{DynamicResource ProjectManager}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <Separator Margin="0,2"/>
+                            <TextBlock Text="{Binding CurrentPO.PMName}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                            <Image Source="{Binding CurrentPO.PMSignature, Converter={StaticResource ImageBytesConverter}}" Height="35" HorizontalAlignment="Center" Margin="0,2"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Head -->
+                    <Border Grid.Column="3" BorderBrush="Black" BorderThickness="1" Padding="5">
+                        <StackPanel>
+                            <Border Background="#D5D8DC" Margin="-5,-5,-5,5">
+                                <TextBlock Text="{DynamicResource FinalApproved}" FontWeight="Bold" HorizontalAlignment="Center" FontSize="9"/>
+                            </Border>
+                            <TextBlock Text="Head / مدير الجمعية" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <Separator Margin="0,2"/>
+                            <TextBlock Text="{Binding CurrentPO.FinalName}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                            <Image Source="{Binding CurrentPO.FinalSignature, Converter={StaticResource ImageBytesConverter}}" Height="35" HorizontalAlignment="Center" Margin="0,2"/>
                         </StackPanel>
                     </Border>
                 </Grid>

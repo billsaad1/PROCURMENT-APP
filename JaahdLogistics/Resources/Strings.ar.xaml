@@ -101,4 +101,5 @@
     <s:String x:Key="UploadSignature">تحميل التوقيع</s:String>
     <s:String x:Key="Vendors">الموردين</s:String>
     <s:String x:Key="RecommendationReasons">أسباب التوصية</s:String>
+    <s:String x:Key="FinalApproved">الموافقة النهائية</s:String>
 </ResourceDictionary>
