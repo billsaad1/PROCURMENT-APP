@@ -59,7 +59,7 @@ namespace JaahdLogistics.Models
         private byte[]? _financeSignature;
 
         [ObservableProperty]
-        private byte[]? _pmSignature;
+        private byte[]? _pMSignature;
 
         [ObservableProperty]
         private byte[]? _finalSignature;
@@ -71,7 +71,7 @@ namespace JaahdLogistics.Models
         private string? _financeName;
 
         [ObservableProperty]
-        private string? _pmName;
+        private string? _pMName;
 
         [ObservableProperty]
         private string? _finalName;
