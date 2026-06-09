@@ -54,6 +54,9 @@ namespace JaahdLogistics.Models
         private string? _vendorName;
 
         [ObservableProperty]
+        private string? _vendorContact;
+
+        [ObservableProperty]
         private string? _vendorTel;
 
         [ObservableProperty]
@@ -107,6 +110,7 @@ namespace JaahdLogistics.Models
     {
         public int Id { get; set; }
         public int POId { get; set; }
+        public int? BudgetLineId { get; set; }
         
         private string _description = string.Empty;
         public string Description { get => _description; set => SetProperty(ref _description, value); }

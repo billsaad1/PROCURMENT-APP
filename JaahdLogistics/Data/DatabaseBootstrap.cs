@@ -82,6 +82,9 @@ namespace JaahdLogistics.Data
                 AddColumnIfMissing(connection, "BidAnalyses", "ExchangeRate", "DECIMAL(18, 4)");
                 AddColumnIfMissing(connection, "BidAnalyses", "RecommendationReasons", "TEXT");
 
+                // Repair BidItems table
+                AddColumnIfMissing(connection, "BidItems", "BudgetLineId", "INTEGER");
+
                 // Repair Bidders table
                 AddColumnIfMissing(connection, "Bidders", "VendorId", "INTEGER");
                 AddColumnIfMissing(connection, "Bidders", "Tel", "TEXT");
@@ -101,9 +104,13 @@ namespace JaahdLogistics.Data
                 AddColumnIfMissing(connection, "PurchaseOrders", "Currency", "TEXT");
                 AddColumnIfMissing(connection, "PurchaseOrders", "ExchangeRate", "DECIMAL(18, 4)");
                 AddColumnIfMissing(connection, "PurchaseOrders", "VendorName", "TEXT");
+                AddColumnIfMissing(connection, "PurchaseOrders", "VendorContact", "TEXT");
                 AddColumnIfMissing(connection, "PurchaseOrders", "VendorTel", "TEXT");
                 AddColumnIfMissing(connection, "PurchaseOrders", "VendorEmail", "TEXT");
                 AddColumnIfMissing(connection, "PurchaseOrders", "VendorAddress", "TEXT");
+
+                // Repair POItems table
+                AddColumnIfMissing(connection, "POItems", "BudgetLineId", "INTEGER");
             }
             
             var userCount = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Users");
@@ -133,6 +140,28 @@ namespace JaahdLogistics.Data
             if (settingsCount == 0)
             {
                 connection.Execute("INSERT INTO Settings (Id, AssociationName) VALUES (1, 'Jaahd Association')");
+            }
+
+            // Cleanup invalid Foreign Keys that might cause crashes in existing data
+            CleanupInvalidForeignKeys(connection);
+        }
+
+        private void CleanupInvalidForeignKeys(SqliteConnection connection)
+        {
+            try
+            {
+                // Set invalid BidAnalysisId to NULL
+                connection.Execute("UPDATE PurchaseOrders SET BidAnalysisId = NULL WHERE BidAnalysisId IS NOT NULL AND BidAnalysisId NOT IN (SELECT Id FROM BidAnalyses)");
+                // Set invalid BidderId to NULL
+                connection.Execute("UPDATE PurchaseOrders SET BidderId = NULL WHERE BidderId IS NOT NULL AND BidderId NOT IN (SELECT Id FROM Bidders)");
+                // Set invalid VendorId to NULL
+                connection.Execute("UPDATE PurchaseOrders SET VendorId = NULL WHERE VendorId IS NOT NULL AND VendorId NOT IN (SELECT Id FROM Vendors)");
+                // Set invalid PRId to a valid one or log it (PRId is NOT NULL, so we can't set to NULL)
+                // We'll leave PRId/ProjectId as they are required and usually valid, but optional ones are the main crash cause.
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error cleaning up FKs: {ex.Message}");
             }
         }
 

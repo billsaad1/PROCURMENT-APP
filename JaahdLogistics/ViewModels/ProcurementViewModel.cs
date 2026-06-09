@@ -284,7 +284,7 @@ namespace JaahdLogistics.ViewModels
                 
                 foreach(var item in SelectedPR.Items)
                 {
-                    var bidItem = new BidItem { Description = item.Description, Quantity = item.Quantity, Unit = item.Unit };
+                    var bidItem = new BidItem { BudgetLineId = item.BudgetLineId, Description = item.Description, Quantity = item.Quantity, Unit = item.Unit };
                     bidder.Items.Add(bidItem);
                     
                     if (isFirst)
@@ -476,7 +476,7 @@ namespace JaahdLogistics.ViewModels
                 {
                     PRId = SelectedPR.Id,
                     ProjectId = SelectedPR.ProjectId,
-                    BidAnalysisId = (SkipBidAnalysis || analysisToUse?.Id == 0) ? (int?)null : analysisToUse?.Id,
+                    BidAnalysisId = (SkipBidAnalysis || (analysisToUse != null && analysisToUse.Id == 0)) ? (int?)null : analysisToUse?.Id,
                     Date = DateTime.Now,
                     PONumber = helper.GenerateNumber("PO", SelectedPR.ProjectId),
                     Status = "Pending",
@@ -492,13 +492,14 @@ namespace JaahdLogistics.ViewModels
                     if (newPO.Vendor != null)
                     {
                         newPO.VendorName = newPO.Vendor.Name;
+                        newPO.VendorContact = newPO.Vendor.Contact;
                         newPO.VendorTel = newPO.Vendor.Tel;
                         newPO.VendorEmail = newPO.Vendor.Email;
                         newPO.VendorAddress = newPO.Vendor.Address;
                     }
                     foreach(var item in SelectedPR.Items)
                     {
-                        newPO.Items.Add(new POItem { Description = item.Description, Quantity = item.Quantity, Unit = item.Unit, UnitPrice = item.UnitPrice });
+                        newPO.Items.Add(new POItem { BudgetLineId = item.BudgetLineId, Description = item.Description, Quantity = item.Quantity, Unit = item.Unit, UnitPrice = item.UnitPrice });
                     }
                 }
                 else if (analysisToUse != null)
@@ -509,33 +510,29 @@ namespace JaahdLogistics.ViewModels
 
                     if (winner != null)
                     {
+                        // Handle potential currency conversion from Winner's items (which are usually in winner's currency)
+                        // Actually, RFQ/BidAnalysis items usually match the PR items.
+                        // We check if winner's items exist and copy them.
                         newPO.BidderId = winner.Id == 0 ? (int?)null : winner.Id;
                         newPO.VendorId = (winner.VendorId == null || winner.VendorId == 0) ? (int?)null : winner.VendorId;
 
-                        // Re-fetch vendor details to ensure CurrentPO.Vendor is populated
-                        if (newPO.VendorId.HasValue && newPO.VendorId > 0)
-                        {
-                            newPO.Vendor = Vendors.FirstOrDefault(v => v.Id == newPO.VendorId);
-                        }
+                        // Priority 1: Master Vendor Record
+                        var masterVendor = newPO.VendorId.HasValue ? Vendors.FirstOrDefault(v => v.Id == newPO.VendorId) : null;
+                        if (masterVendor == null && newPO.VendorId.HasValue)
+                            masterVendor = _dataService.GetVendors().FirstOrDefault(v => v.Id == newPO.VendorId);
 
-                        // If winner vendor info was partially missing in Bidder model, fall back to master Vendor record
-                        if (newPO.Vendor != null)
-                        {
-                            if (string.IsNullOrWhiteSpace(winner.Name)) winner.Name = newPO.Vendor.Name;
-                            if (string.IsNullOrWhiteSpace(winner.Address)) winner.Address = newPO.Vendor.Address;
-                            if (string.IsNullOrWhiteSpace(winner.Tel)) winner.Tel = newPO.Vendor.Tel;
-                            if (string.IsNullOrWhiteSpace(winner.Email)) winner.Email = newPO.Vendor.Email;
-                            if (string.IsNullOrWhiteSpace(winner.Contact)) winner.Contact = newPO.Vendor.Contact;
-                        }
+                        // Priority 2: Specific Bidder Details (falling back to master if empty)
+                        newPO.VendorName = !string.IsNullOrWhiteSpace(winner.Name) ? winner.Name : masterVendor?.Name;
+                        newPO.VendorTel = !string.IsNullOrWhiteSpace(winner.Tel) ? winner.Tel : masterVendor?.Tel;
+                        newPO.VendorEmail = !string.IsNullOrWhiteSpace(winner.Email) ? winner.Email : masterVendor?.Email;
+                        newPO.VendorAddress = !string.IsNullOrWhiteSpace(winner.Address) ? winner.Address : masterVendor?.Address;
 
-                        newPO.VendorName = winner.Name;
-                        newPO.VendorTel = winner.Tel;
-                        newPO.VendorEmail = winner.Email;
-                        newPO.VendorAddress = winner.Address;
+                        // Hydrate Vendor object for UI binding
+                        newPO.Vendor = masterVendor ?? new Vendor { Name = newPO.VendorName, Contact = newPO.VendorContact, Tel = newPO.VendorTel, Email = newPO.VendorEmail, Address = newPO.VendorAddress };
 
                         foreach(var item in winner.Items)
                         {
-                            newPO.Items.Add(new POItem { Description = item.Description, Quantity = item.Quantity, Unit = item.Unit, UnitPrice = item.UnitPrice });
+                            newPO.Items.Add(new POItem { BudgetLineId = item.BudgetLineId, Description = item.Description, Quantity = item.Quantity, Unit = item.Unit, UnitPrice = item.UnitPrice });
                         }
                     }
                     else

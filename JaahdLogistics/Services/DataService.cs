@@ -376,13 +376,13 @@ namespace JaahdLogistics.Services
                         if (item.Id == 0)
                         {
                             item.Id = connection.QuerySingle<int>(
-                                "INSERT INTO BidItems (BidderId, Description, Unit, Quantity, UnitPrice) VALUES (@BidderId, @Description, @Unit, @Quantity, @UnitPrice); SELECT last_insert_rowid();",
+                            "INSERT INTO BidItems (BidderId, BudgetLineId, Description, Unit, Quantity, UnitPrice) VALUES (@BidderId, @BudgetLineId, @Description, @Unit, @Quantity, @UnitPrice); SELECT last_insert_rowid();",
                                 item, transaction);
                         }
                         else
                         {
                             connection.Execute(
-                                "UPDATE BidItems SET Description=@Description, Unit=@Unit, Quantity=@Quantity, UnitPrice=@UnitPrice WHERE Id=@Id",
+                            "UPDATE BidItems SET BudgetLineId=@BudgetLineId, Description=@Description, Unit=@Unit, Quantity=@Quantity, UnitPrice=@UnitPrice WHERE Id=@Id",
                                 item, transaction);
                         }
                     }
@@ -412,7 +412,7 @@ namespace JaahdLogistics.Services
                 BidderId = (po.BidderId == null || po.BidderId == 0) ? (int?)null : po.BidderId,
                 VendorId = (po.VendorId == null || po.VendorId == 0) ? (int?)null : po.VendorId,
                 po.Date, po.Terms, po.Clause, po.Status, po.Currency, po.ExchangeRate,
-                po.VendorName, po.VendorTel, po.VendorEmail, po.VendorAddress
+                po.VendorName, po.VendorContact, po.VendorTel, po.VendorEmail, po.VendorAddress
             };
 
             try
@@ -420,14 +420,14 @@ namespace JaahdLogistics.Services
                 if (po.Id == 0)
                 {
                     po.Id = connection.QuerySingle<int>(
-                        "INSERT INTO PurchaseOrders (PONumber, PRId, ProjectId, BidAnalysisId, BidderId, VendorId, Date, Terms, Clause, Status, Currency, ExchangeRate, VendorName, VendorTel, VendorEmail, VendorAddress) " +
-                        "VALUES (@PONumber, @PRId, @ProjectId, @BidAnalysisId, @BidderId, @VendorId, @Date, @Terms, @Clause, @Status, @Currency, @ExchangeRate, @VendorName, @VendorTel, @VendorEmail, @VendorAddress); SELECT last_insert_rowid();",
+                        "INSERT INTO PurchaseOrders (PONumber, PRId, ProjectId, BidAnalysisId, BidderId, VendorId, Date, Terms, Clause, Status, Currency, ExchangeRate, VendorName, VendorContact, VendorTel, VendorEmail, VendorAddress) " +
+                        "VALUES (@PONumber, @PRId, @ProjectId, @BidAnalysisId, @BidderId, @VendorId, @Date, @Terms, @Clause, @Status, @Currency, @ExchangeRate, @VendorName, @VendorContact, @VendorTel, @VendorEmail, @VendorAddress); SELECT last_insert_rowid();",
                         param, transaction);
                 }
                 else
                 {
                     connection.Execute(
-                        "UPDATE PurchaseOrders SET PONumber=@PONumber, PRId=@PRId, ProjectId=@ProjectId, Date=@Date, BidAnalysisId=@BidAnalysisId, BidderId=@BidderId, VendorId=@VendorId, Terms=@Terms, Clause=@Clause, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate, VendorName=@VendorName, VendorTel=@VendorTel, VendorEmail=@VendorEmail, VendorAddress=@VendorAddress WHERE Id=@Id",
+                        "UPDATE PurchaseOrders SET PONumber=@PONumber, PRId=@PRId, ProjectId=@ProjectId, Date=@Date, BidAnalysisId=@BidAnalysisId, BidderId=@BidderId, VendorId=@VendorId, Terms=@Terms, Clause=@Clause, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate, VendorName=@VendorName, VendorContact=@VendorContact, VendorTel=@VendorTel, VendorEmail=@VendorEmail, VendorAddress=@VendorAddress WHERE Id=@Id",
                         param, transaction);
                 }
 
@@ -456,7 +456,7 @@ namespace JaahdLogistics.Services
                     if (item.Id == 0)
                     {
                         item.Id = connection.QuerySingle<int>(
-                            "INSERT INTO POItems (POId, Description, Unit, Quantity, UnitPrice) VALUES (@POId, @Description, @Unit, @Quantity, @UnitPrice); SELECT last_insert_rowid();",
+                            "INSERT INTO POItems (POId, BudgetLineId, Description, Unit, Quantity, UnitPrice) VALUES (@POId, @BudgetLineId, @Description, @Unit, @Quantity, @UnitPrice); SELECT last_insert_rowid();",
                             item, transaction);
                     }
                     else
@@ -464,7 +464,7 @@ namespace JaahdLogistics.Services
                         try
                         {
                             connection.Execute(
-                                "UPDATE POItems SET Description=@Description, Unit=@Unit, Quantity=@Quantity, UnitPrice=@UnitPrice WHERE Id=@Id",
+                                "UPDATE POItems SET BudgetLineId=@BudgetLineId, Description=@Description, Unit=@Unit, Quantity=@Quantity, UnitPrice=@UnitPrice WHERE Id=@Id",
                                 item, transaction);
                         }
                         catch (SqliteException ex) when (ex.SqliteErrorCode == 19)

@@ -452,10 +452,10 @@
                                          <ColumnDefinition Width="*"/>
                                      </Grid.ColumnDefinitions>
                                      <TextBlock Text="Vendor Name:" FontWeight="Bold" Margin="0,0,10,0"/>
-                                     <TextBlock Grid.Column="1" Text="{Binding CurrentPO.Vendor.Name}" FontWeight="Bold" Foreground="DarkBlue"/>
+                                     <TextBlock Grid.Column="1" Text="{Binding CurrentPO.VendorName}" FontWeight="Bold" Foreground="DarkBlue"/>
 
                                      <TextBlock Grid.Column="2" Text="Contact:" FontWeight="Bold" Margin="20,0,10,0"/>
-                                     <TextBlock Grid.Column="3" Text="{Binding CurrentPO.Vendor.Tel}" Foreground="DarkBlue"/>
+                                     <TextBlock Grid.Column="3" Text="{Binding CurrentPO.VendorContact}" Foreground="DarkBlue"/>
                                  </Grid>
                              </Border>
                         </Grid>

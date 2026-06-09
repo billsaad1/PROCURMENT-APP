@@ -116,11 +116,13 @@ CREATE TABLE IF NOT EXISTS Bidders (
 CREATE TABLE IF NOT EXISTS BidItems (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
     BidderId INTEGER NOT NULL,
+    BudgetLineId INTEGER,
     Description TEXT NOT NULL,
     Unit TEXT,
     Quantity DECIMAL(18, 2) NOT NULL,
     UnitPrice DECIMAL(18, 2) NOT NULL,
-    FOREIGN KEY (BidderId) REFERENCES Bidders(Id)
+    FOREIGN KEY (BidderId) REFERENCES Bidders(Id),
+    FOREIGN KEY (BudgetLineId) REFERENCES BudgetLines(Id)
 );
 
 CREATE TABLE IF NOT EXISTS PurchaseOrders (
@@ -137,22 +139,30 @@ CREATE TABLE IF NOT EXISTS PurchaseOrders (
     Status TEXT DEFAULT 'Pending', -- Pending, LogisticsApproved, FinanceApproved, PMApproved, FinalApproved, Rejected
     Currency TEXT,
     ExchangeRate DECIMAL(18, 4),
+    VendorName TEXT,
+    VendorContact TEXT,
+    VendorTel TEXT,
+    VendorEmail TEXT,
+    VendorAddress TEXT,
     Version INTEGER DEFAULT 1,
     LastModified DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (PRId) REFERENCES PurchaseRequisitions(Id),
     FOREIGN KEY (BidAnalysisId) REFERENCES BidAnalyses(Id),
     FOREIGN KEY (BidderId) REFERENCES Bidders(Id),
-    FOREIGN KEY (VendorId) REFERENCES Vendors(Id)
+    FOREIGN KEY (VendorId) REFERENCES Vendors(Id),
+    FOREIGN KEY (ProjectId) REFERENCES Projects(Id)
 );
 
 CREATE TABLE IF NOT EXISTS POItems (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
     POId INTEGER NOT NULL,
+    BudgetLineId INTEGER,
     Description TEXT NOT NULL,
     Unit TEXT,
     Quantity DECIMAL(18, 2) NOT NULL,
     UnitPrice DECIMAL(18, 2) NOT NULL,
-    FOREIGN KEY (POId) REFERENCES PurchaseOrders(Id)
+    FOREIGN KEY (POId) REFERENCES PurchaseOrders(Id),
+    FOREIGN KEY (BudgetLineId) REFERENCES BudgetLines(Id)
 );
 
 CREATE TABLE IF NOT EXISTS GoodsReceivingNotes (

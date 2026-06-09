@@ -105,6 +105,7 @@ namespace JaahdLogistics.Models
     {
         public int Id { get; set; }
         public int BidderId { get; set; }
+        public int? BudgetLineId { get; set; }
         public string Description { get; set; } = string.Empty;
         public string? Unit { get; set; }
         public decimal Quantity { get; set; }
