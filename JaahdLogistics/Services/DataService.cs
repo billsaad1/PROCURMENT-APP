@@ -202,11 +202,16 @@ namespace JaahdLogistics.Services
             foreach (var po in pos)
             {
                 var items = connection.Query<POItem>("SELECT * FROM POItems WHERE POId = @Id", new { po.Id }).ToList();
-                po.Items = new ObservableCollection<POItem>(items);
+                po.Items.Clear();
+                foreach (var item in items) po.Items.Add(item);
 
-                if (po.VendorId.HasValue)
+                if (po.VendorId.HasValue && po.VendorId > 0)
                 {
                     po.Vendor = connection.QuerySingleOrDefault<Vendor>("SELECT * FROM Vendors WHERE Id = @VendorId", new { po.VendorId });
+                }
+                else
+                {
+                    po.VendorId = null; // Clean up 0s
                 }
 
                 // Load Approvals for PO
@@ -235,11 +240,13 @@ namespace JaahdLogistics.Services
             foreach (var analysis in analyses)
             {
                 var bidders = connection.Query<Bidder>("SELECT * FROM Bidders WHERE BidAnalysisId = @Id", new { analysis.Id }).ToList();
-                analysis.Bidders = new ObservableCollection<Bidder>(bidders);
-                foreach (var bidder in analysis.Bidders)
+                analysis.Bidders.Clear();
+                foreach (var bidder in bidders)
                 {
                     var items = connection.Query<BidItem>("SELECT * FROM BidItems WHERE BidderId = @Id", new { bidder.Id }).ToList();
-                    bidder.Items = new ObservableCollection<BidItem>(items);
+                    bidder.Items.Clear();
+                    foreach (var item in items) bidder.Items.Add(item);
+                    analysis.Bidders.Add(bidder);
                 }
             }
             return analyses;
@@ -404,7 +411,8 @@ namespace JaahdLogistics.Services
                 BidAnalysisId = (po.BidAnalysisId == null || po.BidAnalysisId == 0) ? (int?)null : po.BidAnalysisId,
                 BidderId = (po.BidderId == null || po.BidderId == 0) ? (int?)null : po.BidderId,
                 VendorId = (po.VendorId == null || po.VendorId == 0) ? (int?)null : po.VendorId,
-                po.Date, po.Terms, po.Clause, po.Status, po.Currency, po.ExchangeRate
+                po.Date, po.Terms, po.Clause, po.Status, po.Currency, po.ExchangeRate,
+                po.VendorName, po.VendorTel, po.VendorEmail, po.VendorAddress
             };
 
             try
@@ -412,14 +420,14 @@ namespace JaahdLogistics.Services
                 if (po.Id == 0)
                 {
                     po.Id = connection.QuerySingle<int>(
-                        "INSERT INTO PurchaseOrders (PONumber, PRId, ProjectId, BidAnalysisId, BidderId, VendorId, Date, Terms, Clause, Status, Currency, ExchangeRate) " +
-                        "VALUES (@PONumber, @PRId, @ProjectId, @BidAnalysisId, @BidderId, @VendorId, @Date, @Terms, @Clause, @Status, @Currency, @ExchangeRate); SELECT last_insert_rowid();",
+                        "INSERT INTO PurchaseOrders (PONumber, PRId, ProjectId, BidAnalysisId, BidderId, VendorId, Date, Terms, Clause, Status, Currency, ExchangeRate, VendorName, VendorTel, VendorEmail, VendorAddress) " +
+                        "VALUES (@PONumber, @PRId, @ProjectId, @BidAnalysisId, @BidderId, @VendorId, @Date, @Terms, @Clause, @Status, @Currency, @ExchangeRate, @VendorName, @VendorTel, @VendorEmail, @VendorAddress); SELECT last_insert_rowid();",
                         param, transaction);
                 }
                 else
                 {
                     connection.Execute(
-                        "UPDATE PurchaseOrders SET PONumber=@PONumber, Date=@Date, BidAnalysisId=@BidAnalysisId, BidderId=@BidderId, VendorId=@VendorId, Terms=@Terms, Clause=@Clause, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate WHERE Id=@Id",
+                        "UPDATE PurchaseOrders SET PONumber=@PONumber, PRId=@PRId, ProjectId=@ProjectId, Date=@Date, BidAnalysisId=@BidAnalysisId, BidderId=@BidderId, VendorId=@VendorId, Terms=@Terms, Clause=@Clause, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate, VendorName=@VendorName, VendorTel=@VendorTel, VendorEmail=@VendorEmail, VendorAddress=@VendorAddress WHERE Id=@Id",
                         param, transaction);
                 }
 

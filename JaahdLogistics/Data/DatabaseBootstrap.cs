@@ -100,6 +100,10 @@ namespace JaahdLogistics.Data
                 AddColumnIfMissing(connection, "PurchaseOrders", "Clause", "TEXT");
                 AddColumnIfMissing(connection, "PurchaseOrders", "Currency", "TEXT");
                 AddColumnIfMissing(connection, "PurchaseOrders", "ExchangeRate", "DECIMAL(18, 4)");
+                AddColumnIfMissing(connection, "PurchaseOrders", "VendorName", "TEXT");
+                AddColumnIfMissing(connection, "PurchaseOrders", "VendorTel", "TEXT");
+                AddColumnIfMissing(connection, "PurchaseOrders", "VendorEmail", "TEXT");
+                AddColumnIfMissing(connection, "PurchaseOrders", "VendorAddress", "TEXT");
             }
             
             var userCount = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Users");

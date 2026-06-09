@@ -795,35 +795,35 @@
                                 <TextBlock Text="NAME / الاسم:" FontWeight="Bold" HorizontalAlignment="Right" FontSize="9"/>
                             </Border>
                             <Border Grid.Row="1" Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,0,1" Padding="5">
-                                <TextBlock Text="{Binding CurrentPO.Vendor.Name}" FontWeight="Bold" HorizontalAlignment="Center" FontSize="9" TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding CurrentPO.VendorName}" FontWeight="Bold" HorizontalAlignment="Center" FontSize="9" TextWrapping="Wrap"/>
                             </Border>
 
                             <Border Grid.Row="2" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5">
                                 <TextBlock Text="Contact / التواصل:" FontWeight="Bold" HorizontalAlignment="Right" FontSize="9"/>
                             </Border>
                             <Border Grid.Row="2" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="5">
-                                <TextBlock Text="{Binding CurrentPO.Vendor.Contact}" HorizontalAlignment="Center" FontSize="9" TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding CurrentPO.VendorName}" HorizontalAlignment="Center" FontSize="9" TextWrapping="Wrap"/>
                             </Border>
 
                             <Border Grid.Row="3" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5">
                                 <TextBlock Text="Tel / الهاتف:" FontWeight="Bold" HorizontalAlignment="Right" FontSize="9"/>
                             </Border>
                             <Border Grid.Row="3" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="5">
-                                <TextBlock Text="{Binding CurrentPO.Vendor.Tel}" HorizontalAlignment="Center" FontSize="9"/>
+                                <TextBlock Text="{Binding CurrentPO.VendorTel}" HorizontalAlignment="Center" FontSize="9"/>
                             </Border>
 
                             <Border Grid.Row="4" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5">
                                 <TextBlock Text="Email / البريد:" FontWeight="Bold" HorizontalAlignment="Right" FontSize="9"/>
                             </Border>
                             <Border Grid.Row="4" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="5">
-                                <TextBlock Text="{Binding CurrentPO.Vendor.Email}" HorizontalAlignment="Center" FontSize="9" TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding CurrentPO.VendorEmail}" HorizontalAlignment="Center" FontSize="9" TextWrapping="Wrap"/>
                             </Border>
 
                             <Border Grid.Row="5" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="5">
                                 <TextBlock Text="ADDRESS / العنوان:" FontWeight="Bold" HorizontalAlignment="Right" FontSize="9"/>
                             </Border>
                             <Border Grid.Row="5" Grid.Column="1" Padding="5">
-                                <TextBlock Text="{Binding CurrentPO.Vendor.Address}" HorizontalAlignment="Center" FontSize="9" TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding CurrentPO.VendorAddress}" HorizontalAlignment="Center" FontSize="9" TextWrapping="Wrap"/>
                             </Border>
                         </Grid>
                     </Border>

@@ -393,6 +393,7 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                              <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -417,8 +418,32 @@
                              </StackPanel>
                              <DatePicker Grid.Column="5" SelectedDate="{Binding CurrentPO.Date}" Margin="5"/>
 
+                             <!-- Row 2: Project, Currency, Rate -->
+                             <TextBlock Grid.Row="1" Text="{DynamicResource PRNumber}" FontWeight="Bold" Margin="5" VerticalAlignment="Center"/>
+                             <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding AllPRs}" SelectedValue="{Binding CurrentPO.PRId}" SelectedValuePath="Id" DisplayMemberPath="PRNumber" Margin="5"/>
+
+                             <TextBlock Grid.Row="1" Grid.Column="2" Text="{DynamicResource Project}" FontWeight="Bold" Margin="5" VerticalAlignment="Center"/>
+                             <ComboBox Grid.Row="1" Grid.Column="3" ItemsSource="{Binding Projects}" SelectedValue="{Binding CurrentPO.ProjectId}" SelectedValuePath="Id" DisplayMemberPath="Name" Margin="5"/>
+
+                             <StackPanel Grid.Row="1" Grid.Column="4" Orientation="Horizontal" Margin="5" VerticalAlignment="Center">
+                                 <TextBlock Text="{DynamicResource Currency}" FontWeight="Bold"/>
+                                 <TextBlock Text="/" FontWeight="Bold"/>
+                                 <TextBlock Text="{DynamicResource ExchangeRate}" FontWeight="Bold"/>
+                             </StackPanel>
+                             <Grid Grid.Row="1" Grid.Column="5">
+                                 <Grid.ColumnDefinitions>
+                                     <ColumnDefinition Width="*"/>
+                                     <ColumnDefinition Width="*"/>
+                                 </Grid.ColumnDefinitions>
+                                 <ComboBox Text="{Binding CurrentPO.Currency}" Margin="2" IsEditable="True">
+                                     <ComboBoxItem Content="USD"/>
+                                     <ComboBoxItem Content="YER"/>
+                                 </ComboBox>
+                                 <TextBox Grid.Column="1" Text="{Binding CurrentPO.ExchangeRate}" Margin="2"/>
+                             </Grid>
+
                              <!-- Vendor Details Summary -->
-                             <Border Grid.Row="1" Grid.ColumnSpan="6" BorderBrush="SteelBlue" BorderThickness="1" Background="#F0F8FF" Padding="10" Margin="5">
+                             <Border Grid.Row="2" Grid.ColumnSpan="6" BorderBrush="SteelBlue" BorderThickness="1" Background="#F0F8FF" Padding="10" Margin="5">
                                  <Grid>
                                      <Grid.ColumnDefinitions>
                                          <ColumnDefinition Width="Auto"/>

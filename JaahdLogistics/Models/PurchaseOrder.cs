@@ -49,6 +49,18 @@ namespace JaahdLogistics.Models
 
         [ObservableProperty]
         private decimal _exchangeRate = 1.0m;
+
+        [ObservableProperty]
+        private string? _vendorName;
+
+        [ObservableProperty]
+        private string? _vendorTel;
+
+        [ObservableProperty]
+        private string? _vendorEmail;
+
+        [ObservableProperty]
+        private string? _vendorAddress;
         
         public ObservableCollection<POItem> Items { get; set; } = new();
 

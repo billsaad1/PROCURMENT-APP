@@ -62,7 +62,11 @@ namespace JaahdLogistics.ViewModels
 
         partial void OnCurrentPOChanged(PurchaseOrder value)
         {
-            if (value == null) CurrentPO = new PurchaseOrder();
+            if (value == null)
+            {
+                _currentPO = new PurchaseOrder();
+                OnPropertyChanged(nameof(CurrentPO));
+            }
             SubscribeToCurrentPO();
         }
 
@@ -77,6 +81,12 @@ namespace JaahdLogistics.ViewModels
 
         [ObservableProperty]
         private ObservableCollection<Vendor> _vendors = new();
+
+        [ObservableProperty]
+        private ObservableCollection<Project> _projects = new();
+
+        [ObservableProperty]
+        private ObservableCollection<PurchaseRequisition> _allPRs = new();
 
         [ObservableProperty]
         private Settings _settings;
@@ -98,16 +108,27 @@ namespace JaahdLogistics.ViewModels
         {
             if (CurrentPO == null) return;
             CurrentPO.PropertyChanged += (s, e) => {
-                if ((e.PropertyName == nameof(PurchaseOrder.VendorId) || e.PropertyName == "VendorId"))
+                if (e.PropertyName == nameof(PurchaseOrder.VendorId))
                 {
-                    if (CurrentPO.VendorId.HasValue && CurrentPO.VendorId != 0)
+                    if (CurrentPO.VendorId.HasValue && CurrentPO.VendorId > 0)
                     {
-                        CurrentPO.Vendor = Vendors.FirstOrDefault(v => v.Id == CurrentPO.VendorId);
+                        var vendor = Vendors.FirstOrDefault(v => v.Id == CurrentPO.VendorId);
+                        if (vendor == null)
+                        {
+                            // Load from DB if not in active vendors list
+                            vendor = _dataService.GetVendors().FirstOrDefault(v => v.Id == CurrentPO.VendorId);
+                        }
+                        CurrentPO.Vendor = vendor;
                     }
                     else
                     {
                         CurrentPO.Vendor = null;
                     }
+                }
+                if (e.PropertyName == nameof(PurchaseOrder.ProjectId))
+                {
+                    // Refresh PR list if project changes to ensure valid matching
+                    LoadApprovedPRs();
                 }
             };
         }
@@ -397,6 +418,16 @@ namespace JaahdLogistics.ViewModels
                     return;
                 }
 
+                if (!SkipBidAnalysis && SelectedBidAnalysis != null)
+                {
+                    var winner = SelectedBidAnalysis.Bidders.FirstOrDefault(b => b.IsWinner || b.Id == SelectedBidAnalysis.RecommendedBidderId);
+                    if (winner == null)
+                    {
+                        MessageBox.Show("Please award a winner in the Bid Analysis before creating a PO.");
+                        return;
+                    }
+                }
+
                 // Budget Check for PO
                 foreach (var item in SelectedPR.Items)
                 {
@@ -438,6 +469,9 @@ namespace JaahdLogistics.ViewModels
                 var mainVM = Application.Current.MainWindow.DataContext as MainViewModel;
                 var helper = new NumberingHelper(mainVM?.ConnectionString ?? "Data Source=jaahd.db");
 
+                var currency = analysisToUse?.Currency ?? SelectedPR.Currency;
+                var rate = analysisToUse?.ExchangeRate ?? SelectedPR.ExchangeRate;
+
                 var newPO = new PurchaseOrder
                 {
                     PRId = SelectedPR.Id,
@@ -447,14 +481,21 @@ namespace JaahdLogistics.ViewModels
                     PONumber = helper.GenerateNumber("PO", SelectedPR.ProjectId),
                     Status = "Pending",
                     Terms = Settings.POTerms,
-                    Currency = SelectedPR.Currency,
-                    ExchangeRate = SelectedPR.ExchangeRate
+                    Currency = currency,
+                    ExchangeRate = rate
                 };
 
                 if (SkipBidAnalysis)
                 {
                     newPO.VendorId = CurrentPO.VendorId;
                     newPO.Vendor = Vendors.FirstOrDefault(v => v.Id == newPO.VendorId);
+                    if (newPO.Vendor != null)
+                    {
+                        newPO.VendorName = newPO.Vendor.Name;
+                        newPO.VendorTel = newPO.Vendor.Tel;
+                        newPO.VendorEmail = newPO.Vendor.Email;
+                        newPO.VendorAddress = newPO.Vendor.Address;
+                    }
                     foreach(var item in SelectedPR.Items)
                     {
                         newPO.Items.Add(new POItem { Description = item.Description, Quantity = item.Quantity, Unit = item.Unit, UnitPrice = item.UnitPrice });
@@ -472,7 +513,7 @@ namespace JaahdLogistics.ViewModels
                         newPO.VendorId = (winner.VendorId == null || winner.VendorId == 0) ? (int?)null : winner.VendorId;
 
                         // Re-fetch vendor details to ensure CurrentPO.Vendor is populated
-                        if (newPO.VendorId.HasValue)
+                        if (newPO.VendorId.HasValue && newPO.VendorId > 0)
                         {
                             newPO.Vendor = Vendors.FirstOrDefault(v => v.Id == newPO.VendorId);
                         }
@@ -486,6 +527,11 @@ namespace JaahdLogistics.ViewModels
                             if (string.IsNullOrWhiteSpace(winner.Email)) winner.Email = newPO.Vendor.Email;
                             if (string.IsNullOrWhiteSpace(winner.Contact)) winner.Contact = newPO.Vendor.Contact;
                         }
+
+                        newPO.VendorName = winner.Name;
+                        newPO.VendorTel = winner.Tel;
+                        newPO.VendorEmail = winner.Email;
+                        newPO.VendorAddress = winner.Address;
 
                         foreach(var item in winner.Items)
                         {
@@ -567,12 +613,17 @@ namespace JaahdLogistics.ViewModels
             LoadBidAnalyses();
             LoadPOs();
             Vendors = new ObservableCollection<Vendor>(_dataService.GetVendors());
+            Projects = new ObservableCollection<Project>(_dataService.GetProjects());
+            AllPRs = new ObservableCollection<PurchaseRequisition>(_dataService.GetPRs());
         }
 
         [RelayCommand]
         public void LoadApprovedPRs()
         {
-            var prs = _dataService.GetPRs().Where(p => p.Status == "FinalApproved").ToList();
+            var all = _dataService.GetPRs().ToList();
+            AllPRs = new ObservableCollection<PurchaseRequisition>(all);
+
+            var prs = all.Where(p => p.Status == "FinalApproved").ToList();
             ApprovedPRs = new ObservableCollection<PurchaseRequisition>(prs);
         }
 
@@ -605,23 +656,27 @@ namespace JaahdLogistics.ViewModels
         {
             if (CurrentPO == null) return;
 
-            // Ensure vendor is loaded if VendorId exists
-            if (CurrentPO.VendorId.HasValue && CurrentPO.Vendor == null)
+            try
             {
-                CurrentPO.Vendor = Vendors.FirstOrDefault(v => v.Id == CurrentPO.VendorId);
-            }
+                // Ensure vendor is loaded if VendorId exists
+                if (CurrentPO.VendorId.HasValue && CurrentPO.VendorId > 0)
+                {
+                    CurrentPO.Vendor = Vendors.FirstOrDefault(v => v.Id == CurrentPO.VendorId);
+                }
 
-            _dataService.SavePO(CurrentPO);
-            LoadPOs();
+                _dataService.SavePO(CurrentPO);
+                LoadPOs();
 
-            // Re-select to refresh UI
-            if (CurrentPO != null)
-            {
+                // Re-select to refresh UI
                 var reloaded = POs.FirstOrDefault(p => p.Id == CurrentPO.Id);
                 if (reloaded != null) SelectedPO = reloaded;
-            }
 
-            MessageBox.Show("Purchase Order Saved Successfully");
+                MessageBox.Show("Purchase Order Saved Successfully");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error saving Purchase Order: {ex.Message}\n\nPlease ensure a valid Project and PR are selected.", "Save Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         partial void OnSelectedRFQChanged(RFQ? value)
@@ -679,9 +734,14 @@ namespace JaahdLogistics.ViewModels
             if (value != null)
             {
                 CurrentPO = value;
-                if (CurrentPO.VendorId.HasValue && CurrentPO.Vendor == null)
+                if (CurrentPO.VendorId.HasValue && CurrentPO.VendorId > 0 && CurrentPO.Vendor == null)
                 {
-                    CurrentPO.Vendor = Vendors.FirstOrDefault(v => v.Id == CurrentPO.VendorId);
+                    var vendor = Vendors.FirstOrDefault(v => v.Id == CurrentPO.VendorId);
+                    if (vendor == null)
+                    {
+                        vendor = _dataService.GetVendors().FirstOrDefault(v => v.Id == CurrentPO.VendorId);
+                    }
+                    CurrentPO.Vendor = vendor;
                 }
             }
         }
