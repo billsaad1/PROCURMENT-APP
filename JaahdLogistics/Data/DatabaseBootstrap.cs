@@ -178,6 +178,18 @@ namespace JaahdLogistics.Data
                 connection.Execute("UPDATE PRItems SET BudgetLineId = NULL WHERE BudgetLineId IS NOT NULL AND (BudgetLineId = 0 OR BudgetLineId NOT IN (SELECT Id FROM BudgetLines))");
                 connection.Execute("UPDATE POItems SET BudgetLineId = NULL WHERE BudgetLineId IS NOT NULL AND (BudgetLineId = 0 OR BudgetLineId NOT IN (SELECT Id FROM BudgetLines))");
                 connection.Execute("UPDATE BidItems SET BudgetLineId = NULL WHERE BudgetLineId IS NOT NULL AND (BudgetLineId = 0 OR BudgetLineId NOT IN (SELECT Id FROM BudgetLines))");
+
+                // Proactively repair ID 0 in all foreign keys
+                connection.Execute("UPDATE PurchaseRequisitions SET ProjectId = NULL WHERE ProjectId = 0");
+                connection.Execute("UPDATE PRItems SET BudgetLineId = NULL WHERE BudgetLineId = 0");
+                connection.Execute("UPDATE PurchaseOrders SET ProjectId = NULL WHERE ProjectId = 0");
+                connection.Execute("UPDATE PurchaseOrders SET BidAnalysisId = NULL WHERE BidAnalysisId = 0");
+                connection.Execute("UPDATE PurchaseOrders SET BidderId = NULL WHERE BidderId = 0");
+                connection.Execute("UPDATE PurchaseOrders SET VendorId = NULL WHERE VendorId = 0");
+                connection.Execute("UPDATE POItems SET BudgetLineId = NULL WHERE BudgetLineId = 0");
+                connection.Execute("UPDATE BidAnalyses SET RecommendedBidderId = NULL WHERE RecommendedBidderId = 0");
+                connection.Execute("UPDATE Bidders SET VendorId = NULL WHERE VendorId = 0");
+                connection.Execute("UPDATE BidItems SET BudgetLineId = NULL WHERE BudgetLineId = 0");
             }
             catch (Exception ex)
             {

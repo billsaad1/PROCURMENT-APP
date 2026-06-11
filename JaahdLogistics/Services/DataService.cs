@@ -403,24 +403,43 @@ namespace JaahdLogistics.Services
 
         public void SavePO(PurchaseOrder po)
         {
-            if (po.PRId == 0) throw new Exception("Purchase Order must be linked to a valid Purchase Requisition (PRId is 0).");
-            if (po.ProjectId == 0) throw new Exception("Purchase Order must be linked to a valid Project (ProjectId is 0).");
-
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
 
-            // Validate Foreign Keys before starting transaction
-            var prExists = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM PurchaseRequisitions WHERE Id = @PRId", new { po.PRId }) > 0;
-            if (!prExists) throw new Exception($"The linked Purchase Requisition (ID: {po.PRId}) does not exist in the database.");
+            // 1. Mandatory Validations
+            if (po.PRId <= 0) throw new Exception("Purchase Order must be linked to a valid Purchase Requisition (PRId is missing).");
+            if (po.ProjectId <= 0) throw new Exception("Purchase Order must be linked to a valid Project (ProjectId is missing).");
 
-            var projExists = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Projects WHERE Id = @ProjectId", new { po.ProjectId }) > 0;
-            if (!projExists) throw new Exception($"The linked Project (ID: {po.ProjectId}) does not exist in the database.");
+            // 2. Database Existence Checks
+            if (connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Projects WHERE Id = @ProjectId", new { po.ProjectId }) == 0)
+                throw new Exception($"Project ID {po.ProjectId} does not exist in the database.");
 
+            if (connection.ExecuteScalar<int>("SELECT COUNT(*) FROM PurchaseRequisitions WHERE Id = @PRId", new { po.PRId }) == 0)
+                throw new Exception($"Purchase Requisition ID {po.PRId} does not exist in the database.");
+
+            // 3. Optional Link Checks
             if (po.BidAnalysisId.HasValue && po.BidAnalysisId > 0)
+                if (connection.ExecuteScalar<int>("SELECT COUNT(*) FROM BidAnalyses WHERE Id = @BidAnalysisId", new { po.BidAnalysisId }) == 0)
+                    throw new Exception($"Bid Analysis ID {po.BidAnalysisId} does not exist.");
+
+            if (po.BidderId.HasValue && po.BidderId > 0)
+                if (connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Bidders WHERE Id = @BidderId", new { po.BidderId }) == 0)
+                    throw new Exception($"Winning Bidder ID {po.BidderId} does not exist.");
+
+            if (po.VendorId.HasValue && po.VendorId > 0)
+                if (connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Vendors WHERE Id = @VendorId", new { po.VendorId }) == 0)
+                    throw new Exception($"Vendor ID {po.VendorId} does not exist.");
+
+            // 4. Item-Level Validations
+            foreach (var item in po.Items)
             {
-                var baExists = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM BidAnalyses WHERE Id = @BidAnalysisId", new { po.BidAnalysisId }) > 0;
-                if (!baExists) throw new Exception($"The linked Bid Analysis (ID: {po.BidAnalysisId}) does not exist in the database.");
+                if (item.BudgetLineId.HasValue && item.BudgetLineId > 0)
+                {
+                    if (connection.ExecuteScalar<int>("SELECT COUNT(*) FROM BudgetLines WHERE Id = @BudgetLineId", new { item.BudgetLineId }) == 0)
+                        throw new Exception($"Budget Line ID {item.BudgetLineId} for item '{item.Description}' does not exist.");
+                }
             }
+
             connection.Execute("PRAGMA foreign_keys = ON;");
             using var transaction = connection.BeginTransaction();
 
