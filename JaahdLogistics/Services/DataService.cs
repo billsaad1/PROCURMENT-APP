@@ -453,11 +453,17 @@ namespace JaahdLogistics.Services
                 foreach (var item in po.Items)
                 {
                     item.POId = po.Id;
+                    var itemParam = new {
+                        item.Id, item.POId,
+                        BudgetLineId = (item.BudgetLineId == null || item.BudgetLineId == 0) ? (int?)null : item.BudgetLineId,
+                        item.Description, item.Unit, item.Quantity, item.UnitPrice
+                    };
+
                     if (item.Id == 0)
                     {
                         item.Id = connection.QuerySingle<int>(
                             "INSERT INTO POItems (POId, BudgetLineId, Description, Unit, Quantity, UnitPrice) VALUES (@POId, @BudgetLineId, @Description, @Unit, @Quantity, @UnitPrice); SELECT last_insert_rowid();",
-                            item, transaction);
+                            itemParam, transaction);
                     }
                     else
                     {
@@ -465,7 +471,7 @@ namespace JaahdLogistics.Services
                         {
                             connection.Execute(
                                 "UPDATE POItems SET BudgetLineId=@BudgetLineId, Description=@Description, Unit=@Unit, Quantity=@Quantity, UnitPrice=@UnitPrice WHERE Id=@Id",
-                                item, transaction);
+                                itemParam, transaction);
                         }
                         catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
                         {

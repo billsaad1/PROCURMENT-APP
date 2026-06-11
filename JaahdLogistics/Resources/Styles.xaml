@@ -802,7 +802,7 @@
                                 <TextBlock Text="Contact / التواصل:" FontWeight="Bold" HorizontalAlignment="Right" FontSize="9"/>
                             </Border>
                             <Border Grid.Row="2" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="5">
-                                <TextBlock Text="{Binding CurrentPO.VendorName}" HorizontalAlignment="Center" FontSize="9" TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding CurrentPO.VendorContact}" HorizontalAlignment="Center" FontSize="9" TextWrapping="Wrap"/>
                             </Border>
 
                             <Border Grid.Row="3" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5">

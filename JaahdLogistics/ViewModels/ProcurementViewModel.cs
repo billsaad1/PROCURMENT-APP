@@ -64,8 +64,7 @@ namespace JaahdLogistics.ViewModels
         {
             if (value == null)
             {
-                _currentPO = new PurchaseOrder();
-                OnPropertyChanged(nameof(CurrentPO));
+                CurrentPO = new PurchaseOrder();
             }
             SubscribeToCurrentPO();
         }
@@ -526,6 +525,7 @@ namespace JaahdLogistics.ViewModels
                         newPO.VendorTel = !string.IsNullOrWhiteSpace(winner.Tel) ? winner.Tel : masterVendor?.Tel;
                         newPO.VendorEmail = !string.IsNullOrWhiteSpace(winner.Email) ? winner.Email : masterVendor?.Email;
                         newPO.VendorAddress = !string.IsNullOrWhiteSpace(winner.Address) ? winner.Address : masterVendor?.Address;
+                        newPO.VendorContact = !string.IsNullOrWhiteSpace(winner.Contact) ? winner.Contact : masterVendor?.Contact;
 
                         // Hydrate Vendor object for UI binding
                         newPO.Vendor = masterVendor ?? new Vendor { Name = newPO.VendorName, Contact = newPO.VendorContact, Tel = newPO.VendorTel, Email = newPO.VendorEmail, Address = newPO.VendorAddress };
