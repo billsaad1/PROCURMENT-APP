@@ -100,6 +100,7 @@ namespace JaahdLogistics.Services
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
             using var transaction = connection.BeginTransaction();
             try {
                 // Cascading delete for demo purposes. 
@@ -129,6 +130,7 @@ namespace JaahdLogistics.Services
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
             using var transaction = connection.BeginTransaction();
             try
             {
@@ -145,6 +147,7 @@ namespace JaahdLogistics.Services
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
             using var transaction = connection.BeginTransaction();
             try
             {
@@ -176,6 +179,7 @@ namespace JaahdLogistics.Services
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
             using var transaction = connection.BeginTransaction();
             try
             {
@@ -272,6 +276,7 @@ namespace JaahdLogistics.Services
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
             using var transaction = connection.BeginTransaction();
             try
             {
@@ -403,6 +408,20 @@ namespace JaahdLogistics.Services
 
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
+
+            // Validate Foreign Keys before starting transaction
+            var prExists = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM PurchaseRequisitions WHERE Id = @PRId", new { po.PRId }) > 0;
+            if (!prExists) throw new Exception($"The linked Purchase Requisition (ID: {po.PRId}) does not exist in the database.");
+
+            var projExists = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Projects WHERE Id = @ProjectId", new { po.ProjectId }) > 0;
+            if (!projExists) throw new Exception($"The linked Project (ID: {po.ProjectId}) does not exist in the database.");
+
+            if (po.BidAnalysisId.HasValue && po.BidAnalysisId > 0)
+            {
+                var baExists = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM BidAnalyses WHERE Id = @BidAnalysisId", new { po.BidAnalysisId }) > 0;
+                if (!baExists) throw new Exception($"The linked Bid Analysis (ID: {po.BidAnalysisId}) does not exist in the database.");
+            }
+            connection.Execute("PRAGMA foreign_keys = ON;");
             using var transaction = connection.BeginTransaction();
 
             // Explicitly map 0 to null for optional Foreign Keys to avoid SQLite Error 19
@@ -495,8 +514,19 @@ namespace JaahdLogistics.Services
 
         public void SavePR(PurchaseRequisition pr)
         {
+            if (pr.ProjectId == 0) throw new Exception("Purchase Requisition must be linked to a valid Project (ProjectId is 0).");
+            if (pr.RequesterId == 0) throw new Exception("Purchase Requisition must have a valid Requester (RequesterId is 0).");
+
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
+
+            var projExists = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Projects WHERE Id = @ProjectId", new { pr.ProjectId }) > 0;
+            if (!projExists) throw new Exception($"The linked Project (ID: {pr.ProjectId}) does not exist in the database.");
+
+            var userExists = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Users WHERE Id = @RequesterId", new { pr.RequesterId }) > 0;
+            if (!userExists) throw new Exception($"The requester (ID: {pr.RequesterId}) does not exist in the database.");
+
+            connection.Execute("PRAGMA foreign_keys = ON;");
             using var transaction = connection.BeginTransaction();
             try
             {
@@ -529,17 +559,23 @@ namespace JaahdLogistics.Services
                 foreach (var item in pr.Items)
                 {
                     item.PRId = pr.Id;
+                    var itemParam = new {
+                        item.Id, item.PRId,
+                        BudgetLineId = (item.BudgetLineId == 0) ? (int?)null : item.BudgetLineId,
+                        item.Description, item.Unit, item.Quantity, item.UnitPrice
+                    };
+
                     if (item.Id == 0)
                     {
                         item.Id = connection.QuerySingle<int>(
                             "INSERT INTO PRItems (PRId, BudgetLineId, Description, Unit, Quantity, UnitPrice) " +
-                            "VALUES (@PRId, @BudgetLineId, @Description, @Unit, @Quantity, @UnitPrice); SELECT last_insert_rowid();", item, transaction);
+                            "VALUES (@PRId, @BudgetLineId, @Description, @Unit, @Quantity, @UnitPrice); SELECT last_insert_rowid();", itemParam, transaction);
                     }
                     else
                     {
                         connection.Execute(
                             "UPDATE PRItems SET BudgetLineId=@BudgetLineId, Description=@Description, Unit=@Unit, Quantity=@Quantity, UnitPrice=@UnitPrice WHERE Id=@Id",
-                            item, transaction);
+                            itemParam, transaction);
                     }
                 }
                 transaction.Commit();
@@ -673,6 +709,7 @@ namespace JaahdLogistics.Services
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
             using var transaction = connection.BeginTransaction();
             
             try {
@@ -727,6 +764,7 @@ namespace JaahdLogistics.Services
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
             using var transaction = connection.BeginTransaction();
             try
             {

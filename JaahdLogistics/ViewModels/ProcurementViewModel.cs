@@ -118,6 +118,14 @@ namespace JaahdLogistics.ViewModels
                             vendor = _dataService.GetVendors().FirstOrDefault(v => v.Id == CurrentPO.VendorId);
                         }
                         CurrentPO.Vendor = vendor;
+                        if (vendor != null)
+                        {
+                            CurrentPO.VendorName = vendor.Name;
+                            CurrentPO.VendorContact = vendor.Contact;
+                            CurrentPO.VendorTel = vendor.Tel;
+                            CurrentPO.VendorEmail = vendor.Email;
+                            CurrentPO.VendorAddress = vendor.Address;
+                        }
                     }
                     else
                     {

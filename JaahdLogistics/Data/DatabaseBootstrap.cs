@@ -18,6 +18,8 @@ namespace JaahdLogistics.Data
         public void Setup()
         {
             using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
             
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string schemaPath = Path.Combine(baseDir, "schema.sql");
@@ -150,14 +152,32 @@ namespace JaahdLogistics.Data
         {
             try
             {
+                // Find a default Project and User for repair
+                var defaultProjectId = connection.ExecuteScalar<int?>("SELECT Id FROM Projects LIMIT 1");
+                var defaultUserId = connection.ExecuteScalar<int?>("SELECT Id FROM Users LIMIT 1");
+
+                if (defaultProjectId.HasValue)
+                {
+                    connection.Execute("UPDATE PurchaseRequisitions SET ProjectId = @pid WHERE ProjectId = 0 OR ProjectId NOT IN (SELECT Id FROM Projects)", new { pid = defaultProjectId.Value });
+                    connection.Execute("UPDATE PurchaseOrders SET ProjectId = @pid WHERE ProjectId = 0 OR ProjectId NOT IN (SELECT Id FROM Projects)", new { pid = defaultProjectId.Value });
+                }
+
+                if (defaultUserId.HasValue)
+                {
+                    connection.Execute("UPDATE PurchaseRequisitions SET RequesterId = @uid WHERE RequesterId = 0 OR RequesterId NOT IN (SELECT Id FROM Users)", new { uid = defaultUserId.Value });
+                }
+
                 // Set invalid BidAnalysisId to NULL
-                connection.Execute("UPDATE PurchaseOrders SET BidAnalysisId = NULL WHERE BidAnalysisId IS NOT NULL AND BidAnalysisId NOT IN (SELECT Id FROM BidAnalyses)");
+                connection.Execute("UPDATE PurchaseOrders SET BidAnalysisId = NULL WHERE BidAnalysisId IS NOT NULL AND (BidAnalysisId = 0 OR BidAnalysisId NOT IN (SELECT Id FROM BidAnalyses))");
                 // Set invalid BidderId to NULL
-                connection.Execute("UPDATE PurchaseOrders SET BidderId = NULL WHERE BidderId IS NOT NULL AND BidderId NOT IN (SELECT Id FROM Bidders)");
+                connection.Execute("UPDATE PurchaseOrders SET BidderId = NULL WHERE BidderId IS NOT NULL AND (BidderId = 0 OR BidderId NOT IN (SELECT Id FROM Bidders))");
                 // Set invalid VendorId to NULL
-                connection.Execute("UPDATE PurchaseOrders SET VendorId = NULL WHERE VendorId IS NOT NULL AND VendorId NOT IN (SELECT Id FROM Vendors)");
-                // Set invalid PRId to a valid one or log it (PRId is NOT NULL, so we can't set to NULL)
-                // We'll leave PRId/ProjectId as they are required and usually valid, but optional ones are the main crash cause.
+                connection.Execute("UPDATE PurchaseOrders SET VendorId = NULL WHERE VendorId IS NOT NULL AND (VendorId = 0 OR VendorId NOT IN (SELECT Id FROM Vendors))");
+
+                // Repair items
+                connection.Execute("UPDATE PRItems SET BudgetLineId = NULL WHERE BudgetLineId IS NOT NULL AND (BudgetLineId = 0 OR BudgetLineId NOT IN (SELECT Id FROM BudgetLines))");
+                connection.Execute("UPDATE POItems SET BudgetLineId = NULL WHERE BudgetLineId IS NOT NULL AND (BudgetLineId = 0 OR BudgetLineId NOT IN (SELECT Id FROM BudgetLines))");
+                connection.Execute("UPDATE BidItems SET BudgetLineId = NULL WHERE BudgetLineId IS NOT NULL AND (BudgetLineId = 0 OR BudgetLineId NOT IN (SELECT Id FROM BudgetLines))");
             }
             catch (Exception ex)
             {
