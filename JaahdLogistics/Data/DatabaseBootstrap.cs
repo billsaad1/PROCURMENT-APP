@@ -167,6 +167,12 @@ namespace JaahdLogistics.Data
                     connection.Execute("UPDATE PurchaseRequisitions SET RequesterId = @uid WHERE RequesterId = 0 OR RequesterId NOT IN (SELECT Id FROM Users)", new { uid = defaultUserId.Value });
                 }
 
+                // Repair RFQs (linked to PRs)
+                connection.Execute("UPDATE RFQs SET PRId = (SELECT Id FROM PurchaseRequisitions LIMIT 1) WHERE PRId = 0 OR PRId NOT IN (SELECT Id FROM PurchaseRequisitions)");
+
+                // Repair BidAnalyses (linked to RFQs)
+                connection.Execute("UPDATE BidAnalyses SET RFQId = (SELECT Id FROM RFQs LIMIT 1) WHERE RFQId = 0 OR RFQId NOT IN (SELECT Id FROM RFQs)");
+
                 // Set invalid BidAnalysisId to NULL
                 connection.Execute("UPDATE PurchaseOrders SET BidAnalysisId = NULL WHERE BidAnalysisId IS NOT NULL AND (BidAnalysisId = 0 OR BidAnalysisId NOT IN (SELECT Id FROM BidAnalyses))");
                 // Set invalid BidderId to NULL
@@ -179,10 +185,8 @@ namespace JaahdLogistics.Data
                 connection.Execute("UPDATE POItems SET BudgetLineId = NULL WHERE BudgetLineId IS NOT NULL AND (BudgetLineId = 0 OR BudgetLineId NOT IN (SELECT Id FROM BudgetLines))");
                 connection.Execute("UPDATE BidItems SET BudgetLineId = NULL WHERE BudgetLineId IS NOT NULL AND (BudgetLineId = 0 OR BudgetLineId NOT IN (SELECT Id FROM BudgetLines))");
 
-                // Proactively repair ID 0 in all foreign keys
-                connection.Execute("UPDATE PurchaseRequisitions SET ProjectId = NULL WHERE ProjectId = 0");
+                // Proactively repair ID 0 in all foreign keys (ONLY for nullable columns)
                 connection.Execute("UPDATE PRItems SET BudgetLineId = NULL WHERE BudgetLineId = 0");
-                connection.Execute("UPDATE PurchaseOrders SET ProjectId = NULL WHERE ProjectId = 0");
                 connection.Execute("UPDATE PurchaseOrders SET BidAnalysisId = NULL WHERE BidAnalysisId = 0");
                 connection.Execute("UPDATE PurchaseOrders SET BidderId = NULL WHERE BidderId = 0");
                 connection.Execute("UPDATE PurchaseOrders SET VendorId = NULL WHERE VendorId = 0");

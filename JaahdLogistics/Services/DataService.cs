@@ -192,6 +192,20 @@ namespace JaahdLogistics.Services
                 transaction.Rollback();
                 throw new Exception("Cannot delete PR because it is referenced in an RFQ or PO. Delete those first.");
             }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
+            {
+                transaction.Rollback();
+                var fkIssues = connection.Query("PRAGMA foreign_key_check");
+                string detail = "";
+                foreach(var issue in fkIssues) detail += $"\n- Table '{issue.table}' row {issue.rowid} references missing key in '{issue.parent}'";
+
+                if (string.IsNullOrEmpty(detail))
+                {
+                    // If check returns nothing, it might be a RESTRICT violation on delete/update
+                    throw new Exception("Database constraint violation (Foreign Key). Please ensure all linked documents exist and are not locked by downstream records.", ex);
+                }
+                throw new Exception($"Database integrity error: {detail}", ex);
+            }
             catch
             {
                 transaction.Rollback();
@@ -259,16 +273,26 @@ namespace JaahdLogistics.Services
         public void SaveRFQ(RFQ rfq)
         {
             using var connection = new SqliteConnection(_connectionString);
-            if (rfq.Id == 0)
+            connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
+            try
             {
-                rfq.Id = connection.QuerySingle<int>(
-                    "INSERT INTO RFQs (RFQNumber, PRId, Date, ClosingDate, Terms) " +
-                    "VALUES (@RFQNumber, @PRId, @Date, @ClosingDate, @Terms); SELECT last_insert_rowid();", rfq);
+                if (rfq.Id == 0)
+                {
+                    rfq.Id = connection.QuerySingle<int>(
+                        "INSERT INTO RFQs (RFQNumber, PRId, Date, ClosingDate, Terms) " +
+                        "VALUES (@RFQNumber, @PRId, @Date, @ClosingDate, @Terms); SELECT last_insert_rowid();", rfq);
+                }
+                else
+                {
+                    connection.Execute(
+                        "UPDATE RFQs SET RFQNumber=@RFQNumber, ClosingDate=@ClosingDate, Terms=@Terms WHERE Id=@Id", rfq);
+                }
             }
-            else
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
             {
-                connection.Execute(
-                    "UPDATE RFQs SET RFQNumber=@RFQNumber, ClosingDate=@ClosingDate, Terms=@Terms WHERE Id=@Id", rfq);
+                CheckForeignKeys(connection);
+                throw new Exception($"Database constraint violation in RFQ: {ex.Message}", ex);
             }
         }
 
@@ -398,6 +422,21 @@ namespace JaahdLogistics.Services
             {
                 transaction.Rollback();
                 throw;
+            }
+        }
+
+        private void CheckForeignKeys(SqliteConnection connection)
+        {
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = "PRAGMA foreign_key_check;";
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                string table = reader.GetString(0);
+                long rowid = reader.GetInt64(1);
+                string parent = reader.GetString(2);
+                int fkid = reader.GetInt32(3);
+                throw new Exception($"Database Integrity Error: Table '{table}' (row {rowid}) has a broken link to '{parent}'. Please ensure all related records (Project, User, PR, etc.) exist.");
             }
         }
 
@@ -761,7 +800,15 @@ namespace JaahdLogistics.Services
                     }
                 }
                 transaction.Commit();
-            } catch {
+            }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
+            {
+                transaction.Rollback();
+                CheckForeignKeys(connection);
+                throw new Exception($"Database constraint violation in GRN: {ex.Message}", ex);
+            }
+            catch
+            {
                 transaction.Rollback();
                 throw;
             }
@@ -811,17 +858,27 @@ namespace JaahdLogistics.Services
         public void SaveThreeWayMatch(ThreeWayMatch match)
         {
             using var connection = new SqliteConnection(_connectionString);
-            if (match.Id == 0)
+            connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
+            try
             {
-                connection.Execute(
-                    "INSERT INTO ThreeWayMatch (POId, GRNId, InvoiceNumber, InvoiceDetails, InvoiceScan, Date, Status) " +
-                    "VALUES (@POId, @GRNId, @InvoiceNumber, @InvoiceDetails, @InvoiceScan, @Date, @Status)", match);
+                if (match.Id == 0)
+                {
+                    connection.Execute(
+                        "INSERT INTO ThreeWayMatch (POId, GRNId, InvoiceNumber, InvoiceDetails, InvoiceScan, Date, Status) " +
+                        "VALUES (@POId, @GRNId, @InvoiceNumber, @InvoiceDetails, @InvoiceScan, @Date, @Status)", match);
+                }
+                else
+                {
+                    connection.Execute(
+                        "UPDATE ThreeWayMatch SET POId=@POId, GRNId=@GRNId, InvoiceNumber=@InvoiceNumber, " +
+                        "InvoiceDetails=@InvoiceDetails, InvoiceScan=@InvoiceScan, Status=@Status WHERE Id=@Id", match);
+                }
             }
-            else
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
             {
-                connection.Execute(
-                    "UPDATE ThreeWayMatch SET POId=@POId, GRNId=@GRNId, InvoiceNumber=@InvoiceNumber, " +
-                    "InvoiceDetails=@InvoiceDetails, InvoiceScan=@InvoiceScan, Status=@Status WHERE Id=@Id", match);
+                CheckForeignKeys(connection);
+                throw new Exception($"Database constraint violation in Three-Way Match: {ex.Message}", ex);
             }
         }
 

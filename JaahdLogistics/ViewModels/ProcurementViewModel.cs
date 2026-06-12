@@ -416,6 +416,7 @@ namespace JaahdLogistics.ViewModels
         private void CreatePO()
         {
             if (SelectedPR == null) { MessageBox.Show("Please select a Purchase Requisition first."); return; }
+            if (SelectedPR.ProjectId <= 0) { MessageBox.Show("The selected PR is not linked to a valid Project. Please repair the PR first."); return; }
 
             try
             {
@@ -561,7 +562,9 @@ namespace JaahdLogistics.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error creating Purchase Order: {ex.Message}");
+                string message = ex.Message;
+                if (ex.InnerException != null) message += "\n\nDetails: " + ex.InnerException.Message;
+                MessageBox.Show(message, "Error Creating PO", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
