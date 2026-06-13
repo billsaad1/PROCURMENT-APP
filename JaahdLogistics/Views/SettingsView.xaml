@@ -26,6 +26,9 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     
                     <TextBlock Text="{DynamicResource AssociationName}" VerticalAlignment="Center" Margin="5"/>
@@ -42,9 +45,18 @@
 
                     <TextBlock Grid.Row="4" Text="Email" VerticalAlignment="Center" Margin="5"/>
                     <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Settings.Email}" Margin="5"/>
+
+                    <TextBlock Grid.Row="5" Text="Logistics Manager" VerticalAlignment="Center" Margin="5"/>
+                    <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Settings.LogisticsManager}" Margin="5"/>
+
+                    <TextBlock Grid.Row="6" Text="Finance Manager" VerticalAlignment="Center" Margin="5"/>
+                    <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding Settings.FinanceManager}" Margin="5"/>
+
+                    <TextBlock Grid.Row="7" Text="Head of Association" VerticalAlignment="Center" Margin="5"/>
+                    <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding Settings.HeadOfAssociation}" Margin="5"/>
                     
-                    <TextBlock Grid.Row="5" Text="{DynamicResource Logo}" VerticalAlignment="Center" Margin="5"/>
-                    <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock Grid.Row="8" Text="{DynamicResource Logo}" VerticalAlignment="Center" Margin="5"/>
+                    <StackPanel Grid.Row="8" Grid.Column="1" Orientation="Horizontal">
                         <Border Width="100" Height="100" BorderBrush="Gray" BorderThickness="1" Margin="5">
                              <Image Source="{Binding Settings.LogoImage, Converter={StaticResource ImageBytesConverter}}" Stretch="Uniform"/>
                         </Border>

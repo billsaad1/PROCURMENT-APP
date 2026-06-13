@@ -165,6 +165,7 @@ namespace JaahdLogistics.Services
             var prs = connection.Query<PurchaseRequisition>("SELECT * FROM PurchaseRequisitions").ToList();
             foreach (var pr in prs)
             {
+                pr.Project = connection.QuerySingleOrDefault<Project>("SELECT * FROM Projects WHERE Id = @ProjectId", new { pr.ProjectId });
                 var items = connection.Query<PRItem>("SELECT * FROM PRItems WHERE PRId = @Id", new { pr.Id }).ToList();
                 pr.Items.Clear();
                 foreach (var item in items)
@@ -206,6 +207,12 @@ namespace JaahdLogistics.Services
                 }
                 throw new Exception($"Database integrity error: {detail}", ex);
             }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
+            {
+                transaction.Rollback();
+                CheckForeignKeys(connection);
+                throw new Exception($"Database constraint violation in PO: {ex.Message}", ex);
+            }
             catch
             {
                 transaction.Rollback();
@@ -219,6 +226,7 @@ namespace JaahdLogistics.Services
             var pos = connection.Query<PurchaseOrder>("SELECT * FROM PurchaseOrders").ToList();
             foreach (var po in pos)
             {
+                po.Project = connection.QuerySingleOrDefault<Project>("SELECT * FROM Projects WHERE Id = @ProjectId", new { po.ProjectId });
                 var items = connection.Query<POItem>("SELECT * FROM POItems WHERE POId = @Id", new { po.Id }).ToList();
                 po.Items.Clear();
                 foreach (var item in items) po.Items.Add(item);
@@ -273,26 +281,16 @@ namespace JaahdLogistics.Services
         public void SaveRFQ(RFQ rfq)
         {
             using var connection = new SqliteConnection(_connectionString);
-            connection.Open();
-            connection.Execute("PRAGMA foreign_keys = ON;");
-            try
+            if (rfq.Id == 0)
             {
-                if (rfq.Id == 0)
-                {
-                    rfq.Id = connection.QuerySingle<int>(
-                        "INSERT INTO RFQs (RFQNumber, PRId, Date, ClosingDate, Terms) " +
-                        "VALUES (@RFQNumber, @PRId, @Date, @ClosingDate, @Terms); SELECT last_insert_rowid();", rfq);
-                }
-                else
-                {
-                    connection.Execute(
-                        "UPDATE RFQs SET RFQNumber=@RFQNumber, ClosingDate=@ClosingDate, Terms=@Terms WHERE Id=@Id", rfq);
-                }
+                rfq.Id = connection.QuerySingle<int>(
+                    "INSERT INTO RFQs (RFQNumber, PRId, Date, ClosingDate, Terms) " +
+                    "VALUES (@RFQNumber, @PRId, @Date, @ClosingDate, @Terms); SELECT last_insert_rowid();", rfq);
             }
-            catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
+            else
             {
-                CheckForeignKeys(connection);
-                throw new Exception($"Database constraint violation in RFQ: {ex.Message}", ex);
+                connection.Execute(
+                    "UPDATE RFQs SET RFQNumber=@RFQNumber, ClosingDate=@ClosingDate, Terms=@Terms WHERE Id=@Id", rfq);
             }
         }
 
@@ -648,17 +646,36 @@ namespace JaahdLogistics.Services
         public void SaveBudgetLine(BudgetLine budgetLine)
         {
             using var connection = new SqliteConnection(_connectionString);
-            if (budgetLine.Id == 0)
+            connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
+            using var transaction = connection.BeginTransaction();
+            try
             {
-                budgetLine.Id = connection.QuerySingle<int>(
-                    "INSERT INTO BudgetLines (ProjectId, Code, Name, Description, Unit, Quantity, UnitPrice, TotalAmount, Currency) " +
-                    "VALUES (@ProjectId, @Code, @Name, @Description, @Unit, @Quantity, @UnitPrice, @TotalAmount, @Currency); SELECT last_insert_rowid();", budgetLine);
+                if (budgetLine.Id == 0)
+                {
+                    budgetLine.Id = connection.QuerySingle<int>(
+                        "INSERT INTO BudgetLines (ProjectId, Code, Name, Description, Unit, Quantity, UnitPrice, TotalAmount, Currency) " +
+                        "VALUES (@ProjectId, @Code, @Name, @Description, @Unit, @Quantity, @UnitPrice, @TotalAmount, @Currency); SELECT last_insert_rowid();", budgetLine, transaction);
+                }
+                else
+                {
+                    connection.Execute(
+                        "UPDATE BudgetLines SET Code=@Code, Name=@Name, Description=@Description, Unit=@Unit, " +
+                        "Quantity=@Quantity, UnitPrice=@UnitPrice, TotalAmount=@TotalAmount, Currency=@Currency WHERE Id=@Id", budgetLine, transaction);
+
+                    // Automatic Data Synchronization across modules
+                    // Update PRItems, POItems, and BidItems that reference this budget line
+                    var syncParam = new { budgetLine.Id, budgetLine.Description, budgetLine.Unit };
+                    connection.Execute("UPDATE PRItems SET Description=@Description, Unit=@Unit WHERE BudgetLineId=@Id", syncParam, transaction);
+                    connection.Execute("UPDATE POItems SET Description=@Description, Unit=@Unit WHERE BudgetLineId=@Id", syncParam, transaction);
+                    connection.Execute("UPDATE BidItems SET Description=@Description, Unit=@Unit WHERE BudgetLineId=@Id", syncParam, transaction);
+                }
+                transaction.Commit();
             }
-            else
+            catch
             {
-                connection.Execute(
-                    "UPDATE BudgetLines SET Code=@Code, Name=@Name, Description=@Description, Unit=@Unit, " +
-                    "Quantity=@Quantity, UnitPrice=@UnitPrice, TotalAmount=@TotalAmount, Currency=@Currency WHERE Id=@Id", budgetLine);
+                transaction.Rollback();
+                throw;
             }
         }
 
@@ -686,7 +703,9 @@ namespace JaahdLogistics.Services
             connection.Execute(
                 "UPDATE Settings SET AssociationName=@AssociationName, Address=@Address, " +
                 "ContactInfo=@ContactInfo, Tel=@Tel, Email=@Email, LogoImage=@LogoImage, " +
-                "PRTerms=@PRTerms, RFQTerms=@RFQTerms, POTerms=@POTerms WHERE Id=1", settings);
+                "PRTerms=@PRTerms, RFQTerms=@RFQTerms, POTerms=@POTerms, " +
+                "LogisticsManager=@LogisticsManager, FinanceManager=@FinanceManager, " +
+                "HeadOfAssociation=@HeadOfAssociation WHERE Id=1", settings);
         }
 
         public decimal GetSpentBudget(int budgetLineId, int? excludePRId = null)
@@ -800,15 +819,7 @@ namespace JaahdLogistics.Services
                     }
                 }
                 transaction.Commit();
-            }
-            catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
-            {
-                transaction.Rollback();
-                CheckForeignKeys(connection);
-                throw new Exception($"Database constraint violation in GRN: {ex.Message}", ex);
-            }
-            catch
-            {
+            } catch {
                 transaction.Rollback();
                 throw;
             }
@@ -858,27 +869,17 @@ namespace JaahdLogistics.Services
         public void SaveThreeWayMatch(ThreeWayMatch match)
         {
             using var connection = new SqliteConnection(_connectionString);
-            connection.Open();
-            connection.Execute("PRAGMA foreign_keys = ON;");
-            try
+            if (match.Id == 0)
             {
-                if (match.Id == 0)
-                {
-                    connection.Execute(
-                        "INSERT INTO ThreeWayMatch (POId, GRNId, InvoiceNumber, InvoiceDetails, InvoiceScan, Date, Status) " +
-                        "VALUES (@POId, @GRNId, @InvoiceNumber, @InvoiceDetails, @InvoiceScan, @Date, @Status)", match);
-                }
-                else
-                {
-                    connection.Execute(
-                        "UPDATE ThreeWayMatch SET POId=@POId, GRNId=@GRNId, InvoiceNumber=@InvoiceNumber, " +
-                        "InvoiceDetails=@InvoiceDetails, InvoiceScan=@InvoiceScan, Status=@Status WHERE Id=@Id", match);
-                }
+                connection.Execute(
+                    "INSERT INTO ThreeWayMatch (POId, GRNId, InvoiceNumber, InvoiceDetails, InvoiceScan, Date, Status) " +
+                    "VALUES (@POId, @GRNId, @InvoiceNumber, @InvoiceDetails, @InvoiceScan, @Date, @Status)", match);
             }
-            catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
+            else
             {
-                CheckForeignKeys(connection);
-                throw new Exception($"Database constraint violation in Three-Way Match: {ex.Message}", ex);
+                connection.Execute(
+                    "UPDATE ThreeWayMatch SET POId=@POId, GRNId=@GRNId, InvoiceNumber=@InvoiceNumber, " +
+                    "InvoiceDetails=@InvoiceDetails, InvoiceScan=@InvoiceScan, Status=@Status WHERE Id=@Id", match);
             }
         }
 

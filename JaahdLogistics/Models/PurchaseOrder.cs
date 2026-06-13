@@ -65,6 +65,8 @@ namespace JaahdLogistics.Models
         [ObservableProperty]
         private string? _vendorAddress;
         
+        public Project? Project { get; set; }
+
         public ObservableCollection<POItem> Items { get; set; } = new();
 
         [ObservableProperty]

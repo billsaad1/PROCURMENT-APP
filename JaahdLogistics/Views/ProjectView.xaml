@@ -43,6 +43,8 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     
                     <TextBlock Text="{DynamicResource Name}" Margin="5"/>
@@ -53,6 +55,12 @@
                     
                     <TextBlock Grid.Row="2" Text="{DynamicResource Year}" Margin="5"/>
                     <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SelectedProject.Year, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+
+                    <TextBlock Grid.Row="3" Text="Project Manager" Margin="5"/>
+                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding SelectedProject.ProjectManager, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+
+                    <TextBlock Grid.Row="4" Text="Project Officer" Margin="5"/>
+                    <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding SelectedProject.ProjectOfficer, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
                 </Grid>
             </StackPanel>
 

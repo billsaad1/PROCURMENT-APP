@@ -31,6 +31,95 @@ namespace JaahdLogistics.ViewModels
         private ObservableCollection<PurchaseRequisition> _approvedPRs = new();
 
         [ObservableProperty]
+        private ObservableCollection<PurchaseRequisition> _filteredApprovedPRs = new();
+
+        [ObservableProperty]
+        private string _pRSearchText = string.Empty;
+
+        [ObservableProperty]
+        private string _rFQSearchText = string.Empty;
+
+        [ObservableProperty]
+        private string _bidSearchText = string.Empty;
+
+        [ObservableProperty]
+        private string _pOSearchText = string.Empty;
+
+        [ObservableProperty]
+        private Project? _filterProject;
+
+        [ObservableProperty]
+        private int? _filterYear;
+
+        partial void OnPRSearchTextChanged(string value) => FilterPRs();
+        partial void OnRFQSearchTextChanged(string value) => FilterRFQs();
+        partial void OnBidSearchTextChanged(string value) => FilterBidAnalyses();
+        partial void OnPOSearchTextChanged(string value) => FilterPOs();
+        partial void OnFilterProjectChanged(Project? value) => FilterAll();
+        partial void OnFilterYearChanged(int? value) => FilterAll();
+
+        private void FilterAll()
+        {
+            FilterPRs();
+            FilterRFQs();
+            FilterBidAnalyses();
+            FilterPOs();
+        }
+
+        private void FilterPRs()
+        {
+            var filtered = ApprovedPRs.AsEnumerable();
+            if (FilterProject != null) filtered = filtered.Where(p => p.ProjectId == FilterProject.Id);
+            if (FilterYear.HasValue) filtered = filtered.Where(p => p.Date.Year == FilterYear.Value);
+            if (!string.IsNullOrWhiteSpace(PRSearchText))
+                filtered = filtered.Where(p => p.PRNumber.Contains(PRSearchText, StringComparison.OrdinalIgnoreCase) ||
+                                             p.Justification?.Contains(PRSearchText, StringComparison.OrdinalIgnoreCase) == true);
+
+            FilteredApprovedPRs = new ObservableCollection<PurchaseRequisition>(filtered);
+        }
+
+        [ObservableProperty]
+        private ObservableCollection<RFQ> _filteredRFQs = new();
+
+        private void FilterRFQs()
+        {
+            var filtered = RFQs.AsEnumerable();
+            // RFQ doesn't have ProjectId/Date directly, we might need to join or load carefully if deep filtering is needed
+            if (!string.IsNullOrWhiteSpace(RFQSearchText))
+                filtered = filtered.Where(r => r.RFQNumber.Contains(RFQSearchText, StringComparison.OrdinalIgnoreCase));
+
+            FilteredRFQs = new ObservableCollection<RFQ>(filtered);
+        }
+
+        [ObservableProperty]
+        private ObservableCollection<BidAnalysis> _filteredBidAnalyses = new();
+
+        private void FilterBidAnalyses()
+        {
+            var filtered = BidAnalyses.AsEnumerable();
+            if (!string.IsNullOrWhiteSpace(BidSearchText))
+                filtered = filtered.Where(b => b.Justification?.Contains(BidSearchText, StringComparison.OrdinalIgnoreCase) == true ||
+                                              b.RecommendationReasons?.Contains(BidSearchText, StringComparison.OrdinalIgnoreCase) == true);
+
+            FilteredBidAnalyses = new ObservableCollection<BidAnalysis>(filtered);
+        }
+
+        [ObservableProperty]
+        private ObservableCollection<PurchaseOrder> _filteredPOs = new();
+
+        private void FilterPOs()
+        {
+            var filtered = POs.AsEnumerable();
+            if (FilterProject != null) filtered = filtered.Where(p => p.ProjectId == FilterProject.Id);
+            if (FilterYear.HasValue) filtered = filtered.Where(p => p.Date.Year == FilterYear.Value);
+            if (!string.IsNullOrWhiteSpace(POSearchText))
+                filtered = filtered.Where(p => p.PONumber.Contains(POSearchText, StringComparison.OrdinalIgnoreCase) ||
+                                             p.VendorName?.Contains(POSearchText, StringComparison.OrdinalIgnoreCase) == true);
+
+            FilteredPOs = new ObservableCollection<PurchaseOrder>(filtered);
+        }
+
+        [ObservableProperty]
         private PurchaseRequisition? _selectedPR;
 
         [ObservableProperty]
@@ -85,6 +174,9 @@ namespace JaahdLogistics.ViewModels
         private ObservableCollection<Project> _projects = new();
 
         [ObservableProperty]
+        private ObservableCollection<int> _filterYears = new();
+
+        [ObservableProperty]
         private ObservableCollection<PurchaseRequisition> _allPRs = new();
 
         [ObservableProperty]
@@ -98,6 +190,9 @@ namespace JaahdLogistics.ViewModels
             _dataService = dataService;
             _settings = _dataService.GetSettings();
             Vendors = new ObservableCollection<Vendor>(_dataService.GetVendors());
+
+            int currentYear = DateTime.Now.Year;
+            for (int y = currentYear - 5; y <= currentYear + 5; y++) FilterYears.Add(y);
 
             SubscribeToCurrentPO();
             RefreshAll();
@@ -416,7 +511,6 @@ namespace JaahdLogistics.ViewModels
         private void CreatePO()
         {
             if (SelectedPR == null) { MessageBox.Show("Please select a Purchase Requisition first."); return; }
-            if (SelectedPR.ProjectId <= 0) { MessageBox.Show("The selected PR is not linked to a valid Project. Please repair the PR first."); return; }
 
             try
             {
@@ -562,9 +656,7 @@ namespace JaahdLogistics.ViewModels
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
-                if (ex.InnerException != null) message += "\n\nDetails: " + ex.InnerException.Message;
-                MessageBox.Show(message, "Error Creating PO", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Error creating Purchase Order: {ex.Message}");
             }
         }
 
@@ -633,6 +725,7 @@ namespace JaahdLogistics.ViewModels
 
             var prs = all.Where(p => p.Status == "FinalApproved").ToList();
             ApprovedPRs = new ObservableCollection<PurchaseRequisition>(prs);
+            FilterPRs();
         }
 
         [RelayCommand]
@@ -641,6 +734,7 @@ namespace JaahdLogistics.ViewModels
             var items = _dataService.GetRFQs().ToList();
             RFQs.Clear();
             foreach (var item in items) RFQs.Add(item);
+            FilterRFQs();
         }
 
         [RelayCommand]
@@ -649,6 +743,7 @@ namespace JaahdLogistics.ViewModels
             var items = _dataService.GetBidAnalyses().ToList();
             BidAnalyses.Clear();
             foreach (var item in items) BidAnalyses.Add(item);
+            FilterBidAnalyses();
         }
 
         [RelayCommand]
@@ -657,6 +752,7 @@ namespace JaahdLogistics.ViewModels
             var items = _dataService.GetPOs().ToList();
             POs.Clear();
             foreach (var item in items) POs.Add(item);
+            FilterPOs();
         }
 
         [RelayCommand]
@@ -742,6 +838,7 @@ namespace JaahdLogistics.ViewModels
             if (value != null)
             {
                 CurrentPO = value;
+                CurrentPO.Project = Projects.FirstOrDefault(p => p.Id == value.ProjectId);
                 if (CurrentPO.VendorId.HasValue && CurrentPO.VendorId > 0 && CurrentPO.Vendor == null)
                 {
                     var vendor = Vendors.FirstOrDefault(v => v.Id == CurrentPO.VendorId);
@@ -753,6 +850,12 @@ namespace JaahdLogistics.ViewModels
                 }
             }
         }
+
+        [RelayCommand]
+        private void ClearProjectFilter() => FilterProject = null;
+
+        [RelayCommand]
+        private void ClearYearFilter() => FilterYear = null;
 
         [RelayCommand]
         private void Print()

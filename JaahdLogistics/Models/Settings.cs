@@ -12,5 +12,8 @@ namespace JaahdLogistics.Models
         public string? PRTerms { get; set; }
         public string? RFQTerms { get; set; }
         public string? POTerms { get; set; }
+        public string? LogisticsManager { get; set; }
+        public string? FinanceManager { get; set; }
+        public string? HeadOfAssociation { get; set; }
     }
 }

@@ -190,21 +190,21 @@
                         <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5">
                              <Image Source="{Binding CurrentPR.LogisticsSignature, Converter={StaticResource ImageBytesConverter}}"/>
                         </Border>
-                        <TextBlock Text="{Binding CurrentPR.LogisticsName}" FontSize="10" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding Data.Settings.LogisticsManager, Source={StaticResource Proxy}}" FontSize="10" HorizontalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Center">
                         <TextBlock Text="Finance" FontWeight="Bold" HorizontalAlignment="Center"/>
                         <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5">
                              <Image Source="{Binding CurrentPR.FinanceSignature, Converter={StaticResource ImageBytesConverter}}"/>
                         </Border>
-                        <TextBlock Text="{Binding CurrentPR.FinanceName}" FontSize="10" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding Data.Settings.FinanceManager, Source={StaticResource Proxy}}" FontSize="10" HorizontalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="Approved By" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{DynamicResource ProjectManager}" FontWeight="Bold" HorizontalAlignment="Center"/>
                         <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5">
-                             <Image Source="{Binding CurrentPR.FinalSignature, Converter={StaticResource ImageBytesConverter}}"/>
+                             <Image Source="{Binding CurrentPR.PMSignature, Converter={StaticResource ImageBytesConverter}}"/>
                         </Border>
-                        <TextBlock Text="{Binding CurrentPR.FinalName}" FontSize="10" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding CurrentPR.Project.ProjectManager}" FontSize="10" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </UniformGrid>
             </Grid>
@@ -282,7 +282,9 @@
                          </StackPanel>
                          <StackPanel Grid.Column="1" HorizontalAlignment="Center">
                              <TextBlock Text="Logistics Manager / مسؤول اللوجستيات" FontWeight="Bold"/>
-                             <Border BorderBrush="Black" BorderThickness="1" Height="80" Width="200" Margin="10"/>
+                        <Border BorderBrush="Black" BorderThickness="1" Height="80" Width="200" Margin="10">
+                            <TextBlock Text="{Binding Data.Settings.LogisticsManager, Source={StaticResource Proxy}}" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="5"/>
+                        </Border>
                          </StackPanel>
                     </Grid>
                 </StackPanel>
@@ -373,7 +375,22 @@
                             <ColumnDefinition Width="*"/> <!-- Bidders -->
                         </Grid.ColumnDefinitions>
 
-                        <!-- BIDDER labels -->
+                        <!-- Column 0-4 are static, Column 5 is dynamic bidders -->
+                        <Border Grid.Column="0" BorderBrush="Black" BorderThickness="1,1,1,1" Padding="2"><TextBlock Text="NO" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="2"><TextBlock Text="Description" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                        <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="2"><TextBlock Text="Unit" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                        <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="2"><TextBlock Text="QTY" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                        <Border Grid.Column="4" BorderBrush="Black" BorderThickness="0,1,1,1">
+                             <StackPanel>
+                                 <Border Background="#FAD7A0" Padding="2" BorderBrush="Black" BorderThickness="0,0,0,1"><TextBlock Text="Estimative Cost" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
+                                 <Grid>
+                                     <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                     <Border BorderBrush="Black" BorderThickness="0,0,1,0" Padding="1"><TextBlock Text="Unit Price" FontSize="7" HorizontalAlignment="Center"/></Border>
+                                     <Border Grid.Column="1" Padding="1"><TextBlock Text="Total" FontSize="7" HorizontalAlignment="Center"/></Border>
+                                 </Grid>
+                             </StackPanel>
+                        </Border>
+
                         <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,1,1,1">
                             <ItemsControl ItemsSource="{Binding Bidders}">
                                 <ItemsControl.ItemsPanel>
@@ -383,41 +400,22 @@
                                     <DataTemplate>
                                         <Border BorderBrush="Black" BorderThickness="0,0,1,0" Width="120">
                                             <StackPanel>
-                                                <TextBlock Text="BIDDER / المورد" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center" Margin="2"/>
-                                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center" TextWrapping="Wrap"/>
-                                                <TextBlock Text="{Binding Address}" FontSize="8" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                                                <!-- Top: Bidder Info -->
+                                                <Border BorderBrush="Black" BorderThickness="0,0,0,1">
+                                                    <StackPanel>
+                                                        <TextBlock Text="BIDDER / المورد" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center" Margin="2"/>
+                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                                                        <TextBlock Text="{Binding Address}" FontSize="8" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                                                    </StackPanel>
+                                                </Border>
+                                                <!-- Bottom: Sub-headers -->
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                                    <Border BorderBrush="Black" BorderThickness="0,0,1,0" Padding="1"><TextBlock Text="Unit Price" FontSize="7" HorizontalAlignment="Center"/></Border>
+                                                    <Border Grid.Column="1" Padding="1"><TextBlock Text="Total" FontSize="7" HorizontalAlignment="Center"/></Border>
+                                                </Grid>
                                             </StackPanel>
                                         </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </Border>
-
-                        <Border Grid.Row="0" Grid.Column="0" BorderBrush="Black" BorderThickness="1,1,1,1" Padding="2"><TextBlock Text="NO" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
-                        <Border Grid.Row="0" Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="2"><TextBlock Text="Description" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
-                        <Border Grid.Row="0" Grid.Column="2" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="2"><TextBlock Text="Unit" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
-                        <Border Grid.Row="0" Grid.Column="3" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="2"><TextBlock Text="QTY" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
-                        <Border Grid.Row="0" Grid.Column="4" BorderBrush="Black" BorderThickness="0,1,1,1">
-                             <StackPanel>
-                                 <Border Background="#FAD7A0" Padding="2"><TextBlock Text="Estimative Cost" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
-                                 <Grid>
-                                     <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                     <Border BorderBrush="Black" BorderThickness="0,1,1,0"><TextBlock Text="Unit Price" FontSize="7" HorizontalAlignment="Center"/></Border>
-                                     <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,0,0"><TextBlock Text="Total" FontSize="7" HorizontalAlignment="Center"/></Border>
-                                 </Grid>
-                             </StackPanel>
-                        </Border>
-                        <!-- Bidder Sub-headers (Price/Total) -->
-                        <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,0,0,1">
-                            <ItemsControl ItemsSource="{Binding Bidders}">
-                                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid Width="120">
-                                            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                            <Border BorderBrush="Black" BorderThickness="0,0,1,0"><TextBlock Text="Unit Price" FontSize="7" HorizontalAlignment="Center"/></Border>
-                                            <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,0"><TextBlock Text="Total" FontSize="7" HorizontalAlignment="Center"/></Border>
-                                        </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
@@ -606,7 +604,7 @@
                                 <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
                                 <TextBlock Text="POSITION :" FontWeight="Bold" FontSize="8"/> <TextBlock Grid.Column="1" Text="Logistic Manager" FontSize="8" Margin="5,0"/>
-                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="" FontSize="8" Margin="5,0"/>
+                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Data.Settings.LogisticsManager, Source={StaticResource Proxy}}" FontSize="8" Margin="5,0"/>
                                 <TextBlock Grid.Row="2" Text="Date :" FontSize="8"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentBidAnalysis.Date, StringFormat=d}" FontSize="8" Margin="5,0"/>
                                 <TextBlock Grid.Row="3" Text="Signature" FontSize="8"/>
                             </Grid>
@@ -620,7 +618,7 @@
                                 <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
                                 <TextBlock Text="POSITION :" FontWeight="Bold" FontSize="8"/> <TextBlock Grid.Column="1" Text="Finance Manager" FontSize="8" Margin="5,0"/>
-                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="" FontSize="8" Margin="5,0"/>
+                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Data.Settings.FinanceManager, Source={StaticResource Proxy}}" FontSize="8" Margin="5,0"/>
                                 <TextBlock Grid.Row="2" Text="Date :" FontSize="8"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentBidAnalysis.Date, StringFormat=d}" FontSize="8" Margin="5,0"/>
                                 <TextBlock Grid.Row="3" Text="Signature" FontSize="8"/>
                             </Grid>
@@ -633,8 +631,8 @@
                             <Grid Margin="5">
                                 <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                <TextBlock Text="POSITION :" FontWeight="Bold" FontSize="8"/> <TextBlock Grid.Column="1" Text="Project Manager" FontSize="8" Margin="5,0"/>
-                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="" FontSize="8" Margin="5,0"/>
+                                <TextBlock Text="POSITION :" FontWeight="Bold" FontSize="8"/> <TextBlock Grid.Column="1" Text="Head of Association" FontSize="8" Margin="5,0"/>
+                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Data.Settings.HeadOfAssociation, Source={StaticResource Proxy}}" FontSize="8" Margin="5,0"/>
                                 <TextBlock Grid.Row="2" Text="Date :" FontSize="8"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentBidAnalysis.Date, StringFormat=d}" FontSize="8" Margin="5,0"/>
                                 <TextBlock Grid.Row="3" Text="Signature" FontSize="8"/>
                             </Grid>
@@ -952,7 +950,7 @@
                             </Border>
                             <TextBlock Text="{DynamicResource LogisticManager}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
                             <Separator Margin="0,2"/>
-                            <TextBlock Text="{Binding CurrentPO.LogisticsName}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding Data.Settings.LogisticsManager, Source={StaticResource Proxy}}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center" TextWrapping="Wrap"/>
                             <Image Source="{Binding CurrentPO.LogisticsSignature, Converter={StaticResource ImageBytesConverter}}" Height="35" HorizontalAlignment="Center" Margin="0,2"/>
                         </StackPanel>
                     </Border>
@@ -965,7 +963,7 @@
                             </Border>
                             <TextBlock Text="{DynamicResource FinanceManager}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
                             <Separator Margin="0,2"/>
-                            <TextBlock Text="{Binding CurrentPO.FinanceName}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding Data.Settings.FinanceManager, Source={StaticResource Proxy}}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center" TextWrapping="Wrap"/>
                             <Image Source="{Binding CurrentPO.FinanceSignature, Converter={StaticResource ImageBytesConverter}}" Height="35" HorizontalAlignment="Center" Margin="0,2"/>
                         </StackPanel>
                     </Border>
@@ -978,7 +976,7 @@
                             </Border>
                             <TextBlock Text="{DynamicResource ProjectManager}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
                             <Separator Margin="0,2"/>
-                            <TextBlock Text="{Binding CurrentPO.PMName}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding CurrentPO.Project.ProjectManager}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center" TextWrapping="Wrap"/>
                             <Image Source="{Binding CurrentPO.PMSignature, Converter={StaticResource ImageBytesConverter}}" Height="35" HorizontalAlignment="Center" Margin="0,2"/>
                         </StackPanel>
                     </Border>
@@ -991,7 +989,7 @@
                             </Border>
                             <TextBlock Text="Head / مدير الجمعية" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
                             <Separator Margin="0,2"/>
-                            <TextBlock Text="{Binding CurrentPO.FinalName}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding Data.Settings.HeadOfAssociation, Source={StaticResource Proxy}}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center" TextWrapping="Wrap"/>
                             <Image Source="{Binding CurrentPO.FinalSignature, Converter={StaticResource ImageBytesConverter}}" Height="35" HorizontalAlignment="Center" Margin="0,2"/>
                         </StackPanel>
                     </Border>

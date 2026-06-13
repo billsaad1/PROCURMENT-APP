@@ -233,6 +233,7 @@ namespace JaahdLogistics.ViewModels
             }
 
             CurrentPR = pr;
+            CurrentPR.Project = Projects.FirstOrDefault(p => p.Id == pr.ProjectId);
             SelectedProject = Projects.FirstOrDefault(p => p.Id == pr.ProjectId);
             SelectedTabIndex = 1; // Switch to Edit tab
         }

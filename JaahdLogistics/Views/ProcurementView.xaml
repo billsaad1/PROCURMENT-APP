@@ -6,7 +6,20 @@
              xmlns:local="clr-namespace:JaahdLogistics.Views"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="900">
-    <TabControl Margin="10" SelectedIndex="{Binding SelectedTabIndex}">
+    <DockPanel Margin="10">
+        <GroupBox Header="Global Filters" DockPanel.Dock="Top" Margin="0,0,0,10">
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <TextBlock Text="{DynamicResource Project}" VerticalAlignment="Center" Margin="10,0,5,0"/>
+                <ComboBox ItemsSource="{Binding Projects}" SelectedItem="{Binding FilterProject}" DisplayMemberPath="Name" Width="150"/>
+                <Button Content="X" Command="{Binding ClearProjectFilterCommand}" Margin="2,0,10,0" Padding="5,0"/>
+
+                <TextBlock Text="{DynamicResource Year}" VerticalAlignment="Center" Margin="10,0,5,0"/>
+                <ComboBox ItemsSource="{Binding FilterYears}" SelectedItem="{Binding FilterYear}" Width="80"/>
+                <Button Content="X" Command="{Binding ClearYearFilterCommand}" Margin="2,0,10,0" Padding="5,0"/>
+            </StackPanel>
+        </GroupBox>
+
+    <TabControl SelectedIndex="{Binding SelectedTabIndex}">
         <TabItem Header="{DynamicResource RFQ}">
             <Grid Margin="10">
                 <Grid.ColumnDefinitions>
@@ -20,11 +33,14 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                        <TextBlock Text="{DynamicResource RFQ}" FontWeight="Bold" VerticalAlignment="Center"/>
-                        <Button Content="{DynamicResource New}" Command="{Binding NewRFQCommand}" Margin="10,0,0,0"/>
+                    <StackPanel Grid.Row="0">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="{DynamicResource RFQ}" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <Button Content="{DynamicResource New}" Command="{Binding NewRFQCommand}" Margin="10,0,0,0"/>
+                        </StackPanel>
+                        <TextBox Text="{Binding RFQSearchText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,5" Tag="Search RFQ #..."/>
                     </StackPanel>
-                    <DataGrid Grid.Row="1" ItemsSource="{Binding RFQs}" SelectedItem="{Binding SelectedRFQ}" AutoGenerateColumns="False" IsReadOnly="True">
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding FilteredRFQs}" SelectedItem="{Binding SelectedRFQ}" AutoGenerateColumns="False" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="RFQ #" Binding="{Binding RFQNumber}" Width="*"/>
                             <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=d}" Width="Auto"/>
@@ -50,7 +66,8 @@
                     <TextBlock Text="{DynamicResource CreateRFQ}" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
                     <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
                         <TextBlock Text="{DynamicResource SelectPR}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                        <ComboBox ItemsSource="{Binding ApprovedPRs}" SelectedItem="{Binding SelectedPR}" DisplayMemberPath="PRNumber" Width="200"
+                        <TextBox Text="{Binding PRSearchText, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="0,0,5,0" Tag="Search PR..."/>
+                        <ComboBox ItemsSource="{Binding FilteredApprovedPRs}" SelectedItem="{Binding SelectedPR}" DisplayMemberPath="PRNumber" Width="100"
                                   IsSynchronizedWithCurrentItem="True"/>
                         <Button Content="🔄" Command="{Binding LoadApprovedPRsCommand}" Margin="5,0,0,0" ToolTip="Refresh PR List"/>
                         <Button Content="{DynamicResource Generate}" Command="{Binding CreateRFQCommand}" Margin="10,0,0,0"/>
@@ -103,11 +120,14 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                        <TextBlock Text="{DynamicResource BidAnalysis}" FontWeight="Bold" VerticalAlignment="Center"/>
-                        <Button Content="{DynamicResource New}" Command="{Binding NewBidAnalysisCommand}" Margin="10,0,0,0"/>
+                    <StackPanel Grid.Row="0">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="{DynamicResource BidAnalysis}" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <Button Content="{DynamicResource New}" Command="{Binding NewBidAnalysisCommand}" Margin="10,0,0,0"/>
+                        </StackPanel>
+                        <TextBox Text="{Binding BidSearchText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,5" Tag="Search Justification..."/>
                     </StackPanel>
-                    <DataGrid Grid.Row="1" ItemsSource="{Binding BidAnalyses}" SelectedItem="{Binding SelectedBidAnalysis}" AutoGenerateColumns="False" IsReadOnly="True">
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding FilteredBidAnalyses}" SelectedItem="{Binding SelectedBidAnalysis}" AutoGenerateColumns="False" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto"/>
                             <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=d}" Width="*"/>
@@ -331,11 +351,14 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                        <TextBlock Text="{DynamicResource PO}" FontWeight="Bold" VerticalAlignment="Center"/>
-                        <Button Content="{DynamicResource New}" Command="{Binding NewPOCommand}" Margin="10,0,0,0"/>
+                    <StackPanel Grid.Row="0">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="{DynamicResource PO}" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <Button Content="{DynamicResource New}" Command="{Binding NewPOCommand}" Margin="10,0,0,0"/>
+                        </StackPanel>
+                        <TextBox Text="{Binding POSearchText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,5" Tag="Search PO # / Vendor..."/>
                     </StackPanel>
-                    <DataGrid Grid.Row="1" ItemsSource="{Binding POs}" SelectedItem="{Binding SelectedPO}" AutoGenerateColumns="False" IsReadOnly="True">
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding FilteredPOs}" SelectedItem="{Binding SelectedPO}" AutoGenerateColumns="False" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="PO #" Binding="{Binding PONumber}" Width="*"/>
                             <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="Auto"/>
@@ -360,9 +383,10 @@
                     </Grid.RowDefinitions>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                         <TextBlock Text="Select PR" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                        <ComboBox ItemsSource="{Binding ApprovedPRs}" SelectedItem="{Binding SelectedPR}" DisplayMemberPath="PRNumber" Width="150" Margin="0,0,10,0"/>
+                        <TextBox Text="{Binding PRSearchText, UpdateSourceTrigger=PropertyChanged}" Width="80" Margin="0,0,5,0" Tag="Search..."/>
+                        <ComboBox ItemsSource="{Binding FilteredApprovedPRs}" SelectedItem="{Binding SelectedPR}" DisplayMemberPath="PRNumber" Width="100" Margin="0,0,10,0"/>
                         <TextBlock Text="Select Bid Analysis" VerticalAlignment="Center" Margin="10,0,10,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
-                        <ComboBox ItemsSource="{Binding BidAnalyses}" SelectedItem="{Binding SelectedBidAnalysis}" DisplayMemberPath="Id" Width="100" Margin="0,0,10,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                        <ComboBox ItemsSource="{Binding FilteredBidAnalyses}" SelectedItem="{Binding SelectedBidAnalysis}" DisplayMemberPath="Id" Width="80" Margin="0,0,10,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
                         <TextBlock Text="Vendor" VerticalAlignment="Center" Margin="10,0,5,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                         <ComboBox ItemsSource="{Binding Vendors}" SelectedValue="{Binding CurrentPO.VendorId}" SelectedValuePath="Id" DisplayMemberPath="Name" Width="150" Margin="0,0,10,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                         <Button Content="{DynamicResource CreatePO}" Command="{Binding CreatePOCommand}"/>
@@ -513,4 +537,5 @@
             </Grid>
         </TabItem>
     </TabControl>
+    </DockPanel>
 </UserControl>

@@ -12,7 +12,9 @@ CREATE TABLE IF NOT EXISTS Projects (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
     Name TEXT NOT NULL,
     Code TEXT NOT NULL,
-    Year INTEGER NOT NULL
+    Year INTEGER NOT NULL,
+    ProjectManager TEXT,
+    ProjectOfficer TEXT
 );
 
 CREATE TABLE IF NOT EXISTS BudgetLines (
@@ -220,7 +222,10 @@ CREATE TABLE IF NOT EXISTS Settings (
     LogoImage BLOB,
     PRTerms TEXT,
     RFQTerms TEXT,
-    POTerms TEXT
+    POTerms TEXT,
+    LogisticsManager TEXT,
+    FinanceManager TEXT,
+    HeadOfAssociation TEXT
 );
 
 CREATE TABLE IF NOT EXISTS Approvals (

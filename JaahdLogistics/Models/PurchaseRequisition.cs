@@ -63,6 +63,8 @@ namespace JaahdLogistics.Models
         private string? _finalName;
         public string? FinalName { get => _finalName; set => SetProperty(ref _finalName, value); }
 
+        public Project? Project { get; set; }
+
         public ObservableCollection<PRItem> Items { get; set; } = new();
 
         public decimal TotalAmount => Items.Sum(i => i.TotalPrice);

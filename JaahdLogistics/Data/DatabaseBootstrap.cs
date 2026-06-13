@@ -33,6 +33,8 @@ namespace JaahdLogistics.Data
                 AddColumnIfMissing(connection, "Projects", "Name", "TEXT NOT NULL DEFAULT ''");
                 AddColumnIfMissing(connection, "Projects", "Code", "TEXT NOT NULL DEFAULT ''");
                 AddColumnIfMissing(connection, "Projects", "Year", "INTEGER NOT NULL DEFAULT 0");
+                AddColumnIfMissing(connection, "Projects", "ProjectManager", "TEXT");
+                AddColumnIfMissing(connection, "Projects", "ProjectOfficer", "TEXT");
 
                 // Repair BudgetLines table
                 AddColumnIfMissing(connection, "BudgetLines", "Name", "TEXT NOT NULL DEFAULT ''");
@@ -53,6 +55,9 @@ namespace JaahdLogistics.Data
                 AddColumnIfMissing(connection, "Settings", "PRTerms", "TEXT");
                 AddColumnIfMissing(connection, "Settings", "RFQTerms", "TEXT");
                 AddColumnIfMissing(connection, "Settings", "POTerms", "TEXT");
+                AddColumnIfMissing(connection, "Settings", "LogisticsManager", "TEXT");
+                AddColumnIfMissing(connection, "Settings", "FinanceManager", "TEXT");
+                AddColumnIfMissing(connection, "Settings", "HeadOfAssociation", "TEXT");
 
                 // Repair Users
                 AddColumnIfMissing(connection, "Users", "SignatureImage", "BLOB");
