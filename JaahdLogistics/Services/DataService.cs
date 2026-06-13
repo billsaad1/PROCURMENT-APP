@@ -589,14 +589,14 @@ namespace JaahdLogistics.Services
                 if (pr.Id == 0)
                 {
                     pr.Id = connection.QuerySingle<int>(
-                        "INSERT INTO PurchaseRequisitions (PRNumber, ProjectId, RequesterId, Date, Justification, Currency, ExchangeRate, Status) " +
-                        "VALUES (@PRNumber, @ProjectId, @RequesterId, @Date, @Justification, @Currency, @ExchangeRate, @Status); SELECT last_insert_rowid();", 
+                        "INSERT INTO PurchaseRequisitions (PRNumber, ProjectId, RequesterId, Date, Justification, Currency, ExchangeRate, PRType, Status) " +
+                        "VALUES (@PRNumber, @ProjectId, @RequesterId, @Date, @Justification, @Currency, @ExchangeRate, @PRType, @Status); SELECT last_insert_rowid();",
                         pr, transaction);
                 }
                 else
                 {
                     connection.Execute(
-                        "UPDATE PurchaseRequisitions SET PRNumber=@PRNumber, ProjectId=@ProjectId, Justification=@Justification, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate WHERE Id=@Id", 
+                        "UPDATE PurchaseRequisitions SET PRNumber=@PRNumber, ProjectId=@ProjectId, Justification=@Justification, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate, PRType=@PRType WHERE Id=@Id",
                         pr, transaction);
                 }
 
@@ -790,12 +790,25 @@ namespace JaahdLogistics.Services
             using var transaction = connection.BeginTransaction();
             
             try {
-                var grnId = connection.QuerySingle<int>(
-                    "INSERT INTO GoodsReceivingNotes (GRNNumber, POId, ReceiverId) VALUES (@GRNNumber, @POId, @ReceiverId); SELECT last_insert_rowid();", 
-                    grn, transaction);
+                if (grn.Id == 0)
+                {
+                    grn.Id = connection.QuerySingle<int>(
+                        "INSERT INTO GoodsReceivingNotes (GRNNumber, POId, ReceiverId, InvoiceNumber, IsQtyComply, IsQtyMatch, IsQtyIntact) " +
+                        "VALUES (@GRNNumber, @POId, @ReceiverId, @InvoiceNumber, @IsQtyComply, @IsQtyMatch, @IsQtyIntact); SELECT last_insert_rowid();",
+                        grn, transaction);
+                }
+                else
+                {
+                    connection.Execute(
+                        "UPDATE GoodsReceivingNotes SET GRNNumber=@GRNNumber, InvoiceNumber=@InvoiceNumber, " +
+                        "IsQtyComply=@IsQtyComply, IsQtyMatch=@IsQtyMatch, IsQtyIntact=@IsQtyIntact WHERE Id=@Id",
+                        grn, transaction);
+                    // Clear existing items for re-insertion or update logic
+                    connection.Execute("DELETE FROM GRNItems WHERE GRNId=@Id", new { grn.Id }, transaction);
+                }
                 
                 foreach(var item in items) {
-                    item.GRNId = grnId;
+                    item.GRNId = grn.Id;
                     connection.Execute(
                         "INSERT INTO GRNItems (GRNId, POItemId, ReceivedQuantity, AcceptedQuantity, RejectedQuantity, RejectReason) " +
                         "VALUES (@GRNId, @POItemId, @ReceivedQuantity, @AcceptedQuantity, @RejectedQuantity, @RejectReason)", 
@@ -869,17 +882,41 @@ namespace JaahdLogistics.Services
         public void SaveThreeWayMatch(ThreeWayMatch match)
         {
             using var connection = new SqliteConnection(_connectionString);
-            if (match.Id == 0)
+            connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
+            using var transaction = connection.BeginTransaction();
+            try
             {
-                connection.Execute(
-                    "INSERT INTO ThreeWayMatch (POId, GRNId, InvoiceNumber, InvoiceDetails, InvoiceScan, Date, Status) " +
-                    "VALUES (@POId, @GRNId, @InvoiceNumber, @InvoiceDetails, @InvoiceScan, @Date, @Status)", match);
+                if (match.Id == 0)
+                {
+                    match.Id = connection.QuerySingle<int>(
+                        "INSERT INTO ThreeWayMatch (POId, GRNId, InvoiceNumber, InvoiceDetails, InvoiceScan, Date, Status) " +
+                        "VALUES (@POId, @GRNId, @InvoiceNumber, @InvoiceDetails, @InvoiceScan, @Date, @Status); SELECT last_insert_rowid();",
+                        match, transaction);
+                }
+                else
+                {
+                    connection.Execute(
+                        "UPDATE ThreeWayMatch SET POId=@POId, GRNId=@GRNId, InvoiceNumber=@InvoiceNumber, " +
+                        "InvoiceDetails=@InvoiceDetails, InvoiceScan=@InvoiceScan, Status=@Status WHERE Id=@Id",
+                        match, transaction);
+                }
+
+                connection.Execute("DELETE FROM ThreeWayMatchItems WHERE ThreeWayMatchId = @Id", new { match.Id }, transaction);
+                foreach (var item in match.Items)
+                {
+                    item.ThreeWayMatchId = match.Id;
+                    connection.Execute(@"
+                        INSERT INTO ThreeWayMatchItems (ThreeWayMatchId, Description, Unit, POPrice, POQuantity, ExtractPrice, ExtractQuantity, GRNPrice, GRNQuantity, ClarifyDiff)
+                        VALUES (@ThreeWayMatchId, @Description, @Unit, @POPrice, @POQuantity, @ExtractPrice, @ExtractQuantity, @GRNPrice, @GRNQuantity, @ClarifyDiff)",
+                        item, transaction);
+                }
+                transaction.Commit();
             }
-            else
+            catch
             {
-                connection.Execute(
-                    "UPDATE ThreeWayMatch SET POId=@POId, GRNId=@GRNId, InvoiceNumber=@InvoiceNumber, " +
-                    "InvoiceDetails=@InvoiceDetails, InvoiceScan=@InvoiceScan, Status=@Status WHERE Id=@Id", match);
+                transaction.Rollback();
+                throw;
             }
         }
 
@@ -892,7 +929,12 @@ namespace JaahdLogistics.Services
         public IEnumerable<ThreeWayMatch> GetThreeWayMatches()
         {
             using var connection = new SqliteConnection(_connectionString);
-            return connection.Query<ThreeWayMatch>("SELECT * FROM ThreeWayMatch");
+            var matches = connection.Query<ThreeWayMatch>("SELECT * FROM ThreeWayMatch").ToList();
+            foreach (var m in matches)
+            {
+                m.Items = connection.Query<ThreeWayMatchItem>("SELECT * FROM ThreeWayMatchItems WHERE ThreeWayMatchId = @Id", new { m.Id }).ToList();
+            }
+            return matches;
         }
 
         public IEnumerable<string> GetPreviousItemDescriptions()

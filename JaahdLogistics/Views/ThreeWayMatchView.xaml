@@ -51,38 +51,92 @@
                 <Button Content="{DynamicResource Verify}" Command="{Binding VerifyMatchCommand}" Margin="10,0,0,0"/>
             </StackPanel>
 
-            <Border Grid.Row="2" BorderBrush="Gray" BorderThickness="1" Padding="15">
-                <StackPanel>
-                    <TextBlock Text="{Binding CurrentMatch.Status}" FontSize="18" Foreground="Green" FontWeight="Bold" Margin="0,0,0,15"/>
-                    
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        
-                        <TextBlock Text="Invoice Number:" Margin="5"/>
-                        <TextBox Grid.Column="1" Text="{Binding CurrentMatch.InvoiceNumber}" Margin="5"/>
-                        
-                        <TextBlock Grid.Row="1" Text="Invoice Details:" Margin="5"/>
-                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding CurrentMatch.InvoiceDetails}" Height="60" TextWrapping="Wrap" Margin="5"/>
-                        
-                        <TextBlock Grid.Row="2" Text="Invoice Scan:" Margin="5"/>
-                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
-                            <Button Content="Upload Scan" Command="{Binding UploadInvoiceScanCommand}" Margin="5"/>
-                            <TextBlock Text="File uploaded" Visibility="{Binding CurrentMatch.InvoiceScan, Converter={StaticResource NullToVisibilityConverter}}" VerticalAlignment="Center" Margin="10,0,0,0" Foreground="Gray"/>
-                        </StackPanel>
+            <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-                        <Button Grid.Row="3" Grid.Column="1" Content="Save Match Details" Command="{Binding SaveCommand}" HorizontalAlignment="Left" Margin="5,15,5,5"/>
-                    </Grid>
+                <TextBlock Text="{Binding CurrentMatch.Status}" FontSize="18" Foreground="Green" FontWeight="Bold" Margin="0,0,0,10"/>
+
+                <Grid Grid.Row="1" Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Invoice Number:" VerticalAlignment="Center" Margin="5"/>
+                    <TextBox Grid.Column="1" Text="{Binding CurrentMatch.InvoiceNumber}" Margin="5"/>
+                    <Button Grid.Column="2" Content="Upload Scan" Command="{Binding UploadInvoiceScanCommand}" Margin="10,0,0,0"/>
+                </Grid>
+
+                <DataGrid Grid.Row="2" ItemsSource="{Binding CurrentMatch.Items}" AutoGenerateColumns="False" CanUserAddRows="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Item" Binding="{Binding Description}" Width="*" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="60" IsReadOnly="True"/>
+                        
+                        <!-- PO Columns -->
+                        <DataGridTextColumn Header="PO Price" Binding="{Binding POPrice, StringFormat=N2}" Width="80" IsReadOnly="True">
+                            <DataGridTextColumn.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="Background" Value="#F0F8FF"/>
+                                </Style>
+                            </DataGridTextColumn.CellStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="PO Qty" Binding="{Binding POQuantity}" Width="60" IsReadOnly="True">
+                            <DataGridTextColumn.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="Background" Value="#F0F8FF"/>
+                                </Style>
+                            </DataGridTextColumn.CellStyle>
+                        </DataGridTextColumn>
+
+                        <!-- Extract Columns (Editable) -->
+                        <DataGridTextColumn Header="Ext Price" Binding="{Binding ExtractPrice, UpdateSourceTrigger=PropertyChanged}" Width="80"/>
+                        <DataGridTextColumn Header="Ext Qty" Binding="{Binding ExtractQuantity, UpdateSourceTrigger=PropertyChanged}" Width="60"/>
+
+                        <!-- GRN Columns -->
+                        <DataGridTextColumn Header="GRN Price" Binding="{Binding GRNPrice, StringFormat=N2}" Width="80" IsReadOnly="True">
+                            <DataGridTextColumn.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="Background" Value="#FFF5EE"/>
+                                </Style>
+                            </DataGridTextColumn.CellStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="GRN Qty" Binding="{Binding GRNQuantity}" Width="60" IsReadOnly="True">
+                            <DataGridTextColumn.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="Background" Value="#FFF5EE"/>
+                                </Style>
+                            </DataGridTextColumn.CellStyle>
+                        </DataGridTextColumn>
+
+                        <!-- Diff -->
+                        <DataGridTextColumn Header="Diff?" Binding="{Binding DiffNote}" Width="50" IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasDiff}" Value="True">
+                                            <Setter Property="Foreground" Value="Red"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Clarify Diff" Binding="{Binding ClarifyDiff}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+                    <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
+                    <Button Content="Save Match" Command="{Binding SaveCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
                 </StackPanel>
-            </Border>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

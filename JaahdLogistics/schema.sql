@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS PurchaseRequisitions (
     Justification TEXT,
     Currency TEXT NOT NULL,
     ExchangeRate DECIMAL(18, 4) DEFAULT 1.0,
+    PRType TEXT, -- Services, Goods
     Status TEXT DEFAULT 'Pending', -- Pending, LogisticsApproved, FinanceApproved, FinalApproved, Rejected
     Version INTEGER DEFAULT 1,
     LastModified DATETIME DEFAULT CURRENT_TIMESTAMP,

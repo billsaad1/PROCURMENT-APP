@@ -26,9 +26,16 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private ThreeWayMatch? _selectedMatch;
 
+        [ObservableProperty]
+        private string? _grnNumber;
+
+        [ObservableProperty]
+        private Settings _settings;
+
         public ThreeWayMatchViewModel(IDataService dataService)
         {
             _dataService = dataService;
+            _settings = _dataService.GetSettings();
             RefreshAll();
         }
 
@@ -55,6 +62,8 @@ namespace JaahdLogistics.ViewModels
             {
                 CurrentMatch = value;
                 SelectedPO = CompletedPOs.FirstOrDefault(p => p.Id == value.POId);
+                var grn = _dataService.GetGRNs().FirstOrDefault(g => g.Id == value.GRNId);
+                GrnNumber = grn?.GRNNumber;
             }
         }
 
@@ -83,7 +92,7 @@ namespace JaahdLogistics.ViewModels
         {
             if (SelectedPO == null) return;
             
-            var grn = _dataService.GetGRNs().FirstOrDefault(g => g.POId == SelectedPO.Id);
+            var grn = _dataService.GetGRNs().LastOrDefault(g => g.POId == SelectedPO.Id);
             if (grn == null)
             {
                 System.Windows.MessageBox.Show("No GRN found for this PO. Match cannot be verified.");
@@ -95,11 +104,32 @@ namespace JaahdLogistics.ViewModels
                 POId = SelectedPO.Id, 
                 GRNId = grn.Id,
                 Date = System.DateTime.Now,
+                InvoiceNumber = grn.InvoiceNumber,
                 Status = "Verified" 
             };
+            GrnNumber = grn.GRNNumber;
+
+            // Populate comparison items
+            CurrentMatch.Items.Clear();
+            foreach (var poItem in SelectedPO.Items)
+            {
+                var grnItem = grn.Items.FirstOrDefault(gi => gi.POItemId == poItem.Id);
+                CurrentMatch.Items.Add(new ThreeWayMatchItem
+                {
+                    Description = poItem.Description,
+                    Unit = poItem.Unit,
+                    POPrice = poItem.UnitPrice,
+                    POQuantity = poItem.Quantity,
+                    GRNPrice = poItem.UnitPrice, // Assuming price remains same as PO for comparison
+                    GRNQuantity = grnItem?.AcceptedQuantity ?? 0,
+                    ExtractPrice = poItem.UnitPrice, // Default to PO
+                    ExtractQuantity = grnItem?.AcceptedQuantity ?? 0 // Default to GRN
+                });
+            }
             
             _dataService.SaveThreeWayMatch(CurrentMatch);
             System.Windows.MessageBox.Show("Three-Way Match Verified Successfully");
+            LoadMatches();
         }
 
         [RelayCommand]
@@ -117,9 +147,19 @@ namespace JaahdLogistics.ViewModels
         private void Save()
         {
             if (CurrentMatch.POId == 0) return;
-            _dataService.SaveThreeWayMatch(CurrentMatch);
-            System.Windows.MessageBox.Show("Saved Successfully");
-            LoadMatches();
+            try
+            {
+                _dataService.SaveThreeWayMatch(CurrentMatch);
+                System.Windows.MessageBox.Show("Saved Successfully");
+                LoadMatches();
+            }
+            catch (System.Exception ex) { System.Windows.MessageBox.Show(ex.Message); }
+        }
+
+        [RelayCommand]
+        private void Print()
+        {
+            new PrintService().ShowPreview(this, "ThreeWayMatchPrintTemplate");
         }
     }
 }

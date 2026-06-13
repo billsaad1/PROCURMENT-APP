@@ -19,6 +19,10 @@
     <SolidColorBrush x:Key="PrimaryTealBrush" Color="{StaticResource PrimaryTealColor}"/>
     <SolidColorBrush x:Key="SecondaryBlueBrush" Color="{StaticResource SecondaryBlueColor}"/>
     <SolidColorBrush x:Key="LightGrayBrush" Color="{StaticResource LightGrayColor}"/>
+    <SolidColorBrush x:Key="JaahdBlueBrush" Color="#1B4F72"/>
+    <SolidColorBrush x:Key="JaahdBrownBrush" Color="#922B21"/>
+    <SolidColorBrush x:Key="JaahdLightBlueBrush" Color="#AED6F1"/>
+    <SolidColorBrush x:Key="JaahdLightBrownBrush" Color="#FAD7A0"/>
 
     <!-- Global Styles -->
     <Style TargetType="Button">
@@ -108,184 +112,341 @@
     </ControlTemplate>
 
     <ControlTemplate x:Key="PRPrintTemplate">
-        <Border Background="White" Width="793" Height="1122" Padding="40">
+        <Border Background="White" Width="793" Height="1122" Padding="25" BorderBrush="Black" BorderThickness="0.5">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/> <!-- Header -->
+                    <RowDefinition Height="Auto"/> <!-- Title Bar -->
+                    <RowDefinition Height="Auto"/> <!-- Info Bar -->
+                    <RowDefinition Height="Auto"/> <!-- Justification Bar -->
+                    <RowDefinition Height="*"/>    <!-- Items Table -->
+                    <RowDefinition Height="Auto"/> <!-- Summary -->
+                    <RowDefinition Height="Auto"/> <!-- Signatures -->
                 </Grid.RowDefinitions>
 
                 <!-- Header -->
-                <Grid Margin="0,0,0,20">
+                <Grid Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Image Source="{Binding Data.Settings.LogoImage, Source={StaticResource Proxy}, Converter={StaticResource ImageBytesConverter}}" Height="80" Width="80"/>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="20,0,0,0">
-                        <TextBlock Text="{Binding Data.Settings.AssociationName, Source={StaticResource Proxy}}" FontSize="20" FontWeight="Bold"/>
-                        <TextBlock Text="Purchase Requisition" FontSize="16" FontWeight="SemiBold"/>
+                    <Image Source="{Binding Data.Settings.LogoImage, Source={StaticResource Proxy}, Converter={StaticResource ImageBytesConverter}}" Height="60" Width="60" Stretch="Uniform"/>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="{Binding Data.Settings.AssociationName, Source={StaticResource Proxy}}" FontSize="18" FontWeight="Bold" TextDecorations="Underline"/>
+                        <TextBlock Text="Logistics Management" FontSize="14" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
 
-                <Separator Grid.Row="1" Margin="0,0,0,20"/>
+                <!-- Title Bar -->
+                <Border Grid.Row="1" Background="{StaticResource JaahdBlueBrush}" Margin="0,0,0,10">
+                    <TextBlock Text="Purchase Requisition / طلب شراء" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" Margin="5" FontSize="14"/>
+                </Border>
 
-                <!-- Info -->
-                <Grid Grid.Row="2" Margin="0,0,0,20">
+                <!-- Info Bar -->
+                <Grid Grid.Row="2" Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="PR Number:" FontWeight="Bold" Margin="5"/>
-                    <TextBlock Grid.Column="1" Text="{Binding CurrentPR.PRNumber}" Margin="5"/>
-                    <TextBlock Grid.Column="2" Text="Date:" FontWeight="Bold" Margin="5"/>
-                    <TextBlock Grid.Column="3" Text="{Binding CurrentPR.Date, StringFormat=d}" Margin="5"/>
+                    <Border BorderBrush="Black" BorderThickness="1" Padding="5">
+                        <TextBlock Text="PR NUMBER / رقم الطلب :" FontWeight="Bold" FontSize="9"/>
+                    </Border>
+                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
+                        <TextBlock Text="{Binding CurrentPR.PRNumber}" FontSize="10" FontWeight="Bold"/>
+                    </Border>
+                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
+                        <TextBlock Text="Project / المشروع :" FontWeight="Bold" FontSize="9"/>
+                    </Border>
+                    <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
+                        <TextBlock Text="{Binding CurrentPR.Project.Name}" FontSize="10"/>
+                    </Border>
+                    <Border Grid.Column="4" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
+                        <TextBlock Text="DATE / التاريخ :" FontWeight="Bold" FontSize="9"/>
+                    </Border>
+                    <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5" Width="100">
+                        <TextBlock Text="{Binding CurrentPR.Date, StringFormat=MM/dd/yyyy}" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    </Border>
                 </Grid>
 
-                <!-- Items -->
-                <DataGrid Grid.Row="3" ItemsSource="{Binding CurrentPR.Items}" AutoGenerateColumns="False" 
-                          IsReadOnly="True" BorderThickness="1" BorderBrush="Black">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
-                        <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="60"/>
-                        <DataGridTextColumn Header="Qty" Binding="{Binding Quantity}" Width="60"/>
-                        <DataGridTextColumn Header="Price" Binding="{Binding UnitPrice}" Width="80"/>
-                        <DataGridTextColumn Header="Total" Binding="{Binding TotalPrice}" Width="80"/>
-                    </DataGrid.Columns>
-                </DataGrid>
+                <!-- Justification / Currency Bar -->
+                <Grid Grid.Row="3" Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="250"/>
+                    </Grid.ColumnDefinitions>
+                    <Border BorderBrush="Black" BorderThickness="1">
+                        <StackPanel>
+                            <Border Background="{StaticResource JaahdBrownBrush}" Padding="3">
+                                <TextBlock Text="Justification For The Request / مبررات الطلب" Foreground="White" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="{Binding CurrentPR.Justification}" FontSize="9" Margin="5" Height="40" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1" Background="{StaticResource JaahdLightBrownBrush}">
+                        <Grid Margin="5">
+                            <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                            <TextBlock Text="Type:" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Column="1" Text="{Binding CurrentPR.PRType}" FontSize="9" Margin="5,0" HorizontalAlignment="Right"/>
+                            <TextBlock Grid.Row="1" Text="Currency:" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CurrentPR.Currency}" FontSize="9" Margin="5,0" HorizontalAlignment="Right"/>
+                            <TextBlock Grid.Row="2" Text="Ex. Rate:" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentPR.ExchangeRate}" FontSize="9" Margin="5,0" HorizontalAlignment="Right"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- Items Table -->
+                <Grid Grid.Row="4">
+                    <DataGrid ItemsSource="{Binding CurrentPR.Items}" AutoGenerateColumns="False" IsReadOnly="True"
+                              BorderThickness="1" BorderBrush="Black" HeadersVisibility="Column" GridLinesVisibility="All"
+                              HorizontalGridLinesBrush="Black" VerticalGridLinesBrush="Black">
+                        <DataGrid.Resources>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#D5D8DC"/>
+                                <Setter Property="Foreground" Value="Black"/>
+                                <Setter Property="BorderBrush" Value="Black"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                                <Setter Property="Padding" Value="5"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                <Setter Property="FontSize" Value="9"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="SI NO." Width="40">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Header}" HorizontalAlignment="Center"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Item Description / المواصفات" Binding="{Binding Description}" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextWrapping" Value="Wrap"/>
+                                        <Setter Property="FontSize" Value="9"/>
+                                        <Setter Property="Padding" Value="2"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Clause / البند" Binding="{Binding BudgetLineId}" Width="60"/>
+                            <DataGridTextColumn Header="Unit / الوحدة" Binding="{Binding Unit}" Width="60"/>
+                            <DataGridTextColumn Header="Qty / الكمية" Binding="{Binding Quantity}" Width="60"/>
+                            <DataGridTextColumn Header="Unit Price / السعر" Binding="{Binding UnitPrice, StringFormat=N2}" Width="80"/>
+                            <DataGridTextColumn Header="Total / الإجمالي" Binding="{Binding TotalPrice, StringFormat=N2}" Width="100">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="HorizontalAlignment" Value="Right"/>
+                                        <Setter Property="Margin" Value="0,0,5,0"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
 
                 <!-- Summary -->
-                <StackPanel Grid.Row="4" Margin="0,10">
-                    <TextBlock Text="{Binding CurrentPR.TotalAmount, StringFormat='Total: {0:N2}'}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right"/>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <TextBlock Text="Amount in words: " FontWeight="Bold" FontSize="12"/>
-                        <TextBlock FontWeight="Bold" FontSize="12">
-                            <TextBlock.Text>
-                                <MultiBinding Converter="{StaticResource CurrencyWordsConverter}">
-                                    <Binding Path="CurrentPR.TotalAmount"/>
-                                    <Binding Path="CurrentPR.Currency"/>
-                                </MultiBinding>
-                            </TextBlock.Text>
-                        </TextBlock>
-                    </StackPanel>
-                </StackPanel>
+                <Grid Grid.Row="5" Margin="0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="150"/>
+                    </Grid.ColumnDefinitions>
+                    <Border BorderBrush="Black" BorderThickness="1,0,1,1" Padding="10" Background="#F2F4F4">
+                        <StackPanel>
+                            <TextBlock Text="Total in Words / الإجمالي كتابة:" FontWeight="Bold" FontSize="9"/>
+                            <TextBlock FontWeight="Bold" FontSize="11" TextWrapping="Wrap">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource CurrencyWordsConverter}">
+                                        <Binding Path="CurrentPR.TotalAmount"/>
+                                        <Binding Path="CurrentPR.Currency"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="10" Background="#F2F4F4">
+                        <TextBlock Text="{Binding CurrentPR.TotalAmount, StringFormat=N2}" FontWeight="Bold" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
 
                 <!-- Signatures -->
-                <UniformGrid Grid.Row="5" Columns="4" Margin="0,40,0,0">
-                    <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="Requester" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5">
-                             <Image Source="{Binding CurrentPR.RequesterSignature, Converter={StaticResource ImageBytesConverter}}"/>
-                        </Border>
-                        <TextBlock Text="{Binding CurrentPR.RequesterName}" FontSize="10" HorizontalAlignment="Center"/>
-                    </StackPanel>
-                    <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="Logistics" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5">
-                             <Image Source="{Binding CurrentPR.LogisticsSignature, Converter={StaticResource ImageBytesConverter}}"/>
-                        </Border>
-                        <TextBlock Text="{Binding Data.Settings.LogisticsManager, Source={StaticResource Proxy}}" FontSize="10" HorizontalAlignment="Center"/>
-                    </StackPanel>
-                    <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="Finance" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5">
-                             <Image Source="{Binding CurrentPR.FinanceSignature, Converter={StaticResource ImageBytesConverter}}"/>
-                        </Border>
-                        <TextBlock Text="{Binding Data.Settings.FinanceManager, Source={StaticResource Proxy}}" FontSize="10" HorizontalAlignment="Center"/>
-                    </StackPanel>
-                    <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="{DynamicResource ProjectManager}" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5">
-                             <Image Source="{Binding CurrentPR.PMSignature, Converter={StaticResource ImageBytesConverter}}"/>
-                        </Border>
-                        <TextBlock Text="{Binding CurrentPR.Project.ProjectManager}" FontSize="10" HorizontalAlignment="Center"/>
-                    </StackPanel>
-                </UniformGrid>
+                <Grid Grid.Row="6" Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border BorderBrush="Black" BorderThickness="1" Margin="0,0,5,0">
+                        <StackPanel>
+                            <Border Background="#D5D8DC" Padding="2"><TextBlock Text="Requester / جهة الطلب" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
+                            <TextBlock Text="Project Manager" FontSize="8" HorizontalAlignment="Center" Margin="0,2"/>
+                            <Separator/>
+                            <Image Source="{Binding CurrentPR.RequesterSignature, Converter={StaticResource ImageBytesConverter}}" Height="40" Margin="2"/>
+                            <TextBlock Text="{Binding CurrentPR.RequesterName}" FontSize="8" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="0,0,5,0">
+                        <StackPanel>
+                            <Border Background="#D5D8DC" Padding="2"><TextBlock Text="Verified / تم المراجعة" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
+                            <TextBlock Text="Logistic Manager" FontSize="8" HorizontalAlignment="Center" Margin="0,2"/>
+                            <Separator/>
+                            <Image Source="{Binding CurrentPR.LogisticsSignature, Converter={StaticResource ImageBytesConverter}}" Height="40" Margin="2"/>
+                            <TextBlock Text="{Binding Data.Settings.LogisticsManager, Source={StaticResource Proxy}}" FontSize="8" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="1" Margin="0,0,5,0">
+                        <StackPanel>
+                            <Border Background="#D5D8DC" Padding="2"><TextBlock Text="Verified / تم المراجعة" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
+                            <TextBlock Text="Finance Manager" FontSize="8" HorizontalAlignment="Center" Margin="0,2"/>
+                            <Separator/>
+                            <Image Source="{Binding CurrentPR.FinanceSignature, Converter={StaticResource ImageBytesConverter}}" Height="40" Margin="2"/>
+                            <TextBlock Text="{Binding Data.Settings.FinanceManager, Source={StaticResource Proxy}}" FontSize="8" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="3" BorderBrush="Black" BorderThickness="1">
+                        <StackPanel>
+                            <Border Background="#D5D8DC" Padding="2"><TextBlock Text="Approved / تم الاعتماد" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
+                            <TextBlock Text="Head of Association" FontSize="8" HorizontalAlignment="Center" Margin="0,2"/>
+                            <Separator/>
+                            <Image Source="{Binding CurrentPR.FinalSignature, Converter={StaticResource ImageBytesConverter}}" Height="40" Margin="2"/>
+                            <TextBlock Text="{Binding Data.Settings.HeadOfAssociation, Source={StaticResource Proxy}}" FontSize="8" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
             </Grid>
         </Border>
     </ControlTemplate>
 
     <ControlTemplate x:Key="RFQPrintTemplate">
-        <Border Background="White" Width="793" Height="1122" Padding="40">
+        <Border Background="White" Width="793" Height="1122" Padding="25" BorderBrush="Black" BorderThickness="0.5">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/> <!-- Header -->
+                    <RowDefinition Height="Auto"/> <!-- Title Bar -->
+                    <RowDefinition Height="Auto"/> <!-- Info Bar -->
+                    <RowDefinition Height="*"/>    <!-- Items Table -->
+                    <RowDefinition Height="Auto"/> <!-- Footer -->
                 </Grid.RowDefinitions>
 
                 <!-- Header -->
-                <Grid Margin="0,0,0,20">
+                <Grid Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Image Source="{Binding Data.Settings.LogoImage, Source={StaticResource Proxy}, Converter={StaticResource ImageBytesConverter}}" Height="80" Width="80"/>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="20,0,0,0">
-                        <TextBlock Text="{Binding Data.Settings.AssociationName, Source={StaticResource Proxy}}" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        <TextBlock Text="Request for Quotation (RFQ) - طلب عرض سعر" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                    <Image Source="{Binding Data.Settings.LogoImage, Source={StaticResource Proxy}, Converter={StaticResource ImageBytesConverter}}" Height="60" Width="60" Stretch="Uniform"/>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="{Binding Data.Settings.AssociationName, Source={StaticResource Proxy}}" FontSize="18" FontWeight="Bold" TextDecorations="Underline"/>
+                        <TextBlock Text="Logistics Management" FontSize="14" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
 
-                <Separator Grid.Row="1" Margin="0,0,0,20"/>
+                <!-- Title Bar -->
+                <Border Grid.Row="1" Background="{StaticResource JaahdBlueBrush}" Margin="0,0,0,10">
+                    <TextBlock Text="Request for Quotation (RFQ) / طلب عرض سعر" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" Margin="5" FontSize="14"/>
+                </Border>
 
-                <Grid Grid.Row="2" Margin="0,0,0,20">
+                <!-- Info Bar -->
+                <Grid Grid.Row="2" Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel Orientation="Horizontal" Margin="5">
-                        <TextBlock Text="RFQ Number / رقم طلب عرض السعر:" FontWeight="Bold"/>
-                    </StackPanel>
-                    <TextBlock Grid.Column="1" Text="{Binding CurrentRFQ.RFQNumber}" Margin="5"/>
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5">
-                        <TextBlock Text="Closing Date / تاريخ الإغلاق:" FontWeight="Bold"/>
-                    </StackPanel>
-                    <TextBlock Grid.Column="3" Text="{Binding CurrentRFQ.ClosingDate, StringFormat=d}" Margin="5"/>
+                    <Border BorderBrush="Black" BorderThickness="1" Padding="5">
+                        <TextBlock Text="RFQ Number / رقم طلب عرض السعر :" FontWeight="Bold" FontSize="9"/>
+                    </Border>
+                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
+                        <TextBlock Text="{Binding CurrentRFQ.RFQNumber}" FontSize="10" FontWeight="Bold"/>
+                    </Border>
+                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
+                        <TextBlock Text="Closing Date / تاريخ الإغلاق :" FontWeight="Bold" FontSize="9"/>
+                    </Border>
+                    <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5" Width="100">
+                        <TextBlock Text="{Binding CurrentRFQ.ClosingDate, StringFormat=MM/dd/yyyy}" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    </Border>
                 </Grid>
 
-                <!-- Items -->
-                <DataGrid Grid.Row="3" ItemsSource="{Binding SelectedPR.Items}" AutoGenerateColumns="False" 
-                          IsReadOnly="True" BorderThickness="1" BorderBrush="Black">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Description / الوصف" Binding="{Binding Description}" Width="*"/>
-                        <DataGridTextColumn Header="Unit / الوحدة" Binding="{Binding Unit}" Width="80"/>
-                        <DataGridTextColumn Header="Quantity / الكمية" Binding="{Binding Quantity}" Width="80"/>
-                        <DataGridTextColumn Header="Unit Price / سعر الوحدة" Width="100"/>
-                        <DataGridTextColumn Header="Total / الإجمالي" Width="100"/>
-                    </DataGrid.Columns>
-                </DataGrid>
+                <!-- Items Table -->
+                <Grid Grid.Row="3">
+                    <DataGrid ItemsSource="{Binding SelectedPR.Items}" AutoGenerateColumns="False" IsReadOnly="True"
+                              BorderThickness="1" BorderBrush="Black" HeadersVisibility="Column" GridLinesVisibility="All"
+                              HorizontalGridLinesBrush="Black" VerticalGridLinesBrush="Black">
+                        <DataGrid.Resources>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#D5D8DC"/>
+                                <Setter Property="Foreground" Value="Black"/>
+                                <Setter Property="BorderBrush" Value="Black"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                                <Setter Property="Padding" Value="5"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                <Setter Property="FontSize" Value="9"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="SI NO." Width="40">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Header}" HorizontalAlignment="Center"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Item Description / المواصفات" Binding="{Binding Description}" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextWrapping" Value="Wrap"/>
+                                        <Setter Property="FontSize" Value="9"/>
+                                        <Setter Property="Padding" Value="2"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Unit / الوحدة" Binding="{Binding Unit}" Width="80"/>
+                            <DataGridTextColumn Header="Qty / الكمية" Binding="{Binding Quantity}" Width="80"/>
+                            <DataGridTextColumn Header="Unit Price / السعر" Width="100"/>
+                            <DataGridTextColumn Header="Total / الإجمالي" Width="100"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
 
-                <!-- Terms -->
-                <StackPanel Grid.Row="4" Margin="0,20,0,0">
-                    <TextBlock Text="Terms &amp; Conditions / الشروط والأحكام:" FontWeight="Bold"/>
-                    <TextBlock Text="{Binding CurrentRFQ.Terms}" TextWrapping="Wrap" Margin="5"/>
+                <!-- Footer -->
+                <StackPanel Grid.Row="4" Margin="0,15,0,0">
+                    <Border BorderBrush="Black" BorderThickness="1">
+                        <StackPanel>
+                            <Border Background="{StaticResource JaahdBrownBrush}" Padding="3">
+                                <TextBlock Text="Terms &amp; Conditions / الشروط والأحكام" Foreground="White" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="{Binding CurrentRFQ.Terms}" FontSize="9" Margin="5" Height="60" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
                     
-                    <Grid Margin="0,40,0,0">
-                         <Grid.ColumnDefinitions>
-                             <ColumnDefinition Width="*"/>
-                             <ColumnDefinition Width="*"/>
-                         </Grid.ColumnDefinitions>
-                         <StackPanel HorizontalAlignment="Center">
-                             <TextBlock Text="Vendor Signature &amp; Stamp / توقيع وختم المورد" FontWeight="Bold"/>
-                             <Border BorderBrush="Black" BorderThickness="1" Height="80" Width="200" Margin="10"/>
-                         </StackPanel>
-                         <StackPanel Grid.Column="1" HorizontalAlignment="Center">
-                             <TextBlock Text="Logistics Manager / مسؤول اللوجستيات" FontWeight="Bold"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="80" Width="200" Margin="10">
-                            <TextBlock Text="{Binding Data.Settings.LogisticsManager, Source={StaticResource Proxy}}" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="5"/>
+                    <Grid Margin="0,20,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border BorderBrush="Black" BorderThickness="1" Margin="0,0,10,0">
+                            <StackPanel>
+                                <Border Background="#D5D8DC" Padding="2"><TextBlock Text="Vendor Signature &amp; Stamp / توقيع وختم المورد" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
+                                <Border Height="60"/>
+                            </StackPanel>
                         </Border>
-                         </StackPanel>
+                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1">
+                            <StackPanel>
+                                <Border Background="#D5D8DC" Padding="2"><TextBlock Text="Logistics Manager / مسؤول اللوجستيات" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
+                                <TextBlock Text="{Binding Data.Settings.LogisticsManager, Source={StaticResource Proxy}}" FontSize="8" HorizontalAlignment="Center" Margin="0,5,0,0" VerticalAlignment="Top"/>
+                                <Border Height="40"/>
+                            </StackPanel>
+                        </Border>
                     </Grid>
                 </StackPanel>
             </Grid>
@@ -999,61 +1160,393 @@
     </ControlTemplate>
 
     <ControlTemplate x:Key="GRNPrintTemplate">
-        <Border Background="White" Width="793" Height="1122" Padding="40">
+        <Border Background="White" Width="793" Height="1122" Padding="25" BorderBrush="Black" BorderThickness="0.5">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/> <!-- Header -->
+                    <RowDefinition Height="Auto"/> <!-- Info Bar -->
+                    <RowDefinition Height="Auto"/> <!-- Details Bar -->
+                    <RowDefinition Height="*"/>    <!-- Items Table -->
+                    <RowDefinition Height="Auto"/> <!-- Remarks Section -->
+                    <RowDefinition Height="Auto"/> <!-- Signatures -->
                 </Grid.RowDefinitions>
 
-                <Grid Margin="0,0,0,20">
+                <!-- Header -->
+                <Grid Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Image Source="{Binding Data.Settings.LogoImage, Source={StaticResource Proxy}, Converter={StaticResource ImageBytesConverter}}" Height="80" Width="80"/>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="20,0,0,0">
-                        <TextBlock Text="{Binding Data.Settings.AssociationName, Source={StaticResource Proxy}}" FontSize="20" FontWeight="Bold"/>
-                        <TextBlock Text="Goods Receiving Note" FontSize="16" FontWeight="SemiBold"/>
+                    <Image Source="{Binding Settings.LogoImage, Converter={StaticResource ImageBytesConverter}}" Height="60" Width="60" Stretch="Uniform"/>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right">
+                        <TextBlock Text="GOODS RECEIVING NOTE" FontSize="18" FontWeight="Bold" Foreground="{StaticResource JaahdBlueBrush}"/>
+                        <TextBlock Text="Supply Management and Logistics Service" FontSize="12" Foreground="{StaticResource JaahdBlueBrush}"/>
                     </StackPanel>
                 </Grid>
 
-                <Separator Grid.Row="1" Margin="0,0,0,20"/>
-
-                <Grid Grid.Row="2" Margin="0,0,0,20">
+                <!-- Info Bar -->
+                <Grid Grid.Row="1" Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="GRN Number:" FontWeight="Bold" Margin="5"/>
-                    <TextBlock Grid.Column="1" Text="{Binding CurrentGRN.GRNNumber}" Margin="5"/>
+                    <Border BorderBrush="Black" BorderThickness="1" Padding="5">
+                        <TextBlock Text="DISTRIBUTION :-" FontWeight="Bold" FontSize="9" Foreground="{StaticResource JaahdBlueBrush}"/>
+                    </Border>
+                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
+                        <TextBlock Text="{Binding SelectedPO.Project.Name}" FontSize="10"/>
+                    </Border>
+                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
+                        <TextBlock Text="GRN NO." FontWeight="Bold" FontSize="9" Foreground="{StaticResource JaahdBlueBrush}"/>
+                    </Border>
+                    <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
+                        <TextBlock Text="{Binding CurrentGRN.GRNNumber}" FontSize="10" FontWeight="Bold" Foreground="DarkBlue" HorizontalAlignment="Center"/>
+                    </Border>
                 </Grid>
 
-                <DataGrid Grid.Row="3" ItemsSource="{Binding GrnItems}" AutoGenerateColumns="False" 
-                          IsReadOnly="True" BorderThickness="1" BorderBrush="Black">
+                <!-- Details Bar -->
+                <Grid Grid.Row="2" Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border BorderBrush="Black" BorderThickness="1" Margin="0,0,10,0">
+                        <StackPanel>
+                            <Border Background="#FAD7A0" Padding="5"><TextBlock Text="VENDOR DETAILS" FontWeight="Bold" FontSize="10" HorizontalAlignment="Center"/></Border>
+                            <Grid Margin="5">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                                <TextBlock Text="NAME:" FontWeight="Bold" FontSize="9" Foreground="{StaticResource JaahdBlueBrush}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding SelectedPO.VendorName}" FontWeight="Bold" FontSize="11" Margin="10,0"/>
+                                <TextBlock Grid.Row="1" Text="SUPPLY TYPE:" FontWeight="Bold" FontSize="8" Foreground="{StaticResource JaahdBlueBrush}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="Materials" FontSize="8" Margin="10,0"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1">
+                        <StackPanel>
+                            <Border Background="White" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="5"><TextBlock Text="PURCHASE ORDER DETAILS" FontWeight="Bold" FontSize="10" HorizontalAlignment="Center"/></Border>
+                            <Grid Margin="5">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                                <TextBlock Text="PO. NO. :-" FontWeight="Bold" FontSize="9" Foreground="{StaticResource JaahdBlueBrush}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding SelectedPO.PONumber}" FontWeight="Bold" FontSize="9" Margin="10,0" HorizontalAlignment="Right"/>
+                                <TextBlock Grid.Row="1" Text="INVOICE NO. :-" FontWeight="Bold" FontSize="9" Foreground="{StaticResource JaahdBlueBrush}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CurrentGRN.InvoiceNumber}" FontSize="9" Margin="10,0" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Items Table -->
+                <DataGrid Grid.Row="3" ItemsSource="{Binding GrnItems}" AutoGenerateColumns="False" IsReadOnly="True"
+                          BorderThickness="1" BorderBrush="Black" HeadersVisibility="Column" GridLinesVisibility="All"
+                          HorizontalGridLinesBrush="Black" VerticalGridLinesBrush="Black">
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="White"/>
+                            <Setter Property="Foreground" Value="Black"/>
+                            <Setter Property="BorderBrush" Value="Black"/>
+                            <Setter Property="BorderThickness" Value="1"/>
+                            <Setter Property="Padding" Value="2"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            <Setter Property="FontSize" Value="8"/>
+                        </Style>
+                    </DataGrid.Resources>
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
-                        <DataGridTextColumn Header="Ordered" Binding="{Binding OrderedQuantity}" Width="80"/>
-                        <DataGridTextColumn Header="Accepted" Binding="{Binding AcceptedQuantity}" Width="80"/>
-                        <DataGridTextColumn Header="Rejected" Binding="{Binding RejectedQuantity}" Width="80"/>
+                        <DataGridTemplateColumn Header="SI NO." Width="40">
+                             <DataGridTemplateColumn.CellTemplate>
+                                 <DataTemplate><TextBlock Text="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Header}" HorizontalAlignment="Center"/></DataTemplate>
+                             </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="ITEM DESCRIPTION" Binding="{Binding Description}" Width="*"/>
+                        <DataGridTextColumn Header="UNIT" Binding="{Binding Unit}" Width="80"/>
+                        <DataGridTextColumn Header="TOT ITEMS RECEIVED" Binding="{Binding ReceivedQuantity}" Width="80">
+                            <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock"><Setter Property="FontWeight" Value="Bold"/><Setter Property="HorizontalAlignment" Value="Center"/></Style></DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="NO. ACCEPTED" Binding="{Binding AcceptedQuantity}" Width="80">
+                            <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock"><Setter Property="FontWeight" Value="Bold"/><Setter Property="HorizontalAlignment" Value="Center"/></Style></DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="NO. REJECTED" Binding="{Binding RejectedQuantity}" Width="80"/>
+                        <DataGridTextColumn Header="REJECT REASON(S)" Binding="{Binding RejectReason}" Width="*"/>
                     </DataGrid.Columns>
                 </DataGrid>
 
-                <UniformGrid Grid.Row="4" Columns="2" Margin="0,40,0,0">
-                    <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="Storekeeper" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5"/>
+                <!-- Remarks Section -->
+                <Grid Grid.Row="4" Margin="0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="100"/>
+                    </Grid.ColumnDefinitions>
+                    <Border BorderBrush="Black" BorderThickness="1">
+                        <StackPanel>
+                            <Border Background="{StaticResource JaahdBlueBrush}" Width="150" HorizontalAlignment="Left" Padding="5">
+                                <TextBlock Text="REMARKS" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Margin="10">
+                                <StackPanel Orientation="Horizontal" Margin="0,5">
+                                    <Ellipse Fill="{StaticResource JaahdBlueBrush}" Width="6" Height="6" Margin="0,0,10,0"/>
+                                    <TextBlock Text="Quantity Comply to The Required Specifications" Foreground="{StaticResource JaahdBlueBrush}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,5">
+                                    <Ellipse Fill="{StaticResource JaahdBlueBrush}" Width="6" Height="6" Margin="0,0,10,0"/>
+                                    <TextBlock Text="Quantity Matches The Required Number" Foreground="{StaticResource JaahdBlueBrush}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,5">
+                                    <Ellipse Fill="{StaticResource JaahdBlueBrush}" Width="6" Height="6" Margin="0,0,10,0"/>
+                                    <TextBlock Text="Quantity Intact" Foreground="{StaticResource JaahdBlueBrush}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1">
+                        <StackPanel VerticalAlignment="Center">
+                             <CheckBox IsChecked="{Binding CurrentGRN.IsQtyComply}" HorizontalAlignment="Center" Margin="0,10" IsEnabled="False"/>
+                             <CheckBox IsChecked="{Binding CurrentGRN.IsQtyMatch}" HorizontalAlignment="Center" Margin="0,10" IsEnabled="False"/>
+                             <CheckBox IsChecked="{Binding CurrentGRN.IsQtyIntact}" HorizontalAlignment="Center" Margin="0,10" IsEnabled="False"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Signatures -->
+                <Border Grid.Row="5" BorderBrush="Black" BorderThickness="1">
+                    <StackPanel>
+                        <Border Padding="5"><TextBlock Text="RECEIVER DETAILS" FontWeight="Bold" Foreground="Brown" FontSize="11"/></Border>
+                        <Grid Margin="10">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+
+                            <TextBlock Text="NAME" FontWeight="Bold" TextDecorations="Underline" VerticalAlignment="Center"/>
+                            <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="5" Padding="5">
+                                <TextBlock Text="{Binding Settings.HeadOfAssociation}" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            </Border>
+
+                            <TextBlock Grid.Column="2" Text="POSITION" FontWeight="Bold" TextDecorations="Underline" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                            <Border Grid.Column="3" BorderBrush="Black" BorderThickness="1" Margin="5" Padding="5">
+                                <TextBlock Text="Storekeeper" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            </Border>
+
+                            <TextBlock Grid.Row="1" Text="SIGNATURE" FontWeight="Bold" TextDecorations="Underline" VerticalAlignment="Center"/>
+                            <Border Grid.Row="1" Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="5" Height="30"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="RECEIVING DATE" FontWeight="Bold" TextDecorations="Underline" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                            <Border Grid.Row="1" Grid.Column="3" BorderBrush="Black" BorderThickness="1" Margin="5" Padding="5">
+                                <TextBlock Text="{Binding CurrentGRN.Date, StringFormat=d}" HorizontalAlignment="Center"/>
+                            </Border>
+                        </Grid>
                     </StackPanel>
-                    <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="Receiver" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        <Border BorderBrush="Black" BorderThickness="1" Height="60" Width="120" Margin="5"/>
-                    </StackPanel>
-                </UniformGrid>
+                </Border>
             </Grid>
         </Border>
     </ControlTemplate>
 
+    <ControlTemplate x:Key="ThreeWayMatchPrintTemplate">
+        <Border Background="White" Width="1122" Height="793" Padding="25" BorderBrush="Black" BorderThickness="0.5">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/> <!-- Header -->
+                    <RowDefinition Height="Auto"/> <!-- Title Bar -->
+                    <RowDefinition Height="Auto"/> <!-- Info Bar -->
+                    <RowDefinition Height="*"/>    <!-- Comparison Table -->
+                    <RowDefinition Height="Auto"/> <!-- Signatures -->
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Source="{Binding Settings.LogoImage, Converter={StaticResource ImageBytesConverter}}" Height="60" Width="60" Stretch="Uniform"/>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="{Binding Settings.AssociationName}" FontSize="16" FontWeight="Bold" Foreground="{StaticResource JaahdBlueBrush}" TextDecorations="Underline"/>
+                        <TextBlock Text="Logistics Management" FontSize="14" Foreground="Black" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Title Bar -->
+                <Border Grid.Row="1" Background="#4682B4" Margin="0,0,0,10">
+                    <TextBlock Text="(Three-Way Match)" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" Margin="3" FontSize="12"/>
+                </Border>
+
+                <!-- Info Bar -->
+                <Grid Grid.Row="2" Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="200"/>
+                    </Grid.ColumnDefinitions>
+                    <Border BorderBrush="Black" BorderThickness="1" Background="#E8F1E9" Padding="5">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock Text="PO NUMBER :" FontWeight="Bold" FontSize="9"/>
+                            <TextBlock Text="{Binding SelectedPO.PONumber}" FontSize="9" Margin="10,0,0,0" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1" Background="#FAD7A0" Padding="5">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock Text="GRN NO:" FontWeight="Bold" FontSize="9"/>
+                            <TextBlock Text="{Binding GrnNumber}" FontSize="9" Margin="10,0,0,0" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,1,1,1" Background="#D5D8DC" Padding="5">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock Text="TWM DATE :" FontWeight="Bold" FontSize="9"/>
+                            <TextBlock Text="{Binding CurrentMatch.Date, StringFormat=MM/dd/yyyy}" FontSize="9" Margin="10,0,0,0" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Comparison Table -->
+                <Grid Grid.Row="3">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/> <!-- Header rows -->
+                        <RowDefinition Height="*"/>    <!-- Data rows -->
+                    </Grid.RowDefinitions>
+
+                    <!-- Headers -->
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/> <!-- Item -->
+                            <ColumnDefinition Width="60"/>  <!-- Unit -->
+                            <ColumnDefinition Width="150"/> <!-- PO -->
+                            <ColumnDefinition Width="150"/> <!-- Extracts -->
+                            <ColumnDefinition Width="150"/> <!-- GRN -->
+                            <ColumnDefinition Width="80"/>  <!-- Diff Note -->
+                            <ColumnDefinition Width="*"/>   <!-- Clarify the diff -->
+                        </Grid.ColumnDefinitions>
+                        <Border BorderBrush="Black" BorderThickness="1" Background="#D5D8DC" Padding="5"><TextBlock Text="Item" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1" Background="#D5D8DC" Padding="5"><TextBlock Text="Unit" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+
+                        <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,1,1,1">
+                            <StackPanel>
+                                <Border Background="#D5D8DC" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="2"><TextBlock Text="PURCHASE ORDER/CONTRACT" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/></Border>
+                                <Grid>
+                                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                    <Border BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2" Background="#D5D8DC"><TextBlock Text="Price" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/></Border>
+                                    <Border Grid.Column="1" Padding="2" Background="#D5D8DC"><TextBlock Text="Quantity" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/></Border>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,1,1,1">
+                            <StackPanel>
+                                <Border Background="#D5D8DC" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="2"><TextBlock Text="EXTRACTS" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/></Border>
+                                <Grid>
+                                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                    <Border BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2" Background="#D5D8DC"><TextBlock Text="Price" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/></Border>
+                                    <Border Grid.Column="1" Padding="2" Background="#D5D8DC"><TextBlock Text="Quantity" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/></Border>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="4" BorderBrush="Black" BorderThickness="0,1,1,1">
+                            <StackPanel>
+                                <Border Background="#D5D8DC" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="2"><TextBlock Text="GRN" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/></Border>
+                                <Grid>
+                                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                    <Border BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2" Background="#D5D8DC"><TextBlock Text="Price" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/></Border>
+                                    <Border Grid.Column="1" Padding="2" Background="#D5D8DC"><TextBlock Text="Quantity" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/></Border>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,1,1,1" Background="#D5D8DC" Padding="5"><TextBlock Text="Diff Note" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="9"/></Border>
+                        <Border Grid.Column="6" BorderBrush="Black" BorderThickness="0,1,1,1" Background="#D5D8DC" Padding="5"><TextBlock Text="Clarify the Diff" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="9"/></Border>
+                    </Grid>
+
+                    <ItemsControl Grid.Row="1" ItemsSource="{Binding CurrentMatch.Items}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="60"/>
+                                        <ColumnDefinition Width="75"/>
+                                        <ColumnDefinition Width="75"/>
+                                        <ColumnDefinition Width="75"/>
+                                        <ColumnDefinition Width="75"/>
+                                        <ColumnDefinition Width="75"/>
+                                        <ColumnDefinition Width="75"/>
+                                        <ColumnDefinition Width="80"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border BorderBrush="Black" BorderThickness="1,0,1,1" Padding="5"><TextBlock Text="{Binding Description}" FontSize="9" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Center"/></Border>
+                                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5"><TextBlock Text="{Binding Unit}" FontSize="9" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5"><TextBlock Text="{Binding POPrice, StringFormat=N0}" FontSize="9" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border>
+                                    <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5"><TextBlock Text="{Binding POQuantity}" FontSize="9" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border>
+                                    <Border Grid.Column="4" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5"><TextBlock Text="{Binding ExtractPrice, StringFormat=N0}" FontSize="9" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border>
+                                    <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5"><TextBlock Text="{Binding ExtractQuantity}" FontSize="9" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border>
+                                    <Border Grid.Column="6" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5"><TextBlock Text="{Binding GRNPrice, StringFormat=N0}" FontSize="9" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border>
+                                    <Border Grid.Column="7" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5"><TextBlock Text="{Binding GRNQuantity}" FontSize="9" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border>
+                                    <Border Grid.Column="8" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5"><TextBlock Text="{Binding DiffNote}" FontSize="9" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border>
+                                    <Border Grid.Column="9" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5"><TextBlock Text="{Binding ClarifyDiff}" FontSize="9" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+
+                <!-- Signatures -->
+                <Grid Grid.Row="4" Margin="0,15,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border BorderBrush="Black" BorderThickness="1" Margin="0,0,5,0">
+                        <StackPanel>
+                            <Border Background="#AED6F1" Padding="3"><TextBlock Text="Checked by :" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
+                            <Grid Margin="5">
+                                <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                <TextBlock Text="POSITION :" FontWeight="Bold" FontSize="8"/> <TextBlock Grid.Column="1" Text="Logistic Manager" FontSize="8" Margin="10,0" HorizontalAlignment="Right"/>
+                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Settings.LogisticsManager}" FontSize="8" Margin="10,0" HorizontalAlignment="Right"/>
+                                <TextBlock Grid.Row="2" Text="Date :" FontSize="8"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentMatch.Date, StringFormat=MM/dd/yyyy}" FontSize="8" Margin="10,0" HorizontalAlignment="Right"/>
+                                <TextBlock Grid.Row="3" Text="Signature" FontSize="8"/>
+                            <Image Grid.Row="3" Grid.Column="1" Source="{Binding SelectedPO.LogisticsSignature, Converter={StaticResource ImageBytesConverter}}" Height="30" HorizontalAlignment="Right"/>
+                                <Border Grid.Row="3" Grid.Column="1" Height="30"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="0,0,5,0">
+                        <StackPanel>
+                            <Border Background="#AED6F1" Padding="3"><TextBlock Text="Reviewed by :" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
+                            <Grid Margin="5">
+                                <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                <TextBlock Text="POSITION :" FontWeight="Bold" FontSize="8"/> <TextBlock Grid.Column="1" Text="Finance Manager" FontSize="8" Margin="10,0" HorizontalAlignment="Right"/>
+                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Settings.FinanceManager}" FontSize="8" Margin="10,0" HorizontalAlignment="Right"/>
+                                <TextBlock Grid.Row="2" Text="Date :" FontSize="8"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentMatch.Date, StringFormat=MM/dd/yyyy}" FontSize="8" Margin="10,0" HorizontalAlignment="Right"/>
+                                <TextBlock Grid.Row="3" Text="Signature" FontSize="8"/>
+                            <Image Grid.Row="3" Grid.Column="1" Source="{Binding SelectedPO.FinanceSignature, Converter={StaticResource ImageBytesConverter}}" Height="30" HorizontalAlignment="Right"/>
+                                <Border Grid.Row="3" Grid.Column="1" Height="30"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="1">
+                        <StackPanel>
+                            <Border Background="#AED6F1" Padding="3"><TextBlock Text="Approved by :" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
+                            <Grid Margin="5">
+                                <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                <TextBlock Text="POSITION :" FontWeight="Bold" FontSize="8"/> <TextBlock Grid.Column="1" Text="Heaf of assocation" FontSize="8" Margin="10,0" HorizontalAlignment="Right"/>
+                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Settings.HeadOfAssociation}" FontSize="8" Margin="10,0" HorizontalAlignment="Right"/>
+                                <TextBlock Grid.Row="2" Text="Date :" FontSize="8"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentMatch.Date, StringFormat=MM/dd/yyyy}" FontSize="8" Margin="10,0" HorizontalAlignment="Right"/>
+                                <TextBlock Grid.Row="3" Text="Signature" FontSize="8"/>
+                            <Image Grid.Row="3" Grid.Column="1" Source="{Binding SelectedPO.FinalSignature, Converter={StaticResource ImageBytesConverter}}" Height="30" HorizontalAlignment="Right"/>
+                                <Border Grid.Row="3" Grid.Column="1" Height="30"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Border>
+    </ControlTemplate>
 </ResourceDictionary>

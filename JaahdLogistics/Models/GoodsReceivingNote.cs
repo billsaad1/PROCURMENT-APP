@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace JaahdLogistics.Models
 {
-    public class GoodsReceivingNotes
+    public class GoodsReceivingNotes : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
     {
         public int Id { get; set; }
         public string GRNNumber { get; set; } = string.Empty;
@@ -11,6 +11,19 @@ namespace JaahdLogistics.Models
         public DateTime Date { get; set; }
         public int ReceiverId { get; set; }
         public string Status { get; set; } = "Completed";
+
+        private string? _invoiceNumber;
+        public string? InvoiceNumber { get => _invoiceNumber; set => SetProperty(ref _invoiceNumber, value); }
+
+        private bool _isQtyComply;
+        public bool IsQtyComply { get => _isQtyComply; set => SetProperty(ref _isQtyComply, value); }
+
+        private bool _isQtyMatch;
+        public bool IsQtyMatch { get => _isQtyMatch; set => SetProperty(ref _isQtyMatch, value); }
+
+        private bool _isQtyIntact;
+        public bool IsQtyIntact { get => _isQtyIntact; set => SetProperty(ref _isQtyIntact, value); }
+
         public List<GRNItems> Items { get; set; } = new();
     }
 

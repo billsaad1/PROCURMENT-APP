@@ -47,11 +47,32 @@
 
             <TextBlock Text="{DynamicResource GRN}" FontSize="22" FontWeight="Bold" Margin="0,0,0,15"/>
 
-            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,15">
+            <Grid Grid.Row="1" Margin="0,0,0,15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="150"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
                 <TextBlock Text="{DynamicResource SelectPO}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <ComboBox ItemsSource="{Binding PendingPOs}" SelectedItem="{Binding SelectedPO}" DisplayMemberPath="PONumber" Width="200"/>
-                <Button Content="{DynamicResource CreateGRN}" Command="{Binding CreateGRNCommand}" Margin="10,0,0,0"/>
-            </StackPanel>
+                <ComboBox Grid.Column="1" ItemsSource="{Binding PendingPOs}" SelectedItem="{Binding SelectedPO}" DisplayMemberPath="PONumber"/>
+                <Button Grid.Column="2" Content="{DynamicResource CreateGRN}" Command="{Binding CreateGRNCommand}" Margin="10,0,0,0"/>
+
+                <TextBlock Grid.Column="3" Text="Invoice #" VerticalAlignment="Center" Margin="20,0,10,0"/>
+                <TextBox Grid.Column="4" Text="{Binding CurrentGRN.InvoiceNumber}"/>
+
+                <StackPanel Grid.Row="1" Grid.ColumnSpan="5" Orientation="Horizontal" Margin="0,10,0,0">
+                    <CheckBox Content="Qty Comply" IsChecked="{Binding CurrentGRN.IsQtyComply}" Margin="0,0,20,0"/>
+                    <CheckBox Content="Qty Matches" IsChecked="{Binding CurrentGRN.IsQtyMatch}" Margin="0,0,20,0"/>
+                    <CheckBox Content="Qty Intact" IsChecked="{Binding CurrentGRN.IsQtyIntact}"/>
+                </StackPanel>
+            </Grid>
 
             <DataGrid Grid.Row="2" ItemsSource="{Binding GrnItems}" AutoGenerateColumns="False" CanUserAddRows="False">
                 <DataGrid.Columns>

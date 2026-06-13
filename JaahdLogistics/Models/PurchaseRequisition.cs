@@ -30,6 +30,9 @@ namespace JaahdLogistics.Models
         private decimal _exchangeRate = 1.0m;
         public decimal ExchangeRate { get => _exchangeRate; set => SetProperty(ref _exchangeRate, value); }
 
+        private string? _prType = "Services";
+        public string? PRType { get => _prType; set => SetProperty(ref _prType, value); }
+
         private string _status = "Pending";
         public string Status { get => _status; set => SetProperty(ref _status, value); }
         

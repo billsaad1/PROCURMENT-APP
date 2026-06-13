@@ -97,7 +97,8 @@ namespace JaahdLogistics.ViewModels
             { 
                 POId = SelectedPO.Id, 
                 GRNNumber = "GRN-" + SelectedPO.PONumber,
-                ReceiverId = AuthService.CurrentUser?.Id ?? 0
+                ReceiverId = AuthService.CurrentUser?.Id ?? 0,
+                Date = DateTime.Now
             };
             GrnItems.Clear();
             foreach(var item in SelectedPO.Items)

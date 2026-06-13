@@ -46,6 +46,7 @@ namespace JaahdLogistics.Data
                 // Repair PurchaseRequisitions table
                 AddColumnIfMissing(connection, "PurchaseRequisitions", "Currency", "TEXT NOT NULL DEFAULT 'USD'");
                 AddColumnIfMissing(connection, "PurchaseRequisitions", "ExchangeRate", "DECIMAL(18, 4) DEFAULT 1.0");
+                AddColumnIfMissing(connection, "PurchaseRequisitions", "PRType", "TEXT");
                 
                 // Repair Settings table
                 AddColumnIfMissing(connection, "Settings", "Address", "TEXT");
@@ -77,9 +78,32 @@ namespace JaahdLogistics.Data
                         IsActive INTEGER DEFAULT 1
                     )");
 
+                // Repair GoodsReceivingNotes table
+                AddColumnIfMissing(connection, "GoodsReceivingNotes", "InvoiceNumber", "TEXT");
+                AddColumnIfMissing(connection, "GoodsReceivingNotes", "IsQtyComply", "INTEGER DEFAULT 0");
+                AddColumnIfMissing(connection, "GoodsReceivingNotes", "IsQtyMatch", "INTEGER DEFAULT 0");
+                AddColumnIfMissing(connection, "GoodsReceivingNotes", "IsQtyIntact", "INTEGER DEFAULT 0");
+
                 // Repair ThreeWayMatch table
                 AddColumnIfMissing(connection, "ThreeWayMatch", "InvoiceDetails", "TEXT");
                 AddColumnIfMissing(connection, "ThreeWayMatch", "InvoiceScan", "BLOB");
+
+                // Ensure ThreeWayMatchItems table exists
+                connection.Execute(@"
+                    CREATE TABLE IF NOT EXISTS ThreeWayMatchItems (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        ThreeWayMatchId INTEGER NOT NULL,
+                        Description TEXT NOT NULL,
+                        Unit TEXT,
+                        POPrice DECIMAL(18, 2),
+                        POQuantity DECIMAL(18, 2),
+                        ExtractPrice DECIMAL(18, 2),
+                        ExtractQuantity DECIMAL(18, 2),
+                        GRNPrice DECIMAL(18, 2),
+                        GRNQuantity DECIMAL(18, 2),
+                        ClarifyDiff TEXT,
+                        FOREIGN KEY (ThreeWayMatchId) REFERENCES ThreeWayMatch(Id)
+                    )");
 
                 // Repair PurchaseOrders table
                 AddColumnIfMissing(connection, "PurchaseOrders", "ProjectId", "INTEGER NOT NULL DEFAULT 0");
