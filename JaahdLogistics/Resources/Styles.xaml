@@ -183,16 +183,17 @@
                             <Border Background="{StaticResource JaahdBrownBrush}" Padding="3">
                                 <TextBlock Text="Justification For The Request / مبررات الطلب" Foreground="White" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/>
                             </Border>
-                            <TextBlock Text="{Binding CurrentPR.Justification}" FontSize="9" Margin="5" Height="40" TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding CurrentPR.Justification}" FontSize="9" Margin="5" Height="60" TextWrapping="Wrap"/>
                         </StackPanel>
                     </Border>
                     <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1" Background="{StaticResource JaahdLightBrownBrush}">
                         <Grid Margin="5">
-                            <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                            <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
                             <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
                             <TextBlock Text="Type:" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Column="1" Text="{Binding CurrentPR.PRType}" FontSize="9" Margin="5,0" HorizontalAlignment="Right"/>
                             <TextBlock Grid.Row="1" Text="Currency:" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CurrentPR.Currency}" FontSize="9" Margin="5,0" HorizontalAlignment="Right"/>
                             <TextBlock Grid.Row="2" Text="Ex. Rate:" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentPR.ExchangeRate}" FontSize="9" Margin="5,0" HorizontalAlignment="Right"/>
+                            <TextBlock Grid.Row="3" Text="PM:" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding CurrentPR.Project.ProjectManager}" FontSize="9" Margin="5,0" HorizontalAlignment="Right"/>
                         </Grid>
                     </Border>
                 </Grid>
@@ -371,7 +372,7 @@
                     <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
                         <TextBlock Text="Closing Date / تاريخ الإغلاق :" FontWeight="Bold" FontSize="9"/>
                     </Border>
-                    <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5" Width="100">
+                    <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
                         <TextBlock Text="{Binding CurrentRFQ.ClosingDate, StringFormat=MM/dd/yyyy}" FontWeight="Bold" HorizontalAlignment="Center"/>
                     </Border>
                 </Grid>
@@ -1416,7 +1417,7 @@
                             <ColumnDefinition Width="150"/> <!-- Extracts -->
                             <ColumnDefinition Width="150"/> <!-- GRN -->
                             <ColumnDefinition Width="80"/>  <!-- Diff Note -->
-                            <ColumnDefinition Width="*"/>   <!-- Clarify the diff -->
+                            <ColumnDefinition Width="200"/>   <!-- Clarify the diff -->
                         </Grid.ColumnDefinitions>
                         <Border BorderBrush="Black" BorderThickness="1" Background="#D5D8DC" Padding="5"><TextBlock Text="Item" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
                         <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1" Background="#D5D8DC" Padding="5"><TextBlock Text="Unit" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
@@ -1472,7 +1473,7 @@
                                         <ColumnDefinition Width="75"/>
                                         <ColumnDefinition Width="75"/>
                                         <ColumnDefinition Width="80"/>
-                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="200"/>
                                     </Grid.ColumnDefinitions>
                                     <Border BorderBrush="Black" BorderThickness="1,0,1,1" Padding="5"><TextBlock Text="{Binding Description}" FontSize="9" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Center"/></Border>
                                     <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5"><TextBlock Text="{Binding Unit}" FontSize="9" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>

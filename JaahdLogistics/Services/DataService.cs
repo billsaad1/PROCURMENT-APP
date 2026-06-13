@@ -88,11 +88,11 @@ namespace JaahdLogistics.Services
             if (project.Id == 0)
             {
                 project.Id = connection.QuerySingle<int>(
-                    "INSERT INTO Projects (Name, Code, Year) VALUES (@Name, @Code, @Year); SELECT last_insert_rowid();", project);
+                    "INSERT INTO Projects (Name, Code, Year, ProjectManager, ProjectOfficer) VALUES (@Name, @Code, @Year, @ProjectManager, @ProjectOfficer); SELECT last_insert_rowid();", project);
             }
             else
             {
-                connection.Execute("UPDATE Projects SET Name=@Name, Code=@Code, Year=@Year WHERE Id=@Id", project);
+                connection.Execute("UPDATE Projects SET Name=@Name, Code=@Code, Year=@Year, ProjectManager=@ProjectManager, ProjectOfficer=@ProjectOfficer WHERE Id=@Id", project);
             }
         }
 
@@ -191,27 +191,16 @@ namespace JaahdLogistics.Services
             catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
             {
                 transaction.Rollback();
-                throw new Exception("Cannot delete PR because it is referenced in an RFQ or PO. Delete those first.");
-            }
-            catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
-            {
-                transaction.Rollback();
-                var fkIssues = connection.Query("PRAGMA foreign_key_check");
-                string detail = "";
-                foreach(var issue in fkIssues) detail += $"\n- Table '{issue.table}' row {issue.rowid} references missing key in '{issue.parent}'";
+                var detail = "";
+                try {
+                    var fkIssues = connection.Query("PRAGMA foreign_key_check");
+                    foreach(var issue in fkIssues) detail += $"\n- Table '{issue.table}' row {issue.rowid} references missing key in '{issue.parent}'";
+                } catch {}
 
                 if (string.IsNullOrEmpty(detail))
-                {
-                    // If check returns nothing, it might be a RESTRICT violation on delete/update
-                    throw new Exception("Database constraint violation (Foreign Key). Please ensure all linked documents exist and are not locked by downstream records.", ex);
-                }
-                throw new Exception($"Database integrity error: {detail}", ex);
-            }
-            catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
-            {
-                transaction.Rollback();
-                CheckForeignKeys(connection);
-                throw new Exception($"Database constraint violation in PO: {ex.Message}", ex);
+                    throw new Exception("Cannot delete PR because it is referenced in an RFQ or PO. Delete those first.", ex);
+                else
+                    throw new Exception($"Database integrity error: {detail}", ex);
             }
             catch
             {
@@ -844,7 +833,11 @@ namespace JaahdLogistics.Services
             var grns = connection.Query<GoodsReceivingNotes>("SELECT * FROM GoodsReceivingNotes").ToList();
             foreach (var grn in grns)
             {
-                var items = connection.Query<GRNItems>("SELECT * FROM GRNItems WHERE GRNId = @Id", new { grn.Id }).ToList();
+                var items = connection.Query<GRNItems>(@"
+                    SELECT gi.*, pi.Description, pi.Unit, pi.Quantity as OrderedQuantity
+                    FROM GRNItems gi
+                    JOIN POItems pi ON gi.POItemId = pi.Id
+                    WHERE gi.GRNId = @Id", new { grn.Id }).ToList();
                 grn.Items = items;
             }
             return grns;

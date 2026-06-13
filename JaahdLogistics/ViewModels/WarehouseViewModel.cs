@@ -107,6 +107,7 @@ namespace JaahdLogistics.ViewModels
                 { 
                     POItemId = item.Id, 
                     Description = item.Description, 
+                    Unit = item.Unit,
                     OrderedQuantity = item.Quantity 
                 });
             }

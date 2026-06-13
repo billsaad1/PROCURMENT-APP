@@ -287,6 +287,22 @@ namespace JaahdLogistics.ViewModels
         }
 
         [RelayCommand]
+        private void SaveRFQ()
+        {
+            if (CurrentRFQ == null || CurrentRFQ.Id == 0) return;
+            try
+            {
+                _dataService.SaveRFQ(CurrentRFQ);
+                LoadRFQs();
+                MessageBox.Show("RFQ Saved Successfully");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error saving RFQ: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
         private void CreateRFQ()
         {
             if (SelectedPR == null || SelectedPR.Id == 0)
@@ -860,9 +876,13 @@ namespace JaahdLogistics.ViewModels
         [RelayCommand]
         private void Print()
         {
-            string template = "POPrintTemplate";
-            if (SelectedTabIndex == 0) template = "RFQPrintTemplate";
-            else if (SelectedTabIndex == 1) template = "BidAnalysisPrintTemplate";
+            string template = SelectedTabIndex switch
+            {
+                0 => "RFQPrintTemplate",
+                1 => "BidAnalysisPrintTemplate",
+                2 => "POPrintTemplate",
+                _ => "POPrintTemplate"
+            };
 
             new PrintService().ShowPreview(this, template);
         }

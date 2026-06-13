@@ -71,6 +71,7 @@
                                   IsSynchronizedWithCurrentItem="True"/>
                         <Button Content="🔄" Command="{Binding LoadApprovedPRsCommand}" Margin="5,0,0,0" ToolTip="Refresh PR List"/>
                         <Button Content="{DynamicResource Generate}" Command="{Binding CreateRFQCommand}" Margin="10,0,0,0"/>
+                        <Button Content="{DynamicResource Save}" Command="{Binding SaveRFQCommand}" Margin="10,0,0,0" Background="#27AE60"/>
                         <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" Margin="10,0,0,0" Background="#34495E"/>
                     </StackPanel>
                     <Grid Grid.Row="2">
@@ -377,21 +378,22 @@
                 <Grid Grid.Column="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                        <TextBlock Text="Select PR" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                        <TextBox Text="{Binding PRSearchText, UpdateSourceTrigger=PropertyChanged}" Width="80" Margin="0,0,5,0" Tag="Search..."/>
-                        <ComboBox ItemsSource="{Binding FilteredApprovedPRs}" SelectedItem="{Binding SelectedPR}" DisplayMemberPath="PRNumber" Width="100" Margin="0,0,10,0"/>
-                        <TextBlock Text="Select Bid Analysis" VerticalAlignment="Center" Margin="10,0,10,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
-                        <ComboBox ItemsSource="{Binding FilteredBidAnalyses}" SelectedItem="{Binding SelectedBidAnalysis}" DisplayMemberPath="Id" Width="80" Margin="0,0,10,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
-                        <TextBlock Text="Vendor" VerticalAlignment="Center" Margin="10,0,5,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                        <ComboBox ItemsSource="{Binding Vendors}" SelectedValue="{Binding CurrentPO.VendorId}" SelectedValuePath="Id" DisplayMemberPath="Name" Width="150" Margin="0,0,10,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                        <Button Content="{DynamicResource CreatePO}" Command="{Binding CreatePOCommand}"/>
-                        <CheckBox Content="Direct Purchase (Skip RFQ/Bid Analysis)" IsChecked="{Binding SkipBidAnalysis}" VerticalAlignment="Center" Margin="20,0,0,0"/>
-                    </StackPanel>
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="Select PR" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <TextBox Text="{Binding PRSearchText, UpdateSourceTrigger=PropertyChanged}" Width="80" Margin="0,0,5,0" Tag="Search..."/>
+                            <ComboBox ItemsSource="{Binding FilteredApprovedPRs}" SelectedItem="{Binding SelectedPR}" DisplayMemberPath="PRNumber" Width="100" Margin="0,0,10,0"/>
+                            <TextBlock Text="Select Bid Analysis" VerticalAlignment="Center" Margin="10,0,10,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                            <ComboBox ItemsSource="{Binding FilteredBidAnalyses}" SelectedItem="{Binding SelectedBidAnalysis}" DisplayMemberPath="Id" Width="80" Margin="0,0,10,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                            <TextBlock Text="Vendor" VerticalAlignment="Center" Margin="10,0,5,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <ComboBox ItemsSource="{Binding Vendors}" SelectedValue="{Binding CurrentPO.VendorId}" SelectedValuePath="Id" DisplayMemberPath="Name" Width="150" Margin="0,0,10,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <Button Content="{DynamicResource CreatePO}" Command="{Binding CreatePOCommand}"/>
+                            <CheckBox Content="Direct Purchase (Skip RFQ/Bid Analysis)" IsChecked="{Binding SkipBidAnalysis}" VerticalAlignment="Center" Margin="20,0,0,0"/>
+                        </StackPanel>
+                    </ScrollViewer>
                 
                 <ScrollViewer Grid.Row="1" x:Name="POPrintRoot">
                     <Grid Margin="15" Background="White">
