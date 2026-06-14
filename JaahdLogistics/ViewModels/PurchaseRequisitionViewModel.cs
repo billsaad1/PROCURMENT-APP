@@ -86,6 +86,9 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private ObservableCollection<string> _previousDescriptions;
 
+        [ObservableProperty]
+        private ObservableCollection<string> _pRTypes = new() { "Services", "Goods" };
+
         public string[] Currencies { get; } = { "USD", "YER" };
 
         public PurchaseRequisitionViewModel(IDataService dataService)
@@ -302,6 +305,20 @@ namespace JaahdLogistics.ViewModels
             catch (Exception ex)
             {
                 MessageBox.Show($"Error during approval: {ex.Message}", "Approval Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        [RelayCommand]
+        private void AddCustomType()
+        {
+            var newType = Microsoft.VisualBasic.Interaction.InputBox("Enter Custom PR Type:", "Add Type", "");
+            if (!string.IsNullOrWhiteSpace(newType))
+            {
+                if (!PRTypes.Contains(newType))
+                {
+                    PRTypes.Add(newType);
+                }
+                CurrentPR.PRType = newType;
             }
         }
 

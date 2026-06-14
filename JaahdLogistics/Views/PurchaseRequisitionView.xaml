@@ -85,10 +85,10 @@
                     <ComboBox Grid.Column="3" ItemsSource="{Binding Projects}" SelectedItem="{Binding SelectedProject}" DisplayMemberPath="Name" Margin="5"/>
 
                     <TextBlock Grid.Row="1" Text="PR Type" VerticalAlignment="Center" Margin="5"/>
-                    <ComboBox Grid.Row="1" Grid.Column="1" SelectedItem="{Binding CurrentPR.PRType}" Margin="5">
-                        <System:String xmlns:System="clr-namespace:System;assembly=mscorlib">Services</System:String>
-                        <System:String xmlns:System="clr-namespace:System;assembly=mscorlib">Goods</System:String>
-                    </ComboBox>
+                    <DockPanel Grid.Row="1" Grid.Column="1" Margin="5">
+                        <Button Content="+" Command="{Binding AddCustomTypeCommand}" DockPanel.Dock="Right" Width="25" Margin="5,0,0,0" ToolTip="Add Custom Type"/>
+                        <ComboBox ItemsSource="{Binding PRTypes}" SelectedItem="{Binding CurrentPR.PRType}" IsEditable="True"/>
+                    </DockPanel>
 
                     <TextBlock Grid.Row="2" Text="{DynamicResource Currency}" VerticalAlignment="Center" Margin="5"/>
                     <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding Currencies}" SelectedItem="{Binding CurrentPR.Currency}" Margin="5"/>
