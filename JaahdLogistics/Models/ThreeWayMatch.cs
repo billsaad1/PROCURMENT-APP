@@ -20,6 +20,7 @@ namespace JaahdLogistics.Models
 
     public class ThreeWayMatchItem : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
     {
+        public int Index { get; set; }
         public int Id { get; set; }
         public int ThreeWayMatchId { get; set; }
         public string Description { get; set; } = string.Empty;

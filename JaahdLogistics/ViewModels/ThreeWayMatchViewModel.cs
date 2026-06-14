@@ -11,6 +11,14 @@ namespace JaahdLogistics.ViewModels
     {
         private readonly IDataService _dataService;
 
+        public string? LogisticsNameTWM => Employees.FirstOrDefault(e => e.Id == Settings.DefaultLogisticsEmployeeId)?.NameEN ?? Settings.LogisticsManager;
+        public string? FinanceNameTWM => Employees.FirstOrDefault(e => e.Id == Settings.DefaultFinanceEmployeeId)?.NameEN ?? Settings.FinanceManager;
+        public string? HeadNameTWM => Employees.FirstOrDefault(e => e.Id == Settings.DefaultHeadEmployeeId)?.NameEN ?? Settings.HeadOfAssociation;
+
+        public byte[]? LogisticsSignatureTWM => Employees.FirstOrDefault(e => e.Id == Settings.DefaultLogisticsEmployeeId)?.SignatureImage;
+        public byte[]? FinanceSignatureTWM => Employees.FirstOrDefault(e => e.Id == Settings.DefaultFinanceEmployeeId)?.SignatureImage;
+        public byte[]? HeadSignatureTWM => Employees.FirstOrDefault(e => e.Id == Settings.DefaultHeadEmployeeId)?.SignatureImage;
+
         [ObservableProperty]
         private ObservableCollection<PurchaseOrder> _completedPOs = new();
 
@@ -32,16 +40,26 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private Settings _settings;
 
+        [ObservableProperty]
+        private ObservableCollection<Employee> _employees = new();
+
         public ThreeWayMatchViewModel(IDataService dataService)
         {
             _dataService = dataService;
             _settings = _dataService.GetSettings();
+            LoadEmployees();
             RefreshAll();
+        }
+
+        private void LoadEmployees()
+        {
+            Employees = new ObservableCollection<Employee>(_dataService.GetEmployees());
         }
 
         [RelayCommand]
         public void RefreshAll()
         {
+            LoadEmployees();
             LoadCompletedPOs();
             LoadMatches();
         }
@@ -64,6 +82,12 @@ namespace JaahdLogistics.ViewModels
                 SelectedPO = CompletedPOs.FirstOrDefault(p => p.Id == value.POId);
                 var grn = _dataService.GetGRNs().FirstOrDefault(g => g.Id == value.GRNId);
                 GrnNumber = grn?.GRNNumber;
+
+                // Ensure indices are present for loaded matches
+                for (int i = 0; i < CurrentMatch.Items.Count; i++)
+                {
+                    CurrentMatch.Items[i].Index = i + 1;
+                }
             }
         }
 
@@ -111,11 +135,13 @@ namespace JaahdLogistics.ViewModels
 
             // Populate comparison items
             CurrentMatch.Items.Clear();
+            int i = 1;
             foreach (var poItem in SelectedPO.Items)
             {
                 var grnItem = grn.Items.FirstOrDefault(gi => gi.POItemId == poItem.Id);
                 CurrentMatch.Items.Add(new ThreeWayMatchItem
                 {
+                    Index = i++,
                     Description = poItem.Description,
                     Unit = poItem.Unit,
                     POPrice = poItem.UnitPrice,

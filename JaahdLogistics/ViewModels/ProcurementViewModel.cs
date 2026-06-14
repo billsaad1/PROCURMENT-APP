@@ -27,13 +27,13 @@ namespace JaahdLogistics.ViewModels
     {
         private readonly IDataService _dataService;
 
-        public string? LogisticsNameBA => CurrentBidAnalysis.LogisticsEmployeeId.HasValue ? Employees.FirstOrDefault(e => e.Id == CurrentBidAnalysis.LogisticsEmployeeId)?.NameEN : Settings.LogisticsManager;
-        public string? FinanceNameBA => CurrentBidAnalysis.FinanceEmployeeId.HasValue ? Employees.FirstOrDefault(e => e.Id == CurrentBidAnalysis.FinanceEmployeeId)?.NameEN : Settings.FinanceManager;
-        public string? HeadNameBA => CurrentBidAnalysis.HeadEmployeeId.HasValue ? Employees.FirstOrDefault(e => e.Id == CurrentBidAnalysis.HeadEmployeeId)?.NameEN : Settings.HeadOfAssociation;
+        public string? LogisticsNameBA => Employees.FirstOrDefault(e => e.Id == Settings.DefaultLogisticsEmployeeId)?.NameEN ?? Settings.LogisticsManager;
+        public string? FinanceNameBA => Employees.FirstOrDefault(e => e.Id == Settings.DefaultFinanceEmployeeId)?.NameEN ?? Settings.FinanceManager;
+        public string? HeadNameBA => Employees.FirstOrDefault(e => e.Id == Settings.DefaultHeadEmployeeId)?.NameEN ?? Settings.HeadOfAssociation;
 
-        public byte[]? LogisticsSignatureBA => CurrentBidAnalysis.LogisticsEmployeeId.HasValue ? Employees.FirstOrDefault(e => e.Id == CurrentBidAnalysis.LogisticsEmployeeId)?.SignatureImage : null;
-        public byte[]? FinanceSignatureBA => CurrentBidAnalysis.FinanceEmployeeId.HasValue ? Employees.FirstOrDefault(e => e.Id == CurrentBidAnalysis.FinanceEmployeeId)?.SignatureImage : null;
-        public byte[]? HeadSignatureBA => CurrentBidAnalysis.HeadEmployeeId.HasValue ? Employees.FirstOrDefault(e => e.Id == CurrentBidAnalysis.HeadEmployeeId)?.SignatureImage : null;
+        public byte[]? LogisticsSignatureBA => Employees.FirstOrDefault(e => e.Id == Settings.DefaultLogisticsEmployeeId)?.SignatureImage;
+        public byte[]? FinanceSignatureBA => Employees.FirstOrDefault(e => e.Id == Settings.DefaultFinanceEmployeeId)?.SignatureImage;
+        public byte[]? HeadSignatureBA => Employees.FirstOrDefault(e => e.Id == Settings.DefaultHeadEmployeeId)?.SignatureImage;
 
         [ObservableProperty]
         private ObservableCollection<PurchaseRequisition> _approvedPRs = new();
@@ -170,20 +170,12 @@ namespace JaahdLogistics.ViewModels
         {
             if (value != null)
             {
-                value.PropertyChanged += (s, e) =>
-                {
-                    if (e.PropertyName == nameof(BidAnalysis.LogisticsEmployeeId) ||
-                        e.PropertyName == nameof(BidAnalysis.FinanceEmployeeId) ||
-                        e.PropertyName == nameof(BidAnalysis.HeadEmployeeId))
-                    {
-                        OnPropertyChanged(nameof(LogisticsNameBA));
-                        OnPropertyChanged(nameof(FinanceNameBA));
-                        OnPropertyChanged(nameof(HeadNameBA));
-                        OnPropertyChanged(nameof(LogisticsSignatureBA));
-                        OnPropertyChanged(nameof(FinanceSignatureBA));
-                        OnPropertyChanged(nameof(HeadSignatureBA));
-                    }
-                };
+                OnPropertyChanged(nameof(LogisticsNameBA));
+                OnPropertyChanged(nameof(FinanceNameBA));
+                OnPropertyChanged(nameof(HeadNameBA));
+                OnPropertyChanged(nameof(LogisticsSignatureBA));
+                OnPropertyChanged(nameof(FinanceSignatureBA));
+                OnPropertyChanged(nameof(HeadSignatureBA));
             }
         }
 
@@ -270,29 +262,22 @@ namespace JaahdLogistics.ViewModels
                     // Refresh PR list if project changes to ensure valid matching
                     LoadApprovedPRs();
                 }
-                if (e.PropertyName == nameof(PurchaseOrder.LogisticsEmployeeId)) UpdatePOSignatures();
-                if (e.PropertyName == nameof(PurchaseOrder.FinanceEmployeeId)) UpdatePOSignatures();
-                if (e.PropertyName == nameof(PurchaseOrder.HeadEmployeeId)) UpdatePOSignatures();
             };
         }
 
         private void UpdatePOSignatures()
         {
-            if (CurrentPO.LogisticsEmployeeId.HasValue)
-            {
-                var emp = Employees.FirstOrDefault(e => e.Id == CurrentPO.LogisticsEmployeeId);
-                if (emp != null) { CurrentPO.LogisticsSignature = emp.SignatureImage; CurrentPO.LogisticsName = emp.NameEN; }
-            }
-            if (CurrentPO.FinanceEmployeeId.HasValue)
-            {
-                var emp = Employees.FirstOrDefault(e => e.Id == CurrentPO.FinanceEmployeeId);
-                if (emp != null) { CurrentPO.FinanceSignature = emp.SignatureImage; CurrentPO.FinanceName = emp.NameEN; }
-            }
-            if (CurrentPO.HeadEmployeeId.HasValue)
-            {
-                var emp = Employees.FirstOrDefault(e => e.Id == CurrentPO.HeadEmployeeId);
-                if (emp != null) { CurrentPO.FinalSignature = emp.SignatureImage; CurrentPO.FinalName = emp.NameEN; }
-            }
+            var logEmp = Employees.FirstOrDefault(e => e.Id == Settings.DefaultLogisticsEmployeeId);
+            if (logEmp != null) { CurrentPO.LogisticsSignature = logEmp.SignatureImage; CurrentPO.LogisticsName = logEmp.NameEN; }
+            else { CurrentPO.LogisticsName = Settings.LogisticsManager; }
+
+            var finEmp = Employees.FirstOrDefault(e => e.Id == Settings.DefaultFinanceEmployeeId);
+            if (finEmp != null) { CurrentPO.FinanceSignature = finEmp.SignatureImage; CurrentPO.FinanceName = finEmp.NameEN; }
+            else { CurrentPO.FinanceName = Settings.FinanceManager; }
+
+            var headEmp = Employees.FirstOrDefault(e => e.Id == Settings.DefaultHeadEmployeeId);
+            if (headEmp != null) { CurrentPO.FinalSignature = headEmp.SignatureImage; CurrentPO.FinalName = headEmp.NameEN; }
+            else { CurrentPO.FinalName = Settings.HeadOfAssociation; }
         }
 
 
