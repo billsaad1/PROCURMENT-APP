@@ -1,0 +1,63 @@
+<UserControl x:Class="JaahdLogistics.Views.EmployeeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:JaahdLogistics.Views"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- List -->
+        <Grid Margin="0,0,10,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Button Content="New Employee" Command="{Binding NewEmployeeCommand}" Margin="0,0,0,10"/>
+            <DataGrid Grid.Row="1" ItemsSource="{Binding Employees}" SelectedItem="{Binding SelectedEmployee}" AutoGenerateColumns="False" IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name (EN)" Binding="{Binding NameEN}" Width="*"/>
+                    <DataGridTemplateColumn Width="Auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="X" Command="{Binding DataContext.DeleteEmployeeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#C0392B"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <!-- Details -->
+        <ScrollViewer Grid.Column="1">
+            <StackPanel Margin="10">
+                <TextBlock Text="Employee Details" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+
+                <TextBlock Text="Name (English)"/>
+                <TextBox Text="{Binding SelectedEmployee.NameEN}" Margin="0,5,0,10"/>
+
+                <TextBlock Text="Name (Arabic)"/>
+                <TextBox Text="{Binding SelectedEmployee.NameAR}" Margin="0,5,0,10" FlowDirection="RightToLeft"/>
+
+                <TextBlock Text="Position (English)"/>
+                <TextBox Text="{Binding SelectedEmployee.PositionEN}" Margin="0,5,0,10"/>
+
+                <TextBlock Text="Position (Arabic)"/>
+                <TextBox Text="{Binding SelectedEmployee.PositionAR}" Margin="0,5,0,10" FlowDirection="RightToLeft"/>
+
+                <TextBlock Text="Signature Scan"/>
+                <Border BorderBrush="Gray" BorderThickness="1" Height="100" Width="200" HorizontalAlignment="Left" Margin="0,5">
+                    <Image Source="{Binding SelectedEmployee.SignatureImage, Converter={StaticResource ImageBytesConverter}}"/>
+                </Border>
+                <Button Content="Upload Signature" Command="{Binding UploadSignatureCommand}" Width="150" HorizontalAlignment="Left" Margin="0,5"/>
+
+                <Button Content="Save Employee" Command="{Binding SaveEmployeeCommand}" Width="150" HorizontalAlignment="Right" Margin="0,20,0,0" Background="#27AE60"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

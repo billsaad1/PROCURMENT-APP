@@ -10,6 +10,10 @@ namespace JaahdLogistics.Models
         public int POId { get; set; }
         public DateTime Date { get; set; }
         public int ReceiverId { get; set; }
+
+        private int? _receiverEmployeeId;
+        public int? ReceiverEmployeeId { get => _receiverEmployeeId; set => SetProperty(ref _receiverEmployeeId, value); }
+
         public string Status { get; set; } = "Completed";
 
         private string? _invoiceNumber;

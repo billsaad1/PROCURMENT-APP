@@ -71,6 +71,9 @@
                     <CheckBox Content="Qty Comply" IsChecked="{Binding CurrentGRN.IsQtyComply}" Margin="0,0,20,0"/>
                     <CheckBox Content="Qty Matches" IsChecked="{Binding CurrentGRN.IsQtyMatch}" Margin="0,0,20,0"/>
                     <CheckBox Content="Qty Intact" IsChecked="{Binding CurrentGRN.IsQtyIntact}"/>
+
+                    <TextBlock Text="Receiver:" VerticalAlignment="Center" Margin="20,0,10,0"/>
+                    <ComboBox ItemsSource="{Binding Employees}" SelectedValue="{Binding CurrentGRN.ReceiverEmployeeId}" SelectedValuePath="Id" DisplayMemberPath="DisplayName" Width="150"/>
                 </StackPanel>
             </Grid>
 

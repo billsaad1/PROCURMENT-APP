@@ -27,6 +27,14 @@ namespace JaahdLogistics.ViewModels
     {
         private readonly IDataService _dataService;
 
+        public string? LogisticsNameBA => CurrentBidAnalysis.LogisticsEmployeeId.HasValue ? Employees.FirstOrDefault(e => e.Id == CurrentBidAnalysis.LogisticsEmployeeId)?.NameEN : Settings.LogisticsManager;
+        public string? FinanceNameBA => CurrentBidAnalysis.FinanceEmployeeId.HasValue ? Employees.FirstOrDefault(e => e.Id == CurrentBidAnalysis.FinanceEmployeeId)?.NameEN : Settings.FinanceManager;
+        public string? HeadNameBA => CurrentBidAnalysis.HeadEmployeeId.HasValue ? Employees.FirstOrDefault(e => e.Id == CurrentBidAnalysis.HeadEmployeeId)?.NameEN : Settings.HeadOfAssociation;
+
+        public byte[]? LogisticsSignatureBA => CurrentBidAnalysis.LogisticsEmployeeId.HasValue ? Employees.FirstOrDefault(e => e.Id == CurrentBidAnalysis.LogisticsEmployeeId)?.SignatureImage : null;
+        public byte[]? FinanceSignatureBA => CurrentBidAnalysis.FinanceEmployeeId.HasValue ? Employees.FirstOrDefault(e => e.Id == CurrentBidAnalysis.FinanceEmployeeId)?.SignatureImage : null;
+        public byte[]? HeadSignatureBA => CurrentBidAnalysis.HeadEmployeeId.HasValue ? Employees.FirstOrDefault(e => e.Id == CurrentBidAnalysis.HeadEmployeeId)?.SignatureImage : null;
+
         [ObservableProperty]
         private ObservableCollection<PurchaseRequisition> _approvedPRs = new();
 
@@ -158,6 +166,27 @@ namespace JaahdLogistics.ViewModels
             SubscribeToCurrentPO();
         }
 
+        partial void OnCurrentBidAnalysisChanged(BidAnalysis value)
+        {
+            if (value != null)
+            {
+                value.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == nameof(BidAnalysis.LogisticsEmployeeId) ||
+                        e.PropertyName == nameof(BidAnalysis.FinanceEmployeeId) ||
+                        e.PropertyName == nameof(BidAnalysis.HeadEmployeeId))
+                    {
+                        OnPropertyChanged(nameof(LogisticsNameBA));
+                        OnPropertyChanged(nameof(FinanceNameBA));
+                        OnPropertyChanged(nameof(HeadNameBA));
+                        OnPropertyChanged(nameof(LogisticsSignatureBA));
+                        OnPropertyChanged(nameof(FinanceSignatureBA));
+                        OnPropertyChanged(nameof(HeadSignatureBA));
+                    }
+                };
+            }
+        }
+
         [ObservableProperty]
         private bool _skipBidAnalysis;
 
@@ -172,6 +201,9 @@ namespace JaahdLogistics.ViewModels
 
         [ObservableProperty]
         private ObservableCollection<Project> _projects = new();
+
+        [ObservableProperty]
+        private ObservableCollection<Employee> _employees = new();
 
         [ObservableProperty]
         private ObservableCollection<int> _filterYears = new();
@@ -190,12 +222,18 @@ namespace JaahdLogistics.ViewModels
             _dataService = dataService;
             _settings = _dataService.GetSettings();
             Vendors = new ObservableCollection<Vendor>(_dataService.GetVendors());
+            LoadEmployees();
 
             int currentYear = DateTime.Now.Year;
             for (int y = currentYear - 5; y <= currentYear + 5; y++) FilterYears.Add(y);
 
             SubscribeToCurrentPO();
             RefreshAll();
+        }
+
+        private void LoadEmployees()
+        {
+            Employees = new ObservableCollection<Employee>(_dataService.GetEmployees());
         }
 
         private void SubscribeToCurrentPO()
@@ -232,7 +270,29 @@ namespace JaahdLogistics.ViewModels
                     // Refresh PR list if project changes to ensure valid matching
                     LoadApprovedPRs();
                 }
+                if (e.PropertyName == nameof(PurchaseOrder.LogisticsEmployeeId)) UpdatePOSignatures();
+                if (e.PropertyName == nameof(PurchaseOrder.FinanceEmployeeId)) UpdatePOSignatures();
+                if (e.PropertyName == nameof(PurchaseOrder.HeadEmployeeId)) UpdatePOSignatures();
             };
+        }
+
+        private void UpdatePOSignatures()
+        {
+            if (CurrentPO.LogisticsEmployeeId.HasValue)
+            {
+                var emp = Employees.FirstOrDefault(e => e.Id == CurrentPO.LogisticsEmployeeId);
+                if (emp != null) { CurrentPO.LogisticsSignature = emp.SignatureImage; CurrentPO.LogisticsName = emp.NameEN; }
+            }
+            if (CurrentPO.FinanceEmployeeId.HasValue)
+            {
+                var emp = Employees.FirstOrDefault(e => e.Id == CurrentPO.FinanceEmployeeId);
+                if (emp != null) { CurrentPO.FinanceSignature = emp.SignatureImage; CurrentPO.FinanceName = emp.NameEN; }
+            }
+            if (CurrentPO.HeadEmployeeId.HasValue)
+            {
+                var emp = Employees.FirstOrDefault(e => e.Id == CurrentPO.HeadEmployeeId);
+                if (emp != null) { CurrentPO.FinalSignature = emp.SignatureImage; CurrentPO.FinalName = emp.NameEN; }
+            }
         }
 
 
@@ -366,7 +426,10 @@ namespace JaahdLogistics.ViewModels
                 Date = DateTime.Now,
                 Currency = SelectedPR?.Currency ?? "YER",
                 ExchangeRate = SelectedPR?.ExchangeRate ?? 1.0m,
-                Justification = SelectedPR?.Justification
+                Justification = SelectedPR?.Justification,
+                LogisticsEmployeeId = Settings.DefaultLogisticsEmployeeId,
+                FinanceEmployeeId = Settings.DefaultFinanceEmployeeId,
+                HeadEmployeeId = Settings.DefaultHeadEmployeeId
             };
             Bidders = new ObservableCollection<Bidder>();
             MatrixRows = new ObservableCollection<BidAnalysisMatrixRow>();
@@ -600,7 +663,10 @@ namespace JaahdLogistics.ViewModels
                     Status = "Pending",
                     Terms = Settings.POTerms,
                     Currency = currency,
-                    ExchangeRate = rate
+                    ExchangeRate = rate,
+                    LogisticsEmployeeId = Settings.DefaultLogisticsEmployeeId,
+                    FinanceEmployeeId = Settings.DefaultFinanceEmployeeId,
+                    HeadEmployeeId = Settings.DefaultHeadEmployeeId
                 };
 
                 if (SkipBidAnalysis)
@@ -647,7 +713,7 @@ namespace JaahdLogistics.ViewModels
                         newPO.VendorContact = !string.IsNullOrWhiteSpace(winner.Contact) ? winner.Contact : masterVendor?.Contact;
 
                         // Hydrate Vendor object for UI binding
-                        newPO.Vendor = masterVendor ?? new Vendor { Name = newPO.VendorName, Contact = newPO.VendorContact, Tel = newPO.VendorTel, Email = newPO.VendorEmail, Address = newPO.VendorAddress };
+                        newPO.Vendor = masterVendor ?? new Vendor { Name = newPO.VendorName ?? string.Empty, Contact = newPO.VendorContact, Tel = newPO.VendorTel, Email = newPO.VendorEmail, Address = newPO.VendorAddress };
 
                         foreach(var item in winner.Items)
                         {
@@ -864,6 +930,7 @@ namespace JaahdLogistics.ViewModels
                     }
                     CurrentPO.Vendor = vendor;
                 }
+                UpdatePOSignatures();
             }
         }
 

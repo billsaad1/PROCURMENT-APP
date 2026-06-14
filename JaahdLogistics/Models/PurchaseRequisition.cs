@@ -66,6 +66,21 @@ namespace JaahdLogistics.Models
         private string? _finalName;
         public string? FinalName { get => _finalName; set => SetProperty(ref _finalName, value); }
 
+        private int? _requesterEmployeeId;
+        public int? RequesterEmployeeId { get => _requesterEmployeeId; set => SetProperty(ref _requesterEmployeeId, value); }
+
+        private string? _requesterTitle = "Project Officer";
+        public string? RequesterTitle { get => _requesterTitle; set => SetProperty(ref _requesterTitle, value); }
+
+        private int? _logisticsEmployeeId;
+        public int? LogisticsEmployeeId { get => _logisticsEmployeeId; set => SetProperty(ref _logisticsEmployeeId, value); }
+
+        private int? _financeEmployeeId;
+        public int? FinanceEmployeeId { get => _financeEmployeeId; set => SetProperty(ref _financeEmployeeId, value); }
+
+        private int? _headEmployeeId;
+        public int? HeadEmployeeId { get => _headEmployeeId; set => SetProperty(ref _headEmployeeId, value); }
+
         public Project? Project { get; set; }
 
         public ObservableCollection<PRItem> Items { get; set; } = new();

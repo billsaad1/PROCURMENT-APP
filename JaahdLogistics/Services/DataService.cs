@@ -301,20 +301,23 @@ namespace JaahdLogistics.Services
                     analysis.RecommendationReasons,
                     analysis.Status,
                     analysis.Currency,
-                    analysis.ExchangeRate
+                    analysis.ExchangeRate,
+                    LogisticsEmployeeId = (analysis.LogisticsEmployeeId == 0) ? (int?)null : analysis.LogisticsEmployeeId,
+                    FinanceEmployeeId = (analysis.FinanceEmployeeId == 0) ? (int?)null : analysis.FinanceEmployeeId,
+                    HeadEmployeeId = (analysis.HeadEmployeeId == 0) ? (int?)null : analysis.HeadEmployeeId
                 };
 
                 if (analysis.Id == 0)
                 {
                     analysis.Id = connection.QuerySingle<int>(
-                        "INSERT INTO BidAnalyses (RFQId, Date, RecommendedBidderId, Justification, RecommendationReasons, Status, Currency, ExchangeRate) " +
-                        "VALUES (@RFQId, @Date, @RecommendedBidderId, @Justification, @RecommendationReasons, @Status, @Currency, @ExchangeRate); SELECT last_insert_rowid();",
+                        "INSERT INTO BidAnalyses (RFQId, Date, RecommendedBidderId, Justification, RecommendationReasons, Status, Currency, ExchangeRate, LogisticsEmployeeId, FinanceEmployeeId, HeadEmployeeId) " +
+                        "VALUES (@RFQId, @Date, @RecommendedBidderId, @Justification, @RecommendationReasons, @Status, @Currency, @ExchangeRate, @LogisticsEmployeeId, @FinanceEmployeeId, @HeadEmployeeId); SELECT last_insert_rowid();",
                         analysisParam, transaction);
                 }
                 else
                 {
                     connection.Execute(
-                        "UPDATE BidAnalyses SET RecommendedBidderId=@RecommendedBidderId, Justification=@Justification, RecommendationReasons=@RecommendationReasons, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate WHERE Id=@Id",
+                        "UPDATE BidAnalyses SET RecommendedBidderId=@RecommendedBidderId, Justification=@Justification, RecommendationReasons=@RecommendationReasons, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate, LogisticsEmployeeId=@LogisticsEmployeeId, FinanceEmployeeId=@FinanceEmployeeId, HeadEmployeeId=@HeadEmployeeId WHERE Id=@Id",
                         analysisParam, transaction);
                 }
 
@@ -476,7 +479,10 @@ namespace JaahdLogistics.Services
                 BidderId = (po.BidderId == null || po.BidderId == 0) ? (int?)null : po.BidderId,
                 VendorId = (po.VendorId == null || po.VendorId == 0) ? (int?)null : po.VendorId,
                 po.Date, po.Terms, po.Clause, po.Status, po.Currency, po.ExchangeRate,
-                po.VendorName, po.VendorContact, po.VendorTel, po.VendorEmail, po.VendorAddress
+                po.VendorName, po.VendorContact, po.VendorTel, po.VendorEmail, po.VendorAddress,
+                LogisticsEmployeeId = (po.LogisticsEmployeeId == 0) ? (int?)null : po.LogisticsEmployeeId,
+                FinanceEmployeeId = (po.FinanceEmployeeId == 0) ? (int?)null : po.FinanceEmployeeId,
+                HeadEmployeeId = (po.HeadEmployeeId == 0) ? (int?)null : po.HeadEmployeeId
             };
 
             try
@@ -484,14 +490,14 @@ namespace JaahdLogistics.Services
                 if (po.Id == 0)
                 {
                     po.Id = connection.QuerySingle<int>(
-                        "INSERT INTO PurchaseOrders (PONumber, PRId, ProjectId, BidAnalysisId, BidderId, VendorId, Date, Terms, Clause, Status, Currency, ExchangeRate, VendorName, VendorContact, VendorTel, VendorEmail, VendorAddress) " +
-                        "VALUES (@PONumber, @PRId, @ProjectId, @BidAnalysisId, @BidderId, @VendorId, @Date, @Terms, @Clause, @Status, @Currency, @ExchangeRate, @VendorName, @VendorContact, @VendorTel, @VendorEmail, @VendorAddress); SELECT last_insert_rowid();",
+                        "INSERT INTO PurchaseOrders (PONumber, PRId, ProjectId, BidAnalysisId, BidderId, VendorId, Date, Terms, Clause, Status, Currency, ExchangeRate, VendorName, VendorContact, VendorTel, VendorEmail, VendorAddress, LogisticsEmployeeId, FinanceEmployeeId, HeadEmployeeId) " +
+                        "VALUES (@PONumber, @PRId, @ProjectId, @BidAnalysisId, @BidderId, @VendorId, @Date, @Terms, @Clause, @Status, @Currency, @ExchangeRate, @VendorName, @VendorContact, @VendorTel, @VendorEmail, @VendorAddress, @LogisticsEmployeeId, @FinanceEmployeeId, @HeadEmployeeId); SELECT last_insert_rowid();",
                         param, transaction);
                 }
                 else
                 {
                     connection.Execute(
-                        "UPDATE PurchaseOrders SET PONumber=@PONumber, PRId=@PRId, ProjectId=@ProjectId, Date=@Date, BidAnalysisId=@BidAnalysisId, BidderId=@BidderId, VendorId=@VendorId, Terms=@Terms, Clause=@Clause, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate, VendorName=@VendorName, VendorContact=@VendorContact, VendorTel=@VendorTel, VendorEmail=@VendorEmail, VendorAddress=@VendorAddress WHERE Id=@Id",
+                        "UPDATE PurchaseOrders SET PONumber=@PONumber, PRId=@PRId, ProjectId=@ProjectId, Date=@Date, BidAnalysisId=@BidAnalysisId, BidderId=@BidderId, VendorId=@VendorId, Terms=@Terms, Clause=@Clause, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate, VendorName=@VendorName, VendorContact=@VendorContact, VendorTel=@VendorTel, VendorEmail=@VendorEmail, VendorAddress=@VendorAddress, LogisticsEmployeeId=@LogisticsEmployeeId, FinanceEmployeeId=@FinanceEmployeeId, HeadEmployeeId=@HeadEmployeeId WHERE Id=@Id",
                         param, transaction);
                 }
 
@@ -575,18 +581,27 @@ namespace JaahdLogistics.Services
             using var transaction = connection.BeginTransaction();
             try
             {
+                var prParam = new {
+                    pr.Id, pr.PRNumber, pr.ProjectId, pr.RequesterId, pr.Date, pr.Justification, pr.Currency, pr.ExchangeRate, pr.PRType, pr.Status,
+                    RequesterEmployeeId = (pr.RequesterEmployeeId == 0) ? (int?)null : pr.RequesterEmployeeId,
+                    pr.RequesterTitle,
+                    LogisticsEmployeeId = (pr.LogisticsEmployeeId == 0) ? (int?)null : pr.LogisticsEmployeeId,
+                    FinanceEmployeeId = (pr.FinanceEmployeeId == 0) ? (int?)null : pr.FinanceEmployeeId,
+                    HeadEmployeeId = (pr.HeadEmployeeId == 0) ? (int?)null : pr.HeadEmployeeId
+                };
+
                 if (pr.Id == 0)
                 {
                     pr.Id = connection.QuerySingle<int>(
-                        "INSERT INTO PurchaseRequisitions (PRNumber, ProjectId, RequesterId, Date, Justification, Currency, ExchangeRate, PRType, Status) " +
-                        "VALUES (@PRNumber, @ProjectId, @RequesterId, @Date, @Justification, @Currency, @ExchangeRate, @PRType, @Status); SELECT last_insert_rowid();",
-                        pr, transaction);
+                        "INSERT INTO PurchaseRequisitions (PRNumber, ProjectId, RequesterId, Date, Justification, Currency, ExchangeRate, PRType, Status, RequesterEmployeeId, RequesterTitle, LogisticsEmployeeId, FinanceEmployeeId, HeadEmployeeId) " +
+                        "VALUES (@PRNumber, @ProjectId, @RequesterId, @Date, @Justification, @Currency, @ExchangeRate, @PRType, @Status, @RequesterEmployeeId, @RequesterTitle, @LogisticsEmployeeId, @FinanceEmployeeId, @HeadEmployeeId); SELECT last_insert_rowid();",
+                        prParam, transaction);
                 }
                 else
                 {
                     connection.Execute(
-                        "UPDATE PurchaseRequisitions SET PRNumber=@PRNumber, ProjectId=@ProjectId, Justification=@Justification, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate, PRType=@PRType WHERE Id=@Id",
-                        pr, transaction);
+                        "UPDATE PurchaseRequisitions SET PRNumber=@PRNumber, ProjectId=@ProjectId, Justification=@Justification, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate, PRType=@PRType, RequesterEmployeeId=@RequesterEmployeeId, RequesterTitle=@RequesterTitle, LogisticsEmployeeId=@LogisticsEmployeeId, FinanceEmployeeId=@FinanceEmployeeId, HeadEmployeeId=@HeadEmployeeId WHERE Id=@Id",
+                        prParam, transaction);
                 }
 
                 var existingItemsInDb = connection.Query<PRItem>("SELECT * FROM PRItems WHERE PRId = @Id", new { pr.Id }, transaction).ToList();
@@ -694,7 +709,10 @@ namespace JaahdLogistics.Services
                 "ContactInfo=@ContactInfo, Tel=@Tel, Email=@Email, LogoImage=@LogoImage, " +
                 "PRTerms=@PRTerms, RFQTerms=@RFQTerms, POTerms=@POTerms, " +
                 "LogisticsManager=@LogisticsManager, FinanceManager=@FinanceManager, " +
-                "HeadOfAssociation=@HeadOfAssociation WHERE Id=1", settings);
+                "HeadOfAssociation=@HeadOfAssociation, " +
+                "DefaultLogisticsEmployeeId=@DefaultLogisticsEmployeeId, " +
+                "DefaultFinanceEmployeeId=@DefaultFinanceEmployeeId, " +
+                "DefaultHeadEmployeeId=@DefaultHeadEmployeeId WHERE Id=1", settings);
         }
 
         public decimal GetSpentBudget(int budgetLineId, int? excludePRId = null)
@@ -779,19 +797,24 @@ namespace JaahdLogistics.Services
             using var transaction = connection.BeginTransaction();
             
             try {
+                var grnParam = new {
+                    grn.Id, grn.GRNNumber, grn.POId, grn.ReceiverId, grn.InvoiceNumber, grn.IsQtyComply, grn.IsQtyMatch, grn.IsQtyIntact,
+                    ReceiverEmployeeId = (grn.ReceiverEmployeeId == 0) ? (int?)null : grn.ReceiverEmployeeId
+                };
+
                 if (grn.Id == 0)
                 {
                     grn.Id = connection.QuerySingle<int>(
-                        "INSERT INTO GoodsReceivingNotes (GRNNumber, POId, ReceiverId, InvoiceNumber, IsQtyComply, IsQtyMatch, IsQtyIntact) " +
-                        "VALUES (@GRNNumber, @POId, @ReceiverId, @InvoiceNumber, @IsQtyComply, @IsQtyMatch, @IsQtyIntact); SELECT last_insert_rowid();",
-                        grn, transaction);
+                        "INSERT INTO GoodsReceivingNotes (GRNNumber, POId, ReceiverId, InvoiceNumber, IsQtyComply, IsQtyMatch, IsQtyIntact, ReceiverEmployeeId) " +
+                        "VALUES (@GRNNumber, @POId, @ReceiverId, @InvoiceNumber, @IsQtyComply, @IsQtyMatch, @IsQtyIntact, @ReceiverEmployeeId); SELECT last_insert_rowid();",
+                        grnParam, transaction);
                 }
                 else
                 {
                     connection.Execute(
                         "UPDATE GoodsReceivingNotes SET GRNNumber=@GRNNumber, InvoiceNumber=@InvoiceNumber, " +
-                        "IsQtyComply=@IsQtyComply, IsQtyMatch=@IsQtyMatch, IsQtyIntact=@IsQtyIntact WHERE Id=@Id",
-                        grn, transaction);
+                        "IsQtyComply=@IsQtyComply, IsQtyMatch=@IsQtyMatch, IsQtyIntact=@IsQtyIntact, ReceiverEmployeeId=@ReceiverEmployeeId WHERE Id=@Id",
+                        grnParam, transaction);
                     // Clear existing items for re-insertion or update logic
                     connection.Execute("DELETE FROM GRNItems WHERE GRNId=@Id", new { grn.Id }, transaction);
                 }
@@ -963,6 +986,34 @@ namespace JaahdLogistics.Services
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Execute("UPDATE Vendors SET IsActive = 0 WHERE Id = @id", new { id });
+        }
+
+        public IEnumerable<Employee> GetEmployees()
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            return connection.Query<Employee>("SELECT * FROM Employees");
+        }
+
+        public void SaveEmployee(Employee employee)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            if (employee.Id == 0)
+            {
+                employee.Id = connection.QuerySingle<int>(
+                    "INSERT INTO Employees (NameEN, NameAR, PositionEN, PositionAR, SignatureImage) " +
+                    "VALUES (@NameEN, @NameAR, @PositionEN, @PositionAR, @SignatureImage); SELECT last_insert_rowid();", employee);
+            }
+            else
+            {
+                connection.Execute(
+                    "UPDATE Employees SET NameEN=@NameEN, NameAR=@NameAR, PositionEN=@PositionEN, PositionAR=@PositionAR, SignatureImage=@SignatureImage WHERE Id=@Id", employee);
+            }
+        }
+
+        public void DeleteEmployee(int id)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Execute("DELETE FROM Employees WHERE Id = @id", new { id });
         }
 
         public IEnumerable<PRItem> GetPRItemsForRFQ(int rfqId)

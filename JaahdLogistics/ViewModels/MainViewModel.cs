@@ -88,6 +88,9 @@ namespace JaahdLogistics.ViewModels
                 case "Vendors":
                     CurrentViewModel = new VendorViewModel(_dataService);
                     break;
+                case "Employees":
+                    CurrentViewModel = new EmployeeViewModel(_dataService);
+                    break;
                 case "Settings":
                     CurrentViewModel = new SettingsViewModel(_dataService);
                     break;

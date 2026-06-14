@@ -45,5 +45,9 @@ namespace JaahdLogistics.Services
         void SaveVendor(Vendor vendor);
         void DeleteVendor(int id);
         IEnumerable<PRItem> GetPRItemsForRFQ(int rfqId);
+
+        IEnumerable<Employee> GetEmployees();
+        void SaveEmployee(Employee employee);
+        void DeleteEmployee(int id);
     }
 }

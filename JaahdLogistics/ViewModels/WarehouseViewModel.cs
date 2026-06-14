@@ -12,6 +12,10 @@ namespace JaahdLogistics.ViewModels
     {
         private readonly IDataService _dataService;
 
+        public string? ReceiverName => CurrentGRN.ReceiverEmployeeId.HasValue ? Employees.FirstOrDefault(e => e.Id == CurrentGRN.ReceiverEmployeeId)?.NameEN : null;
+        public string? ReceiverPosition => CurrentGRN.ReceiverEmployeeId.HasValue ? Employees.FirstOrDefault(e => e.Id == CurrentGRN.ReceiverEmployeeId)?.PositionEN : "Storekeeper";
+        public byte[]? ReceiverSignature => CurrentGRN.ReceiverEmployeeId.HasValue ? Employees.FirstOrDefault(e => e.Id == CurrentGRN.ReceiverEmployeeId)?.SignatureImage : null;
+
         [ObservableProperty]
         private ObservableCollection<PurchaseOrder> _pendingPOs = new();
 
@@ -20,6 +24,22 @@ namespace JaahdLogistics.ViewModels
 
         [ObservableProperty]
         private GoodsReceivingNotes _currentGRN = new();
+
+        partial void OnCurrentGRNChanged(GoodsReceivingNotes value)
+        {
+            if (value != null)
+            {
+                value.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == nameof(GoodsReceivingNotes.ReceiverEmployeeId))
+                    {
+                        OnPropertyChanged(nameof(ReceiverName));
+                        OnPropertyChanged(nameof(ReceiverPosition));
+                        OnPropertyChanged(nameof(ReceiverSignature));
+                    }
+                };
+            }
+        }
 
         [ObservableProperty]
         private ObservableCollection<GRNItems> _grnItems = new();
@@ -33,11 +53,20 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private Settings _settings;
 
+        [ObservableProperty]
+        private ObservableCollection<Employee> _employees = new();
+
         public WarehouseViewModel(IDataService dataService)
         {
             _dataService = dataService;
             _settings = _dataService.GetSettings();
+            LoadEmployees();
             RefreshAll();
+        }
+
+        private void LoadEmployees()
+        {
+            Employees = new ObservableCollection<Employee>(_dataService.GetEmployees());
         }
 
         [RelayCommand]
@@ -107,7 +136,7 @@ namespace JaahdLogistics.ViewModels
                 { 
                     POItemId = item.Id, 
                     Description = item.Description, 
-                    Unit = item.Unit,
+                    Unit = item.Unit ?? string.Empty,
                     OrderedQuantity = item.Quantity 
                 });
             }

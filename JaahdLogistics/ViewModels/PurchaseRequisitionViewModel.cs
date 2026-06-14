@@ -34,14 +34,35 @@ namespace JaahdLogistics.ViewModels
                         var rate = _dataService.GetLastExchangeRate(value.Currency);
                         if (rate > 0) value.ExchangeRate = rate;
                     }
+                    if (e.PropertyName == nameof(PurchaseRequisition.RequesterEmployeeId))
+                    {
+                        UpdateRequesterSignature();
+                    }
                 };
                 LoadApprovals();
+            }
+        }
+
+        private void UpdateRequesterSignature()
+        {
+            if (CurrentPR.RequesterEmployeeId.HasValue && CurrentPR.RequesterEmployeeId > 0)
+            {
+                var emp = Employees.FirstOrDefault(e => e.Id == CurrentPR.RequesterEmployeeId);
+                if (emp != null)
+                {
+                    CurrentPR.RequesterSignature = emp.SignatureImage;
+                    CurrentPR.RequesterName = emp.NameEN;
+                }
             }
         }
 
         private void LoadApprovals()
         {
             if (CurrentPR.Id == 0) return;
+
+            // Load Employee-linked signatures first if they exist
+            if (CurrentPR.RequesterEmployeeId.HasValue) UpdateRequesterSignature();
+
             var approvals = _dataService.GetApprovals("PR", CurrentPR.Id);
             foreach (var app in approvals)
             {
@@ -53,17 +74,6 @@ namespace JaahdLogistics.ViewModels
                 else if (status == "ReviewedByFinance") { CurrentPR.FinanceSignature = sig; CurrentPR.FinanceName = name; }
                 else if (status == "ApprovedByPM") { CurrentPR.PMSignature = sig; CurrentPR.PMName = name; }
                 else if (status == "FinalApproved") { CurrentPR.FinalSignature = sig; CurrentPR.FinalName = name; }
-            }
-            // Set requester signature from current user if new PR
-            if (CurrentPR.RequesterId != 0)
-            {
-                var users = _dataService.GetUsers();
-                var req = users.FirstOrDefault(u => u.Id == CurrentPR.RequesterId);
-                if (req != null)
-                {
-                    CurrentPR.RequesterSignature = req.SignatureImage;
-                    CurrentPR.RequesterName = req.FullName;
-                }
             }
             OnPropertyChanged(nameof(CurrentPR));
         }
@@ -89,6 +99,9 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private ObservableCollection<string> _pRTypes = new() { "Services", "Goods" };
 
+        [ObservableProperty]
+        private ObservableCollection<Employee> _employees = new();
+
         public string[] Currencies { get; } = { "USD", "YER" };
 
         public PurchaseRequisitionViewModel(IDataService dataService)
@@ -97,7 +110,14 @@ namespace JaahdLogistics.ViewModels
             _projects = new ObservableCollection<Project>(_dataService.GetProjects());
             _settings = _dataService.GetSettings();
             _previousDescriptions = new ObservableCollection<string>(_dataService.GetPreviousItemDescriptions());
+            LoadEmployees();
             LoadPRs();
+        }
+
+        private void LoadEmployees()
+        {
+            Employees.Clear();
+            foreach (var emp in _dataService.GetEmployees()) Employees.Add(emp);
         }
 
         private void LoadPRs()
@@ -219,7 +239,12 @@ namespace JaahdLogistics.ViewModels
         [RelayCommand]
         private void NewPR()
         {
-            CurrentPR = new PurchaseRequisition();
+            CurrentPR = new PurchaseRequisition
+            {
+                LogisticsEmployeeId = Settings.DefaultLogisticsEmployeeId,
+                FinanceEmployeeId = Settings.DefaultFinanceEmployeeId,
+                HeadEmployeeId = Settings.DefaultHeadEmployeeId
+            };
             SelectedProject = null;
             SelectedTabIndex = 1; // Switch to Edit tab
         }

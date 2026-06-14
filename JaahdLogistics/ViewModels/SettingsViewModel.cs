@@ -19,6 +19,9 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private ObservableCollection<User> _users;
 
+        [ObservableProperty]
+        private ObservableCollection<Employee> _employees;
+
         public string[] Roles { get; } = { "Admin", "ProjectManager", "ProcurementManager", "FinanceManager", "Storekeeper", "HeadOfAssociation" };
 
         public SettingsViewModel(IDataService dataService)
@@ -27,6 +30,7 @@ namespace JaahdLogistics.ViewModels
             _settings = _dataService.GetSettings();
             CurrentUserSignature = AuthService.CurrentUser?.SignatureImage;
             _users = new ObservableCollection<User>(_dataService.GetUsers());
+            _employees = new ObservableCollection<Employee>(_dataService.GetEmployees());
         }
 
         [RelayCommand]

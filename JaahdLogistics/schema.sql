@@ -44,8 +44,17 @@ CREATE TABLE IF NOT EXISTS PurchaseRequisitions (
     Status TEXT DEFAULT 'Pending', -- Pending, LogisticsApproved, FinanceApproved, FinalApproved, Rejected
     Version INTEGER DEFAULT 1,
     LastModified DATETIME DEFAULT CURRENT_TIMESTAMP,
+    RequesterEmployeeId INTEGER,
+    RequesterTitle TEXT,
+    LogisticsEmployeeId INTEGER,
+    FinanceEmployeeId INTEGER,
+    HeadEmployeeId INTEGER,
     FOREIGN KEY (ProjectId) REFERENCES Projects(Id),
-    FOREIGN KEY (RequesterId) REFERENCES Users(Id)
+    FOREIGN KEY (RequesterId) REFERENCES Users(Id),
+    FOREIGN KEY (RequesterEmployeeId) REFERENCES Employees(Id),
+    FOREIGN KEY (LogisticsEmployeeId) REFERENCES Employees(Id),
+    FOREIGN KEY (FinanceEmployeeId) REFERENCES Employees(Id),
+    FOREIGN KEY (HeadEmployeeId) REFERENCES Employees(Id)
 );
 
 CREATE TABLE IF NOT EXISTS PRItems (
@@ -82,7 +91,13 @@ CREATE TABLE IF NOT EXISTS BidAnalyses (
     ExchangeRate DECIMAL(18, 4),
     Version INTEGER DEFAULT 1,
     LastModified DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (RFQId) REFERENCES RFQs(Id)
+    LogisticsEmployeeId INTEGER,
+    FinanceEmployeeId INTEGER,
+    HeadEmployeeId INTEGER,
+    FOREIGN KEY (RFQId) REFERENCES RFQs(Id),
+    FOREIGN KEY (LogisticsEmployeeId) REFERENCES Employees(Id),
+    FOREIGN KEY (FinanceEmployeeId) REFERENCES Employees(Id),
+    FOREIGN KEY (HeadEmployeeId) REFERENCES Employees(Id)
 );
 
 CREATE TABLE IF NOT EXISTS Vendors (
@@ -149,6 +164,9 @@ CREATE TABLE IF NOT EXISTS PurchaseOrders (
     VendorAddress TEXT,
     Version INTEGER DEFAULT 1,
     LastModified DATETIME DEFAULT CURRENT_TIMESTAMP,
+    LogisticsEmployeeId INTEGER,
+    FinanceEmployeeId INTEGER,
+    HeadEmployeeId INTEGER,
     FOREIGN KEY (PRId) REFERENCES PurchaseRequisitions(Id),
     FOREIGN KEY (BidAnalysisId) REFERENCES BidAnalyses(Id),
     FOREIGN KEY (BidderId) REFERENCES Bidders(Id),
@@ -174,9 +192,11 @@ CREATE TABLE IF NOT EXISTS GoodsReceivingNotes (
     POId INTEGER NOT NULL,
     Date DATETIME DEFAULT CURRENT_TIMESTAMP,
     ReceiverId INTEGER NOT NULL, -- Storekeeper
+    ReceiverEmployeeId INTEGER,
     Status TEXT DEFAULT 'Completed',
     FOREIGN KEY (POId) REFERENCES PurchaseOrders(Id),
-    FOREIGN KEY (ReceiverId) REFERENCES Users(Id)
+    FOREIGN KEY (ReceiverId) REFERENCES Users(Id),
+    FOREIGN KEY (ReceiverEmployeeId) REFERENCES Employees(Id)
 );
 
 CREATE TABLE IF NOT EXISTS GRNItems (
@@ -226,7 +246,10 @@ CREATE TABLE IF NOT EXISTS Settings (
     POTerms TEXT,
     LogisticsManager TEXT,
     FinanceManager TEXT,
-    HeadOfAssociation TEXT
+    HeadOfAssociation TEXT,
+    DefaultLogisticsEmployeeId INTEGER,
+    DefaultFinanceEmployeeId INTEGER,
+    DefaultHeadEmployeeId INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS Approvals (
@@ -237,4 +260,13 @@ CREATE TABLE IF NOT EXISTS Approvals (
     Status TEXT NOT NULL, -- Approved, Rejected
     ApprovalDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (UserId) REFERENCES Users(Id)
+);
+
+CREATE TABLE IF NOT EXISTS Employees (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    NameEN TEXT NOT NULL,
+    NameAR TEXT NOT NULL,
+    PositionEN TEXT,
+    PositionAR TEXT,
+    SignatureImage BLOB
 );

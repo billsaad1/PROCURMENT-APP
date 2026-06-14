@@ -33,7 +33,16 @@ namespace JaahdLogistics.Models
         
         [ObservableProperty]
         private decimal _exchangeRate = 1.0m;
-        
+
+        [ObservableProperty]
+        private int? _logisticsEmployeeId;
+
+        [ObservableProperty]
+        private int? _financeEmployeeId;
+
+        [ObservableProperty]
+        private int? _headEmployeeId;
+
         public ObservableCollection<Bidder> Bidders { get; set; } = new();
 
         public string RecommendedBidderName => Bidders.FirstOrDefault(b => b.Id == RecommendedBidderId)?.Name ?? "None";

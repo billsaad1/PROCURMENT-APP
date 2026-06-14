@@ -93,6 +93,15 @@ namespace JaahdLogistics.Models
         [ObservableProperty]
         private string? _finalName;
 
+        [ObservableProperty]
+        private int? _logisticsEmployeeId;
+
+        [ObservableProperty]
+        private int? _financeEmployeeId;
+
+        [ObservableProperty]
+        private int? _headEmployeeId;
+
         public decimal TotalAmount => Items.Sum(i => i.TotalPrice);
 
         public PurchaseOrder()

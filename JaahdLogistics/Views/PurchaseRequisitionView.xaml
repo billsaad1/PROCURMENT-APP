@@ -43,6 +43,7 @@
                     <RowDefinition Height="Auto"/> <!-- Header -->
                     <RowDefinition Height="Auto"/> <!-- Title -->
                     <RowDefinition Height="Auto"/> <!-- Info -->
+                    <RowDefinition Height="Auto"/> <!-- Justification -->
                     <RowDefinition Height="*"/>    <!-- Grid -->
                     <RowDefinition Height="Auto"/> <!-- Summary -->
                     <RowDefinition Height="Auto"/> <!-- Signatures -->
@@ -97,7 +98,16 @@
                     <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding CurrentPR.ExchangeRate}" Margin="5"/>
                 </Grid>
 
-                <DataGrid Grid.Row="3" ItemsSource="{Binding CurrentPR.Items}" AutoGenerateColumns="False" CanUserAddRows="False">
+                <Grid Grid.Row="3" Margin="0,0,0,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Justification / مبررات الطلب" FontWeight="Bold" Margin="5,0"/>
+                    <TextBox Grid.Row="1" Text="{Binding CurrentPR.Justification}" Margin="5" Height="60" TextWrapping="Wrap" AcceptsReturn="True" VerticalContentAlignment="Top"/>
+                </Grid>
+
+                <DataGrid Grid.Row="4" ItemsSource="{Binding CurrentPR.Items}" AutoGenerateColumns="False" CanUserAddRows="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="{DynamicResource BudgetLine}" Width="120">
                             <DataGridTemplateColumn.CellTemplate>
@@ -134,7 +144,7 @@
                     </DataGrid.Columns>
                 </DataGrid>
 
-                <Grid Grid.Row="4" Margin="0,10">
+                <Grid Grid.Row="5" Margin="0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
@@ -150,9 +160,13 @@
                 </Grid>
 
                 <!-- Signatures Area -->
-                <UniformGrid Grid.Row="5" Columns="4" Margin="0,20,0,20">
+                <UniformGrid Grid.Row="6" Columns="4" Margin="0,20,0,20">
                     <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="Requester (PM)" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <ComboBox ItemsSource="{Binding Employees}" SelectedValue="{Binding CurrentPR.RequesterEmployeeId}" SelectedValuePath="Id" DisplayMemberPath="DisplayName" Width="120" Margin="5"/>
+                        <ComboBox Text="{Binding CurrentPR.RequesterTitle}" IsEditable="True" Width="120" Margin="5,0,5,5">
+                            <ComboBoxItem Content="Project Officer"/>
+                            <ComboBoxItem Content="Project Manager"/>
+                        </ComboBox>
                         <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5">
                             <Image Source="{Binding CurrentPR.RequesterSignature, Converter={StaticResource ImageBytesConverter}}"/>
                         </Border>
@@ -181,7 +195,7 @@
                     </StackPanel>
                 </UniformGrid>
 
-                <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right" x:Name="ControlButtons">
+                <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Right" x:Name="ControlButtons">
                     <TextBlock Text="{Binding CurrentPR.Status}" VerticalAlignment="Center" Margin="0,0,20,0" FontWeight="Bold" Foreground="{StaticResource SecondaryBlueBrush}"/>
                     <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
                     <Button Content="{DynamicResource Approve}" Command="{Binding ApproveCommand}" Width="120" Height="35" Margin="0,0,10,0"/>

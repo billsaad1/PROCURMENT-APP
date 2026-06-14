@@ -142,6 +142,38 @@ namespace JaahdLogistics.Data
 
                 // Repair POItems table
                 AddColumnIfMissing(connection, "POItems", "BudgetLineId", "INTEGER");
+
+                // Ensure Employees table exists
+                connection.Execute(@"
+                    CREATE TABLE IF NOT EXISTS Employees (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        NameEN TEXT NOT NULL,
+                        NameAR TEXT NOT NULL,
+                        PositionEN TEXT,
+                        PositionAR TEXT,
+                        SignatureImage BLOB
+                    )");
+
+                // Add Employee reference columns to documents
+                AddColumnIfMissing(connection, "PurchaseRequisitions", "RequesterEmployeeId", "INTEGER");
+                AddColumnIfMissing(connection, "PurchaseRequisitions", "RequesterTitle", "TEXT");
+                AddColumnIfMissing(connection, "PurchaseRequisitions", "LogisticsEmployeeId", "INTEGER");
+                AddColumnIfMissing(connection, "PurchaseRequisitions", "FinanceEmployeeId", "INTEGER");
+                AddColumnIfMissing(connection, "PurchaseRequisitions", "HeadEmployeeId", "INTEGER");
+
+                AddColumnIfMissing(connection, "PurchaseOrders", "LogisticsEmployeeId", "INTEGER");
+                AddColumnIfMissing(connection, "PurchaseOrders", "FinanceEmployeeId", "INTEGER");
+                AddColumnIfMissing(connection, "PurchaseOrders", "HeadEmployeeId", "INTEGER");
+
+                AddColumnIfMissing(connection, "GoodsReceivingNotes", "ReceiverEmployeeId", "INTEGER");
+
+                AddColumnIfMissing(connection, "BidAnalyses", "LogisticsEmployeeId", "INTEGER");
+                AddColumnIfMissing(connection, "BidAnalyses", "FinanceEmployeeId", "INTEGER");
+                AddColumnIfMissing(connection, "BidAnalyses", "HeadEmployeeId", "INTEGER");
+
+                AddColumnIfMissing(connection, "Settings", "DefaultLogisticsEmployeeId", "INTEGER");
+                AddColumnIfMissing(connection, "Settings", "DefaultFinanceEmployeeId", "INTEGER");
+                AddColumnIfMissing(connection, "Settings", "DefaultHeadEmployeeId", "INTEGER");
             }
             
             var userCount = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Users");
