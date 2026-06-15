@@ -370,7 +370,7 @@
                         <TextBlock Text="{Binding CurrentRFQ.RFQNumber}" FontSize="10" FontWeight="Bold"/>
                     </Border>
                     <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
-                        <TextBlock Text="Closing Date / تاريخ الإغلاق :" FontWeight="Bold" FontSize="9"/>
+                        <TextBlock Text="Closing Date / تاريخ الإغلاق" FontWeight="Bold" FontSize="9"/>
                     </Border>
                     <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
                         <TextBlock Text="{Binding CurrentRFQ.ClosingDate, StringFormat=MM/dd/yyyy}" FontWeight="Bold" HorizontalAlignment="Center"/>
@@ -424,7 +424,7 @@
                     <Border BorderBrush="Black" BorderThickness="1">
                         <StackPanel>
                             <Border Background="{StaticResource JaahdBrownBrush}" Padding="3">
-                                <TextBlock Text="Terms &amp; Conditions / الشروط والأحكام" Foreground="White" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{DynamicResource TermsConditions}" Foreground="White" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/>
                             </Border>
                             <TextBlock Text="{Binding CurrentRFQ.Terms}" FontSize="9" Margin="5" Height="60" TextWrapping="Wrap"/>
                         </StackPanel>
@@ -537,7 +537,7 @@
                         <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="2"><TextBlock Text="QTY" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
                         <Border Grid.Column="4" BorderBrush="Black" BorderThickness="0,1,1,1">
                              <StackPanel>
-                                 <Border Background="#FAD7A0" Padding="2" BorderBrush="Black" BorderThickness="0,0,0,1"><TextBlock Text="Estimative Cost" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
+                                 <Border Background="#FAD7A0" Padding="2" BorderBrush="Black" BorderThickness="0,0,0,1"><TextBlock Text="{DynamicResource EstimativeCost}" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
                                  <Grid>
                                      <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
                                      <Border BorderBrush="Black" BorderThickness="0,0,1,0" Padding="1"><TextBlock Text="Unit Price" FontSize="7" HorizontalAlignment="Center"/></Border>
@@ -558,7 +558,7 @@
                                                 <!-- Top: Bidder Info -->
                                                 <Border BorderBrush="Black" BorderThickness="0,0,0,1">
                                                     <StackPanel>
-                                                        <TextBlock Text="BIDDER / المورد" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center" Margin="2"/>
+                                                        <TextBlock Text="{DynamicResource BidderHeader}" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center" Margin="2"/>
                                                         <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center" TextWrapping="Wrap"/>
                                                         <TextBlock Text="{Binding Address}" FontSize="8" HorizontalAlignment="Center" TextWrapping="Wrap"/>
                                                     </StackPanel>
@@ -636,7 +636,7 @@
                             <ColumnDefinition Width="450"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Border BorderBrush="Black" BorderThickness="1" Background="#EBF5FB" Padding="2"><TextBlock Text="Sub : Total" FontWeight="Bold" FontSize="9" HorizontalAlignment="Right"/></Border>
+                        <Border BorderBrush="Black" BorderThickness="1" Background="#EBF5FB" Padding="2"><TextBlock Text="{DynamicResource SubTotal}" FontWeight="Bold" FontSize="9" HorizontalAlignment="Right"/></Border>
                         <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1">
                              <ItemsControl ItemsSource="{Binding Bidders}">
                                 <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
@@ -656,7 +656,7 @@
                             <ColumnDefinition Width="450"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#EBF5FB" Padding="2"><TextBlock Text="Discount" FontWeight="Bold" FontSize="9" HorizontalAlignment="Right"/></Border>
+                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#EBF5FB" Padding="2"><TextBlock Text="{DynamicResource Discount}" FontWeight="Bold" FontSize="9" HorizontalAlignment="Right"/></Border>
                         <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1">
                              <ItemsControl ItemsSource="{Binding Bidders}">
                                 <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
@@ -676,7 +676,7 @@
                             <ColumnDefinition Width="450"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#EBF5FB" Padding="2"><TextBlock Text="Misc/other costs" FontWeight="Bold" FontSize="9" HorizontalAlignment="Right"/></Border>
+                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#EBF5FB" Padding="2"><TextBlock Text="{DynamicResource MiscCosts}" FontWeight="Bold" FontSize="9" HorizontalAlignment="Right"/></Border>
                         <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1">
                              <ItemsControl ItemsSource="{Binding Bidders}">
                                 <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
@@ -696,7 +696,7 @@
                             <ColumnDefinition Width="450"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#EBF5FB" Padding="2"><TextBlock Text="General Total" FontWeight="Bold" FontSize="9" HorizontalAlignment="Right"/></Border>
+                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#EBF5FB" Padding="2"><TextBlock Text="{DynamicResource GeneralTotal}" FontWeight="Bold" FontSize="9" HorizontalAlignment="Right"/></Border>
                         <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1">
                              <ItemsControl ItemsSource="{Binding Bidders}">
                                 <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
@@ -716,7 +716,7 @@
                             <ColumnDefinition Width="300"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#D5F5E3" Padding="2"><TextBlock Text="Recommend to award to:" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
+                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#D5F5E3" Padding="2"><TextBlock Text="{DynamicResource RecomAwardTo}" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
                         <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2"><TextBlock Text="{Binding CurrentBidAnalysis.RecommendedBidderName}" FontWeight="Bold" FontSize="11" HorizontalAlignment="Center"/></Border>
                     </Grid>
 
@@ -725,14 +725,14 @@
                             <ColumnDefinition Width="300"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#FCF3CF" Padding="2"><TextBlock Text="Justification/Reasons for recommendation:" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
+                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#FCF3CF" Padding="2"><TextBlock Text="{DynamicResource RecommendationReasons}" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
                         <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2"><TextBlock Text="{Binding CurrentBidAnalysis.RecommendationReasons}" FontSize="10" HorizontalAlignment="Center" FontWeight="Bold" TextWrapping="Wrap"/></Border>
                     </Grid>
 
                     <Border Grid.Row="6" BorderBrush="Black" BorderThickness="1,0,1,1" Background="#D5D8DC" Padding="5">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Total in Words: " FontWeight="Bold" FontSize="9"/>
-                            <TextBlock FontWeight="Bold" FontSize="9">
+                            <TextBlock Text="{DynamicResource TotalInWords}" FontWeight="Bold" FontSize="9"/>
+                            <TextBlock FontWeight="Bold" FontSize="9" Margin="5,0">
                                 <TextBlock.Text>
                                     <MultiBinding Converter="{StaticResource CurrencyWordsConverter}">
                                         <Binding Path="CurrentBidAnalysis.RecommendedBidderTotal"/>
@@ -1330,12 +1330,13 @@
     </ControlTemplate>
 
     <ControlTemplate x:Key="ThreeWayMatchPrintTemplate">
-        <Border Background="White" Width="1122" Height="793" Padding="25" BorderBrush="Black" BorderThickness="0.5">
+        <Border Background="White" Width="793" Height="1122" Padding="25" BorderBrush="Black" BorderThickness="0.5">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/> <!-- Header -->
                     <RowDefinition Height="Auto"/> <!-- Title Bar -->
-                    <RowDefinition Height="Auto"/> <!-- Info Bar -->
+                    <RowDefinition Height="Auto"/> <!-- Info Bar 1 -->
+                    <RowDefinition Height="Auto"/> <!-- Info Bar 2 -->
                     <RowDefinition Height="*"/>    <!-- Comparison Table -->
                     <RowDefinition Height="Auto"/> <!-- Signatures -->
                 </Grid.RowDefinitions>
@@ -1354,46 +1355,75 @@
                 </Grid>
 
                 <!-- Title Bar -->
-                <Border Grid.Row="1" Background="#4682B4" Margin="0,0,0,10">
-                    <TextBlock Text="THREE-WAY MATCH RECONCILIATION / مطابقة ثلاثية" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" Margin="3" FontSize="12"/>
+                <Border Grid.Row="1" Background="{StaticResource PrimaryTealBrush}" Margin="0,0,0,10">
+                    <TextBlock Text="(Three-Way Match)" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" Margin="3" FontSize="12"/>
                 </Border>
 
-                <!-- Info Bar -->
-                <Grid Grid.Row="2" Margin="0,0,0,10">
+                <!-- Info Bar 1 -->
+                <Grid Grid.Row="2" Margin="0,0,0,0">
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="150"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="100"/>
                     </Grid.ColumnDefinitions>
-                    <Border BorderBrush="Black" BorderThickness="1" Background="#F2F4F4" Padding="8">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <TextBlock Text="PO NUMBER / رقم الأمر :" FontWeight="Bold" FontSize="9"/>
-                            <TextBlock Text="{Binding SelectedPO.PONumber}" FontSize="10" Margin="10,0,0,0" FontWeight="Bold" Foreground="DarkBlue"/>
-                        </StackPanel>
+                    <Border BorderBrush="Black" BorderThickness="1" Background="#E9F7EF" Padding="5">
+                        <TextBlock Text="{DynamicResource PONumberHeader}" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/>
                     </Border>
-                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1" Background="#F2F4F4" Padding="8">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <TextBlock Text="GRN NO / رقم الإشعار :" FontWeight="Bold" FontSize="9"/>
-                            <TextBlock Text="{Binding GrnNumber}" FontSize="10" Margin="10,0,0,0" FontWeight="Bold" Foreground="DarkBlue"/>
-                        </StackPanel>
+                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
+                        <TextBlock Text="{Binding SelectedPO.PONumber}" FontSize="8" HorizontalAlignment="Center" TextWrapping="Wrap"/>
                     </Border>
-                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,1,1,1" Background="#F2F4F4" Padding="8">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <TextBlock Text="INVOICE / الفاتورة :" FontWeight="Bold" FontSize="9"/>
-                            <TextBlock Text="{Binding CurrentMatch.InvoiceNumber}" FontSize="10" Margin="10,0,0,0" FontWeight="Bold"/>
-                        </StackPanel>
+                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,1,1,1" Background="#FAD7A0" Padding="5">
+                        <TextBlock Text="{DynamicResource GRNNumberHeader}" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/>
                     </Border>
-                    <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,1,1,1" Background="#F2F4F4" Padding="8">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <TextBlock Text="DATE / التاريخ :" FontWeight="Bold" FontSize="9"/>
-                            <TextBlock Text="{Binding CurrentMatch.Date, StringFormat=MM/dd/yyyy}" FontSize="10" Margin="10,0,0,0" FontWeight="Bold"/>
-                        </StackPanel>
+                    <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
+                        <TextBlock Text="{Binding GrnNumber}" FontSize="8" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                    </Border>
+                    <Border Grid.Column="4" BorderBrush="Black" BorderThickness="0,1,1,1" Background="#D5D8DC" Padding="5">
+                        <TextBlock Text="{DynamicResource TWMDate}" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
+                        <TextBlock Text="{Binding CurrentMatch.Date, StringFormat=MM/dd/yyyy}" FontSize="9" HorizontalAlignment="Center"/>
+                    </Border>
+                </Grid>
+
+                <!-- Info Bar 2 (Invoice / Description / TWM No) -->
+                <Grid Grid.Row="3" Margin="0,0,0,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="180"/>
+                    </Grid.ColumnDefinitions>
+                    <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#D6EAF8" Padding="5">
+                        <TextBlock Text="{DynamicResource InvoiceNo}" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Background="#D6EAF8" Padding="5">
+                        <TextBlock Text="{DynamicResource Description}" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,0,1,1" Background="#D6EAF8" Padding="5">
+                        <TextBlock Text="{DynamicResource TWMNumber}" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/>
+                    </Border>
+
+                    <!-- Values row -->
+                    <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1,0,1,1" Padding="5" Grid.Column="0">
+                        <TextBlock Text="{Binding CurrentMatch.InvoiceNumber}" FontSize="9" HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border Grid.Row="1" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5">
+                        <TextBlock Text="{Binding CurrentMatch.InvoiceDetails}" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                    </Border>
+                    <Border Grid.Row="1" Grid.Column="2" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5">
+                        <TextBlock Text="{Binding CurrentMatch.TWMNumber}" FontSize="8" HorizontalAlignment="Center" TextWrapping="Wrap"/>
                     </Border>
                 </Grid>
 
                 <!-- Comparison Table -->
-                <Grid Grid.Row="3">
+                <Grid Grid.Row="4">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/> <!-- Header rows -->
                         <RowDefinition Height="*"/>    <!-- Data rows -->
@@ -1401,53 +1431,53 @@
 
                     <Grid Grid.Row="0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="40"/>  <!-- NO -->
-                            <ColumnDefinition Width="*"/>   <!-- Item Description -->
-                            <ColumnDefinition Width="60"/>  <!-- Unit -->
-                            <ColumnDefinition Width="130"/> <!-- PO -->
-                            <ColumnDefinition Width="130"/> <!-- Extracts -->
-                            <ColumnDefinition Width="130"/> <!-- GRN -->
-                            <ColumnDefinition Width="150"/> <!-- Notes -->
+                            <ColumnDefinition Width="180"/> <!-- Item -->
+                            <ColumnDefinition Width="40"/>  <!-- Unit -->
+                            <ColumnDefinition Width="100"/> <!-- PO -->
+                            <ColumnDefinition Width="100"/> <!-- Extracts -->
+                            <ColumnDefinition Width="100"/> <!-- GRN -->
+                            <ColumnDefinition Width="60"/>  <!-- Diff Note -->
+                            <ColumnDefinition Width="*"/>   <!-- Clarify -->
                         </Grid.ColumnDefinitions>
 
-                        <Border BorderBrush="Black" BorderThickness="1" Background="#D5D8DC" Padding="5"><TextBlock Text="NO" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="8"/></Border>
-                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1" Background="#D5D8DC" Padding="5"><TextBlock Text="ITEM DESCRIPTION / المواصفات" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="8"/></Border>
-                        <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,1,1,1" Background="#D5D8DC" Padding="5"><TextBlock Text="UNIT" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="8"/></Border>
+                        <Border BorderBrush="Black" BorderThickness="1" Background="#F2F4F4" Padding="5"><TextBlock Text="{DynamicResource ItemHeader}" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="9"/></Border>
+                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1" Background="#F2F4F4" Padding="5"><TextBlock Text="{DynamicResource Unit}" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="9"/></Border>
 
-                        <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,1,1,1">
+                        <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,1,1,1">
                             <StackPanel>
-                                <Border Background="#AED6F1" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="2"><TextBlock Text="PO / Contract" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/></Border>
+                                <Border Background="#F2F4F4" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="2"><TextBlock Text="{DynamicResource POContract}" FontSize="7" FontWeight="Bold" HorizontalAlignment="Center"/></Border>
                                 <Grid>
                                     <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
                                     <Border BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2"><TextBlock Text="Price" FontSize="8" HorizontalAlignment="Center"/></Border>
-                                    <Border Grid.Column="1" Padding="2"><TextBlock Text="Qty" FontSize="8" HorizontalAlignment="Center"/></Border>
+                                    <Border Grid.Column="1" Padding="2"><TextBlock Text="Quantity" FontSize="8" HorizontalAlignment="Center"/></Border>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,1,1,1">
+                            <StackPanel>
+                                <Border Background="#F2F4F4" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="2"><TextBlock Text="{DynamicResource Extracts}" FontSize="7" FontWeight="Bold" HorizontalAlignment="Center"/></Border>
+                                <Grid>
+                                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                    <Border BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2"><TextBlock Text="Price" FontSize="8" HorizontalAlignment="Center"/></Border>
+                                    <Border Grid.Column="1" Padding="2"><TextBlock Text="Quantity" FontSize="8" HorizontalAlignment="Center"/></Border>
                                 </Grid>
                             </StackPanel>
                         </Border>
 
                         <Border Grid.Column="4" BorderBrush="Black" BorderThickness="0,1,1,1">
                             <StackPanel>
-                                <Border Background="#FAD7A0" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="2"><TextBlock Text="Extracts / المستخلصات" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/></Border>
+                                <Border Background="#F2F4F4" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="2"><TextBlock Text="{DynamicResource GRNDetail}" FontSize="7" FontWeight="Bold" HorizontalAlignment="Center"/></Border>
                                 <Grid>
                                     <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
                                     <Border BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2"><TextBlock Text="Price" FontSize="8" HorizontalAlignment="Center"/></Border>
-                                    <Border Grid.Column="1" Padding="2"><TextBlock Text="Qty" FontSize="8" HorizontalAlignment="Center"/></Border>
+                                    <Border Grid.Column="1" Padding="2"><TextBlock Text="Quantity" FontSize="8" HorizontalAlignment="Center"/></Border>
                                 </Grid>
                             </StackPanel>
                         </Border>
 
-                        <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,1,1,1">
-                            <StackPanel>
-                                <Border Background="#D5F5E3" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="2"><TextBlock Text="GRN / التوريد" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/></Border>
-                                <Grid>
-                                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                    <Border BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2"><TextBlock Text="Price" FontSize="8" HorizontalAlignment="Center"/></Border>
-                                    <Border Grid.Column="1" Padding="2"><TextBlock Text="Qty" FontSize="8" HorizontalAlignment="Center"/></Border>
-                                </Grid>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Grid.Column="6" BorderBrush="Black" BorderThickness="0,1,1,1" Background="#D5D8DC" Padding="5"><TextBlock Text="CLARIFICATION / ملاحظات" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="8"/></Border>
+                        <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,1,1,1" Background="#F2F4F4" Padding="5"><TextBlock Text="Diff Note" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="8"/></Border>
+                        <Border Grid.Column="6" BorderBrush="Black" BorderThickness="0,1,1,1" Background="#F2F4F4" Padding="5"><TextBlock Text="Clarify the Diff" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="8"/></Border>
                     </Grid>
 
                     <ItemsControl Grid.Row="1" ItemsSource="{Binding CurrentMatch.Items}">
@@ -1455,31 +1485,31 @@
                             <DataTemplate>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="180"/>
                                         <ColumnDefinition Width="40"/>
-                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition Width="50"/>
                                         <ColumnDefinition Width="60"/>
-                                        <ColumnDefinition Width="65"/>
-                                        <ColumnDefinition Width="65"/>
-                                        <ColumnDefinition Width="65"/>
-                                        <ColumnDefinition Width="65"/>
-                                        <ColumnDefinition Width="65"/>
-                                        <ColumnDefinition Width="65"/>
-                                        <ColumnDefinition Width="150"/>
+                                        <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <Border BorderBrush="Black" BorderThickness="1,0,1,1" Padding="2"><TextBlock Text="{Binding Index}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
-                                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5"><TextBlock Text="{Binding Description}" FontSize="8" TextWrapping="Wrap" VerticalAlignment="Center"/></Border>
-                                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2"><TextBlock Text="{Binding Unit}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                                    <Border BorderBrush="Black" BorderThickness="1,0,1,1" Padding="5"><TextBlock Text="{Binding Description}" FontSize="9" TextWrapping="Wrap" VerticalAlignment="Center"/></Border>
+                                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2"><TextBlock Text="{Binding Unit}" FontSize="9" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
 
-                                    <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2" Background="#F4FBFF"><TextBlock Text="{Binding POPrice, StringFormat=N2}" FontSize="8" HorizontalAlignment="Right" VerticalAlignment="Center"/></Border>
-                                    <Border Grid.Column="4" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2" Background="#F4FBFF"><TextBlock Text="{Binding POQuantity}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2"><TextBlock Text="{Binding POPrice, StringFormat=N2}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                                    <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2"><TextBlock Text="{Binding POQuantity}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
 
-                                    <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2" Background="#FFF9F0"><TextBlock Text="{Binding ExtractPrice, StringFormat=N2}" FontSize="8" HorizontalAlignment="Right" VerticalAlignment="Center"/></Border>
-                                    <Border Grid.Column="6" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2" Background="#FFF9F0"><TextBlock Text="{Binding ExtractQuantity}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                                    <Border Grid.Column="4" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2"><TextBlock Text="{Binding ExtractPrice, StringFormat=N2}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                                    <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2"><TextBlock Text="{Binding ExtractQuantity}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
 
-                                    <Border Grid.Column="7" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2" Background="#F0FFF4"><TextBlock Text="{Binding GRNPrice, StringFormat=N2}" FontSize="8" HorizontalAlignment="Right" VerticalAlignment="Center"/></Border>
-                                    <Border Grid.Column="8" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2" Background="#F0FFF4"><TextBlock Text="{Binding GRNQuantity}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                                    <Border Grid.Column="6" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2"><TextBlock Text="{Binding GRNPrice, StringFormat=N2}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                                    <Border Grid.Column="7" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2"><TextBlock Text="{Binding GRNQuantity}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
 
-                                    <Border Grid.Column="9" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5"><TextBlock Text="{Binding ClarifyDiff}" FontSize="8" TextWrapping="Wrap" VerticalAlignment="Center"/></Border>
+                                    <Border Grid.Column="8" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2"><TextBlock Text="{Binding DiffNote}" FontSize="9" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border>
+                                    <Border Grid.Column="9" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5"><TextBlock Text="{Binding ClarifyDiff}" FontSize="9" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Center"/></Border>
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
@@ -1487,57 +1517,54 @@
                 </Grid>
 
                 <!-- Signatures -->
-                <Grid Grid.Row="4" Margin="0,15,0,0">
+                <Grid Grid.Row="5" Margin="0,15,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Border BorderBrush="Black" BorderThickness="1" Margin="0,0,5,0">
+                    <Border BorderBrush="Black" BorderThickness="1" Margin="0,0,0,0" Background="#D6EAF8">
                         <StackPanel>
-                            <Border Background="#AED6F1" Padding="3"><TextBlock Text="Checked by :" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
+                            <Border Padding="3" Background="#AED6F1"><TextBlock Text="Checked by / فحص بواسطة" FontWeight="Bold" FontSize="10" HorizontalAlignment="Center"/></Border>
                             <Grid Margin="5">
                                 <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                <TextBlock Text="POSITION :" FontWeight="Bold" FontSize="8"/> <TextBlock Grid.Column="1" Text="Logistic Manager" FontSize="8" Margin="10,0" HorizontalAlignment="Right"/>
-                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding LogisticsNameTWM}" FontSize="8" Margin="10,0" HorizontalAlignment="Right"/>
-                                <TextBlock Grid.Row="2" Text="Date :" FontSize="8"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentMatch.Date, StringFormat=MM/dd/yyyy}" FontSize="8" Margin="10,0" HorizontalAlignment="Right"/>
-                                <TextBlock Grid.Row="3" Text="Signature" FontSize="8"/>
-                                <Image Grid.Row="3" Grid.Column="1" Source="{Binding LogisticsSignatureTWM, Converter={StaticResource ImageBytesConverter}}" Height="30" HorizontalAlignment="Right"/>
-                                <Border Grid.Row="3" Grid.Column="1" Height="30"/>
+                                <TextBlock Text="Position / المنصب :" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Column="1" Text="Logistic Manager / مدير اللوجستيات" FontSize="10" Margin="10,0" HorizontalAlignment="Right" FontWeight="Bold"/>
+                                <TextBlock Grid.Row="1" Text="Name / الاسم :" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding LogisticsNameTWM}" FontSize="10" Margin="10,0" HorizontalAlignment="Right" FontWeight="Bold"/>
+                                <TextBlock Grid.Row="2" Text="Date / التاريخ :" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentMatch.Date, StringFormat=MM/dd/yyyy}" FontSize="10" Margin="10,0" HorizontalAlignment="Right" FontWeight="Bold"/>
+                                <TextBlock Grid.Row="3" Text="Signature / التوقيع" FontWeight="Bold" FontSize="9"/>
+                                <Image Grid.Row="3" Grid.Column="1" Source="{Binding LogisticsSignatureTWM, Converter={StaticResource ImageBytesConverter}}" Height="40" HorizontalAlignment="Right"/>
                             </Grid>
                         </StackPanel>
                     </Border>
 
-                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="0,0,5,0">
+                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1" Margin="0,0,0,0" Background="#D6EAF8">
                         <StackPanel>
-                            <Border Background="#AED6F1" Padding="3"><TextBlock Text="Reviewed by :" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
+                            <Border Padding="3" Background="#D5D8DC"><TextBlock Text="Reviewed by / مراجعة بواسطة" FontWeight="Bold" FontSize="10" HorizontalAlignment="Center"/></Border>
                             <Grid Margin="5">
                                 <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                <TextBlock Text="POSITION :" FontWeight="Bold" FontSize="8"/> <TextBlock Grid.Column="1" Text="Finance Manager" FontSize="8" Margin="10,0" HorizontalAlignment="Right"/>
-                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding FinanceNameTWM}" FontSize="8" Margin="10,0" HorizontalAlignment="Right"/>
-                                <TextBlock Grid.Row="2" Text="Date :" FontSize="8"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentMatch.Date, StringFormat=MM/dd/yyyy}" FontSize="8" Margin="10,0" HorizontalAlignment="Right"/>
-                                <TextBlock Grid.Row="3" Text="Signature" FontSize="8"/>
-                                <Image Grid.Row="3" Grid.Column="1" Source="{Binding FinanceSignatureTWM, Converter={StaticResource ImageBytesConverter}}" Height="30" HorizontalAlignment="Right"/>
-                                <Border Grid.Row="3" Grid.Column="1" Height="30"/>
+                                <TextBlock Text="Position / المنصب :" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Column="1" Text="Finance Manager / المدير المالي" FontSize="10" Margin="10,0" HorizontalAlignment="Right" FontWeight="Bold"/>
+                                <TextBlock Grid.Row="1" Text="Name / الاسم :" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding FinanceNameTWM}" FontSize="10" Margin="10,0" HorizontalAlignment="Right" FontWeight="Bold"/>
+                                <TextBlock Grid.Row="2" Text="Date / التاريخ :" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentMatch.Date, StringFormat=MM/dd/yyyy}" FontSize="10" Margin="10,0" HorizontalAlignment="Right" FontWeight="Bold"/>
+                                <TextBlock Grid.Row="3" Text="Signature / التوقيع" FontWeight="Bold" FontSize="9"/>
+                                <Image Grid.Row="3" Grid.Column="1" Source="{Binding FinanceSignatureTWM, Converter={StaticResource ImageBytesConverter}}" Height="40" HorizontalAlignment="Right"/>
                             </Grid>
                         </StackPanel>
                     </Border>
 
-                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="1">
+                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,1,1,1" Background="#D6EAF8">
                         <StackPanel>
-                            <Border Background="#AED6F1" Padding="3"><TextBlock Text="Approved by :" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
+                            <Border Padding="3" Background="#D5D8DC"><TextBlock Text="Approved by / اعتمد بواسطة" FontWeight="Bold" FontSize="10" HorizontalAlignment="Center"/></Border>
                             <Grid Margin="5">
                                 <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                <TextBlock Text="POSITION :" FontWeight="Bold" FontSize="8"/> <TextBlock Grid.Column="1" Text="Head of Association" FontSize="8" Margin="10,0" HorizontalAlignment="Right"/>
-                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding HeadNameTWM}" FontSize="8" Margin="10,0" HorizontalAlignment="Right"/>
-                                <TextBlock Grid.Row="2" Text="Date :" FontSize="8"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentMatch.Date, StringFormat=MM/dd/yyyy}" FontSize="8" Margin="10,0" HorizontalAlignment="Right"/>
-                                <TextBlock Grid.Row="3" Text="Signature" FontSize="8"/>
-                                <Image Grid.Row="3" Grid.Column="1" Source="{Binding HeadSignatureTWM, Converter={StaticResource ImageBytesConverter}}" Height="30" HorizontalAlignment="Right"/>
-                                <Border Grid.Row="3" Grid.Column="1" Height="30"/>
+                                <TextBlock Text="Position / المنصب :" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Column="1" Text="Head / PM" FontSize="10" Margin="10,0" HorizontalAlignment="Right" FontWeight="Bold"/>
+                                <TextBlock Grid.Row="1" Text="Name / الاسم :" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding HeadNameTWM}" FontSize="10" Margin="10,0" HorizontalAlignment="Right" FontWeight="Bold"/>
+                                <TextBlock Grid.Row="2" Text="Date / التاريخ :" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentMatch.Date, StringFormat=MM/dd/yyyy}" FontSize="10" Margin="10,0" HorizontalAlignment="Right" FontWeight="Bold"/>
+                                <TextBlock Grid.Row="3" Text="Signature / التوقيع" FontWeight="Bold" FontSize="9"/>
+                                <Image Grid.Row="3" Grid.Column="1" Source="{Binding HeadSignatureTWM, Converter={StaticResource ImageBytesConverter}}" Height="40" HorizontalAlignment="Right"/>
                             </Grid>
                         </StackPanel>
                     </Border>

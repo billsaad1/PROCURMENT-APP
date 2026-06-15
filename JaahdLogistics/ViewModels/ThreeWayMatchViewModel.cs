@@ -11,13 +11,13 @@ namespace JaahdLogistics.ViewModels
     {
         private readonly IDataService _dataService;
 
-        public string? LogisticsNameTWM => Employees.FirstOrDefault(e => e.Id == Settings.DefaultLogisticsEmployeeId)?.NameEN ?? Settings.LogisticsManager;
-        public string? FinanceNameTWM => Employees.FirstOrDefault(e => e.Id == Settings.DefaultFinanceEmployeeId)?.NameEN ?? Settings.FinanceManager;
-        public string? HeadNameTWM => Employees.FirstOrDefault(e => e.Id == Settings.DefaultHeadEmployeeId)?.NameEN ?? Settings.HeadOfAssociation;
+        [ObservableProperty] private string? _logisticsNameTWM;
+        [ObservableProperty] private string? _financeNameTWM;
+        [ObservableProperty] private string? _headNameTWM;
 
-        public byte[]? LogisticsSignatureTWM => Employees.FirstOrDefault(e => e.Id == Settings.DefaultLogisticsEmployeeId)?.SignatureImage;
-        public byte[]? FinanceSignatureTWM => Employees.FirstOrDefault(e => e.Id == Settings.DefaultFinanceEmployeeId)?.SignatureImage;
-        public byte[]? HeadSignatureTWM => Employees.FirstOrDefault(e => e.Id == Settings.DefaultHeadEmployeeId)?.SignatureImage;
+        [ObservableProperty] private byte[]? _logisticsSignatureTWM;
+        [ObservableProperty] private byte[]? _financeSignatureTWM;
+        [ObservableProperty] private byte[]? _headSignatureTWM;
 
         [ObservableProperty]
         private ObservableCollection<PurchaseOrder> _completedPOs = new();
@@ -74,6 +74,44 @@ namespace JaahdLogistics.ViewModels
             Matches = new ObservableCollection<ThreeWayMatch>(_dataService.GetThreeWayMatches());
         }
 
+        partial void OnCurrentMatchChanged(ThreeWayMatch value)
+        {
+            if (value != null)
+            {
+                LoadApprovals();
+            }
+        }
+
+        private void LoadApprovals()
+        {
+            if (CurrentMatch == null) return;
+
+            // 1. Initial Fallback
+            LogisticsNameTWM = Employees.FirstOrDefault(e => e.Id == Settings.DefaultLogisticsEmployeeId)?.NameEN ?? Settings.LogisticsManager;
+            LogisticsSignatureTWM = null;
+
+            FinanceNameTWM = Employees.FirstOrDefault(e => e.Id == Settings.DefaultFinanceEmployeeId)?.NameEN ?? Settings.FinanceManager;
+            FinanceSignatureTWM = null;
+
+            HeadNameTWM = Employees.FirstOrDefault(e => e.Id == Settings.DefaultHeadEmployeeId)?.NameEN ?? Settings.HeadOfAssociation;
+            HeadSignatureTWM = null;
+
+            if (CurrentMatch.Id == 0) return;
+
+            // 2. Override with formal approval records
+            var approvals = _dataService.GetApprovals("ThreeWayMatch", CurrentMatch.Id);
+            foreach (var app in approvals)
+            {
+                string status = (string)app.Status;
+                byte[]? sig = (byte[]?)app.SignatureImage;
+                string? name = (string?)app.FullName;
+
+                if (status == "LogisticsApproved") { LogisticsSignatureTWM = sig; LogisticsNameTWM = name; }
+                else if (status == "FinanceApproved") { FinanceSignatureTWM = sig; FinanceNameTWM = name; }
+                else if (status == "PMApproved") { HeadSignatureTWM = sig; HeadNameTWM = name; } // Head of Association or PM
+            }
+        }
+
         partial void OnSelectedMatchChanged(ThreeWayMatch? value)
         {
             if (value != null)
@@ -88,6 +126,7 @@ namespace JaahdLogistics.ViewModels
                 {
                     CurrentMatch.Items[i].Index = i + 1;
                 }
+                LoadApprovals();
             }
         }
 
@@ -129,6 +168,7 @@ namespace JaahdLogistics.ViewModels
                 GRNId = grn.Id,
                 Date = System.DateTime.Now,
                 InvoiceNumber = grn.InvoiceNumber,
+                TWMNumber = SelectedPO.PONumber + "-TWM",
                 Status = "Verified" 
             };
             GrnNumber = grn.GRNNumber;

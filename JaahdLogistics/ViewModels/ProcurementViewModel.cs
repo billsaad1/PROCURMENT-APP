@@ -27,13 +27,13 @@ namespace JaahdLogistics.ViewModels
     {
         private readonly IDataService _dataService;
 
-        public string? LogisticsNameBA => Employees.FirstOrDefault(e => e.Id == Settings.DefaultLogisticsEmployeeId)?.NameEN ?? Settings.LogisticsManager;
-        public string? FinanceNameBA => Employees.FirstOrDefault(e => e.Id == Settings.DefaultFinanceEmployeeId)?.NameEN ?? Settings.FinanceManager;
-        public string? HeadNameBA => Employees.FirstOrDefault(e => e.Id == Settings.DefaultHeadEmployeeId)?.NameEN ?? Settings.HeadOfAssociation;
+        [ObservableProperty] private string? _logisticsNameBA;
+        [ObservableProperty] private string? _financeNameBA;
+        [ObservableProperty] private string? _headNameBA;
 
-        public byte[]? LogisticsSignatureBA => Employees.FirstOrDefault(e => e.Id == Settings.DefaultLogisticsEmployeeId)?.SignatureImage;
-        public byte[]? FinanceSignatureBA => Employees.FirstOrDefault(e => e.Id == Settings.DefaultFinanceEmployeeId)?.SignatureImage;
-        public byte[]? HeadSignatureBA => Employees.FirstOrDefault(e => e.Id == Settings.DefaultHeadEmployeeId)?.SignatureImage;
+        [ObservableProperty] private byte[]? _logisticsSignatureBA;
+        [ObservableProperty] private byte[]? _financeSignatureBA;
+        [ObservableProperty] private byte[]? _headSignatureBA;
 
         [ObservableProperty]
         private ObservableCollection<PurchaseRequisition> _approvedPRs = new();
@@ -170,12 +170,37 @@ namespace JaahdLogistics.ViewModels
         {
             if (value != null)
             {
-                OnPropertyChanged(nameof(LogisticsNameBA));
-                OnPropertyChanged(nameof(FinanceNameBA));
-                OnPropertyChanged(nameof(HeadNameBA));
-                OnPropertyChanged(nameof(LogisticsSignatureBA));
-                OnPropertyChanged(nameof(FinanceSignatureBA));
-                OnPropertyChanged(nameof(HeadSignatureBA));
+                LoadBidAnalysisApprovals();
+            }
+        }
+
+        private void LoadBidAnalysisApprovals()
+        {
+            if (CurrentBidAnalysis == null) return;
+
+            // 1. Fallbacks
+            LogisticsNameBA = Employees.FirstOrDefault(e => e.Id == (CurrentBidAnalysis.LogisticsEmployeeId ?? Settings.DefaultLogisticsEmployeeId))?.NameEN ?? Settings.LogisticsManager;
+            LogisticsSignatureBA = null;
+
+            FinanceNameBA = Employees.FirstOrDefault(e => e.Id == (CurrentBidAnalysis.FinanceEmployeeId ?? Settings.DefaultFinanceEmployeeId))?.NameEN ?? Settings.FinanceManager;
+            FinanceSignatureBA = null;
+
+            HeadNameBA = Employees.FirstOrDefault(e => e.Id == (CurrentBidAnalysis.HeadEmployeeId ?? Settings.DefaultHeadEmployeeId))?.NameEN ?? Settings.HeadOfAssociation;
+            HeadSignatureBA = null;
+
+            if (CurrentBidAnalysis.Id == 0) return;
+
+            // 2. Approvals
+            var approvals = _dataService.GetApprovals("BidAnalysis", CurrentBidAnalysis.Id);
+            foreach (var app in approvals)
+            {
+                string status = (string)app.Status;
+                byte[]? sig = (byte[]?)app.SignatureImage;
+                string? name = (string?)app.FullName;
+
+                if (status == "CheckedByLogistics") { LogisticsSignatureBA = sig; LogisticsNameBA = name; }
+                else if (status == "ReviewedByFinance") { FinanceSignatureBA = sig; FinanceNameBA = name; }
+                else if (status == "FinalApproved" || status == "ApprovedByHead") { HeadSignatureBA = sig; HeadNameBA = name; }
             }
         }
 
@@ -267,17 +292,35 @@ namespace JaahdLogistics.ViewModels
 
         private void UpdatePOSignatures()
         {
-            var logEmp = Employees.FirstOrDefault(e => e.Id == Settings.DefaultLogisticsEmployeeId);
-            if (logEmp != null) { CurrentPO.LogisticsSignature = logEmp.SignatureImage; CurrentPO.LogisticsName = logEmp.NameEN; }
-            else { CurrentPO.LogisticsName = Settings.LogisticsManager; }
+            if (CurrentPO == null) return;
 
-            var finEmp = Employees.FirstOrDefault(e => e.Id == Settings.DefaultFinanceEmployeeId);
-            if (finEmp != null) { CurrentPO.FinanceSignature = finEmp.SignatureImage; CurrentPO.FinanceName = finEmp.NameEN; }
-            else { CurrentPO.FinanceName = Settings.FinanceManager; }
+            // 1. Fallbacks
+            var logEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPO.LogisticsEmployeeId ?? Settings.DefaultLogisticsEmployeeId));
+            CurrentPO.LogisticsName = logEmp?.NameEN ?? Settings.LogisticsManager;
+            CurrentPO.LogisticsSignature = null;
 
-            var headEmp = Employees.FirstOrDefault(e => e.Id == Settings.DefaultHeadEmployeeId);
-            if (headEmp != null) { CurrentPO.FinalSignature = headEmp.SignatureImage; CurrentPO.FinalName = headEmp.NameEN; }
-            else { CurrentPO.FinalName = Settings.HeadOfAssociation; }
+            var finEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPO.FinanceEmployeeId ?? Settings.DefaultFinanceEmployeeId));
+            CurrentPO.FinanceName = finEmp?.NameEN ?? Settings.FinanceManager;
+            CurrentPO.FinanceSignature = null;
+
+            var headEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPO.HeadEmployeeId ?? Settings.DefaultHeadEmployeeId));
+            CurrentPO.FinalName = headEmp?.NameEN ?? Settings.HeadOfAssociation;
+            CurrentPO.FinalSignature = null;
+
+            if (CurrentPO.Id == 0) return;
+
+            // 2. Approvals
+            var approvals = _dataService.GetApprovals("PO", CurrentPO.Id);
+            foreach (var app in approvals)
+            {
+                string status = (string)app.Status;
+                byte[]? sig = (byte[]?)app.SignatureImage;
+                string? name = (string?)app.FullName;
+
+                if (status == "CheckedByLogistics") { CurrentPO.LogisticsSignature = sig; CurrentPO.LogisticsName = name; }
+                else if (status == "ReviewedByFinance") { CurrentPO.FinanceSignature = sig; CurrentPO.FinanceName = name; }
+                else if (status == "FinalApproved" || status == "ApprovedByHead") { CurrentPO.FinalSignature = sig; CurrentPO.FinalName = name; }
+            }
         }
 
 

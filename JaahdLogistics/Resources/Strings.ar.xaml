@@ -102,4 +102,23 @@
     <s:String x:Key="Vendors">الموردين</s:String>
     <s:String x:Key="RecommendationReasons">أسباب التوصية</s:String>
     <s:String x:Key="FinalApproved">الموافقة النهائية</s:String>
+    <s:String x:Key="InvoiceNo">رقم الفاتورة / INVOICE NO</s:String>
+    <s:String x:Key="TWMNumber">رقم المطابقة الثلاثية / THREE-WAY MATCH NO</s:String>
+    <s:String x:Key="DiffNote">ملاحظة الفرق / Diff Note</s:String>
+    <s:String x:Key="ClarifyDiff">توضيح الفرق / Clarify the Diff</s:String>
+    <s:String x:Key="POContract">أمر الشراء-العقد / PURCHASE ORDER-CONTRACT</s:String>
+    <s:String x:Key="Extracts">المستخلصات / EXTRACTS</s:String>
+    <s:String x:Key="GRNDetail">إشعار الاستلام / GRN</s:String>
+    <s:String x:Key="TWMDate">تاريخ المطابقة / TWM DATE</s:String>
+    <s:String x:Key="RecomAwardTo">التوصية بالترسية على / Recommend to award to:</s:String>
+    <s:String x:Key="PONumberHeader">رقم أمر الشراء / PO NUMBER</s:String>
+    <s:String x:Key="GRNNumberHeader">رقم إشعار الاستلام / GRN NO</s:String>
+    <s:String x:Key="ItemHeader">الصنف / Item</s:String>
+    <s:String x:Key="EstimativeCost">التكلفة التقديرية / Estimative Cost</s:String>
+    <s:String x:Key="BidderHeader">مقدم العرض / BIDDER</s:String>
+    <s:String x:Key="SubTotal">الإجمالي الفرعي / Sub : Total</s:String>
+    <s:String x:Key="Discount">الخصم / Discount</s:String>
+    <s:String x:Key="MiscCosts">تكاليف أخرى / Misc/other costs</s:String>
+    <s:String x:Key="GeneralTotal">الإجمالي العام / General Total</s:String>
+    <s:String x:Key="TotalInWords">الإجمالي كتابة / Total in Words:</s:String>
 </ResourceDictionary>

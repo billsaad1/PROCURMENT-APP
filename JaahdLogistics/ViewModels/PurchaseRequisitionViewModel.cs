@@ -52,17 +52,36 @@ namespace JaahdLogistics.ViewModels
                 {
                     CurrentPR.RequesterSignature = emp.SignatureImage;
                     CurrentPR.RequesterName = emp.NameEN;
+                    if (!string.IsNullOrWhiteSpace(emp.PositionEN)) CurrentPR.RequesterTitle = emp.PositionEN;
                 }
             }
         }
 
         private void LoadApprovals()
         {
-            if (CurrentPR.Id == 0) return;
+            if (CurrentPR == null) return;
 
-            // Load Employee-linked signatures first if they exist
+            // 1. Initial Fallback (Names/Titles from Employee records or Settings)
             if (CurrentPR.RequesterEmployeeId.HasValue) UpdateRequesterSignature();
 
+            var logEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPR.LogisticsEmployeeId ?? Settings.DefaultLogisticsEmployeeId));
+            CurrentPR.LogisticsName = logEmp?.NameEN ?? Settings.LogisticsManager;
+            CurrentPR.LogisticsSignature = null;
+
+            var finEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPR.FinanceEmployeeId ?? Settings.DefaultFinanceEmployeeId));
+            CurrentPR.FinanceName = finEmp?.NameEN ?? Settings.FinanceManager;
+            CurrentPR.FinanceSignature = null;
+
+            CurrentPR.PMName = CurrentPR.Project?.ProjectManager ?? "";
+            CurrentPR.PMSignature = null;
+
+            var headEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPR.HeadEmployeeId ?? Settings.DefaultHeadEmployeeId));
+            CurrentPR.FinalName = headEmp?.NameEN ?? Settings.HeadOfAssociation;
+            CurrentPR.FinalSignature = null;
+
+            if (CurrentPR.Id == 0) return;
+
+            // 2. Override with formal approval records if they exist
             var approvals = _dataService.GetApprovals("PR", CurrentPR.Id);
             foreach (var app in approvals)
             {

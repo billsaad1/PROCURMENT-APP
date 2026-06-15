@@ -101,4 +101,23 @@
     <s:String x:Key="Vendors">Vendors</s:String>
     <s:String x:Key="RecommendationReasons">Recommendation Reasons</s:String>
     <s:String x:Key="FinalApproved">Final Approval</s:String>
+    <s:String x:Key="InvoiceNo">INVOICE NO</s:String>
+    <s:String x:Key="TWMNumber">THREE-WAY MATCH NO</s:String>
+    <s:String x:Key="DiffNote">Diff Note</s:String>
+    <s:String x:Key="ClarifyDiff">Clarify the Diff</s:String>
+    <s:String x:Key="POContract">PURCHASE ORDER/CONTRACT</s:String>
+    <s:String x:Key="Extracts">EXTRACTS</s:String>
+    <s:String x:Key="GRNDetail">GRN</s:String>
+    <s:String x:Key="TWMDate">TWM DATE</s:String>
+    <s:String x:Key="RecomAwardTo">Recommend to award to:</s:String>
+    <s:String x:Key="PONumberHeader">PO NUMBER</s:String>
+    <s:String x:Key="GRNNumberHeader">GRN NO</s:String>
+    <s:String x:Key="ItemHeader">Item</s:String>
+    <s:String x:Key="EstimativeCost">Estimative Cost</s:String>
+    <s:String x:Key="BidderHeader">BIDDER / المورد</s:String>
+    <s:String x:Key="SubTotal">Sub : Total</s:String>
+    <s:String x:Key="Discount">Discount</s:String>
+    <s:String x:Key="MiscCosts">Misc/other costs</s:String>
+    <s:String x:Key="GeneralTotal">General Total</s:String>
+    <s:String x:Key="TotalInWords">Total in Words:</s:String>
 </ResourceDictionary>
