@@ -61,31 +61,40 @@ namespace JaahdLogistics.ViewModels
         {
             if (CurrentPR == null) return;
 
+            // 0. Ensure settings are fresh
+            Settings = _dataService.GetSettings();
+
             // 1. Initial Defaults (Names/Titles/Signatures from Employee records or Settings)
             if (CurrentPR.RequesterEmployeeId.HasValue) UpdateRequesterSignature();
 
             var logEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPR.LogisticsEmployeeId ?? Settings.DefaultLogisticsEmployeeId));
             CurrentPR.LogisticsName = logEmp?.NameEN ?? Settings.LogisticsManager;
+            if (string.IsNullOrEmpty(CurrentPR.LogisticsName)) CurrentPR.LogisticsName = "Logistics Manager";
             CurrentPR.LogisticsSignature = logEmp?.SignatureImage;
             CurrentPR.LogisticsTitle = logEmp?.PositionEN ?? "Logistics Manager";
 
             var finEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPR.FinanceEmployeeId ?? Settings.DefaultFinanceEmployeeId));
             CurrentPR.FinanceName = finEmp?.NameEN ?? Settings.FinanceManager;
+            if (string.IsNullOrEmpty(CurrentPR.FinanceName)) CurrentPR.FinanceName = "Finance Manager";
             CurrentPR.FinanceSignature = finEmp?.SignatureImage;
             CurrentPR.FinanceTitle = finEmp?.PositionEN ?? "Finance Manager";
 
             CurrentPR.PMName = CurrentPR.Project?.ProjectManager ?? "";
+            if (string.IsNullOrEmpty(CurrentPR.PMName)) CurrentPR.PMName = "Project Manager";
             CurrentPR.PMTitle = "Project Manager";
-            // PM signature usually comes from an employee but Project model doesn't link directly to Employee ID yet.
-            // For now, if PM matches an employee name, we could try to find it, but standard approval record is safer.
             CurrentPR.PMSignature = null;
 
             var headEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPR.HeadEmployeeId ?? Settings.DefaultHeadEmployeeId));
             CurrentPR.FinalName = headEmp?.NameEN ?? Settings.HeadOfAssociation;
+            if (string.IsNullOrEmpty(CurrentPR.FinalName)) CurrentPR.FinalName = "Head of Association";
             CurrentPR.FinalSignature = headEmp?.SignatureImage;
             CurrentPR.FinalTitle = headEmp?.PositionEN ?? "Head of Association";
 
-            if (CurrentPR.Id == 0) return;
+            if (CurrentPR.Id == 0)
+            {
+                OnPropertyChanged(nameof(CurrentPR));
+                return;
+            }
 
             // 2. Override with formal approval records if they exist (contains real approval timestamped signatures)
             var approvals = _dataService.GetApprovals("PR", CurrentPR.Id);
@@ -94,11 +103,12 @@ namespace JaahdLogistics.ViewModels
                 string status = (string)app.Status;
                 byte[]? sig = (byte[]?)app.SignatureImage;
                 string? name = (string?)app.FullName;
+                string? title = (string?)app.Position;
 
-                if (status == "CheckedByLogistics") { CurrentPR.LogisticsSignature = sig; CurrentPR.LogisticsName = name; }
-                else if (status == "ReviewedByFinance") { CurrentPR.FinanceSignature = sig; CurrentPR.FinanceName = name; }
-                else if (status == "ApprovedByPM") { CurrentPR.PMSignature = sig; CurrentPR.PMName = name; }
-                else if (status == "FinalApproved") { CurrentPR.FinalSignature = sig; CurrentPR.FinalName = name; }
+                if (status == "CheckedByLogistics") { CurrentPR.LogisticsSignature = sig; }
+                else if (status == "ReviewedByFinance") { CurrentPR.FinanceSignature = sig; }
+                else if (status == "ApprovedByPM") { CurrentPR.PMSignature = sig; }
+                else if (status == "FinalApproved") { CurrentPR.FinalSignature = sig; }
             }
             OnPropertyChanged(nameof(CurrentPR));
         }
