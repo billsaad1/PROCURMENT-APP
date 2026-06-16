@@ -297,15 +297,18 @@ namespace JaahdLogistics.ViewModels
             // 1. Fallbacks
             var logEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPO.LogisticsEmployeeId ?? Settings.DefaultLogisticsEmployeeId));
             CurrentPO.LogisticsName = logEmp?.NameEN ?? Settings.LogisticsManager;
-            CurrentPO.LogisticsSignature = null;
+            CurrentPO.LogisticsTitle = logEmp?.PositionEN ?? "Logistics Manager";
+            CurrentPO.LogisticsSignature = logEmp?.SignatureImage;
 
             var finEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPO.FinanceEmployeeId ?? Settings.DefaultFinanceEmployeeId));
             CurrentPO.FinanceName = finEmp?.NameEN ?? Settings.FinanceManager;
-            CurrentPO.FinanceSignature = null;
+            CurrentPO.FinanceTitle = finEmp?.PositionEN ?? "Finance Manager";
+            CurrentPO.FinanceSignature = finEmp?.SignatureImage;
 
             var headEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPO.HeadEmployeeId ?? Settings.DefaultHeadEmployeeId));
             CurrentPO.FinalName = headEmp?.NameEN ?? Settings.HeadOfAssociation;
-            CurrentPO.FinalSignature = null;
+            CurrentPO.FinalTitle = headEmp?.PositionEN ?? "Head / مدير الجمعية";
+            CurrentPO.FinalSignature = headEmp?.SignatureImage;
 
             if (CurrentPO.Id == 0) return;
 

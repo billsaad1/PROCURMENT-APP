@@ -15,6 +15,10 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty] private string? _financeNameTWM;
         [ObservableProperty] private string? _headNameTWM;
 
+        [ObservableProperty] private string? _logisticsTitleTWM;
+        [ObservableProperty] private string? _financeTitleTWM;
+        [ObservableProperty] private string? _headTitleTWM;
+
         [ObservableProperty] private byte[]? _logisticsSignatureTWM;
         [ObservableProperty] private byte[]? _financeSignatureTWM;
         [ObservableProperty] private byte[]? _headSignatureTWM;
@@ -87,14 +91,20 @@ namespace JaahdLogistics.ViewModels
             if (CurrentMatch == null) return;
 
             // 1. Initial Fallback
-            LogisticsNameTWM = Employees.FirstOrDefault(e => e.Id == Settings.DefaultLogisticsEmployeeId)?.NameEN ?? Settings.LogisticsManager;
-            LogisticsSignatureTWM = null;
+            var logEmp = Employees.FirstOrDefault(e => e.Id == Settings.DefaultLogisticsEmployeeId);
+            LogisticsNameTWM = logEmp?.NameEN ?? Settings.LogisticsManager;
+            LogisticsTitleTWM = logEmp?.PositionEN ?? "Logistics Manager / مدير اللوجستيات";
+            LogisticsSignatureTWM = logEmp?.SignatureImage;
 
-            FinanceNameTWM = Employees.FirstOrDefault(e => e.Id == Settings.DefaultFinanceEmployeeId)?.NameEN ?? Settings.FinanceManager;
-            FinanceSignatureTWM = null;
+            var finEmp = Employees.FirstOrDefault(e => e.Id == Settings.DefaultFinanceEmployeeId);
+            FinanceNameTWM = finEmp?.NameEN ?? Settings.FinanceManager;
+            FinanceTitleTWM = finEmp?.PositionEN ?? "Finance Manager / المدير المالي";
+            FinanceSignatureTWM = finEmp?.SignatureImage;
 
-            HeadNameTWM = Employees.FirstOrDefault(e => e.Id == Settings.DefaultHeadEmployeeId)?.NameEN ?? Settings.HeadOfAssociation;
-            HeadSignatureTWM = null;
+            var headEmp = Employees.FirstOrDefault(e => e.Id == Settings.DefaultHeadEmployeeId);
+            HeadNameTWM = headEmp?.NameEN ?? Settings.HeadOfAssociation;
+            HeadTitleTWM = headEmp?.PositionEN ?? "Head / PM";
+            HeadSignatureTWM = headEmp?.SignatureImage;
 
             if (CurrentMatch.Id == 0) return;
 

@@ -67,12 +67,15 @@ namespace JaahdLogistics.ViewModels
             var logEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPR.LogisticsEmployeeId ?? Settings.DefaultLogisticsEmployeeId));
             CurrentPR.LogisticsName = logEmp?.NameEN ?? Settings.LogisticsManager;
             CurrentPR.LogisticsSignature = logEmp?.SignatureImage;
+            CurrentPR.LogisticsTitle = logEmp?.PositionEN ?? "Logistics Manager";
 
             var finEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPR.FinanceEmployeeId ?? Settings.DefaultFinanceEmployeeId));
             CurrentPR.FinanceName = finEmp?.NameEN ?? Settings.FinanceManager;
             CurrentPR.FinanceSignature = finEmp?.SignatureImage;
+            CurrentPR.FinanceTitle = finEmp?.PositionEN ?? "Finance Manager";
 
             CurrentPR.PMName = CurrentPR.Project?.ProjectManager ?? "";
+            CurrentPR.PMTitle = "Project Manager";
             // PM signature usually comes from an employee but Project model doesn't link directly to Employee ID yet.
             // For now, if PM matches an employee name, we could try to find it, but standard approval record is safer.
             CurrentPR.PMSignature = null;
@@ -80,6 +83,7 @@ namespace JaahdLogistics.ViewModels
             var headEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPR.HeadEmployeeId ?? Settings.DefaultHeadEmployeeId));
             CurrentPR.FinalName = headEmp?.NameEN ?? Settings.HeadOfAssociation;
             CurrentPR.FinalSignature = headEmp?.SignatureImage;
+            CurrentPR.FinalTitle = headEmp?.PositionEN ?? "Head of Association";
 
             if (CurrentPR.Id == 0) return;
 

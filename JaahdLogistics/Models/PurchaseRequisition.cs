@@ -66,6 +66,18 @@ namespace JaahdLogistics.Models
         private string? _finalName;
         public string? FinalName { get => _finalName; set => SetProperty(ref _finalName, value); }
 
+        private string? _logisticsTitle = "Logistics Manager";
+        public string? LogisticsTitle { get => _logisticsTitle; set => SetProperty(ref _logisticsTitle, value); }
+
+        private string? _financeTitle = "Finance Manager";
+        public string? FinanceTitle { get => _financeTitle; set => SetProperty(ref _financeTitle, value); }
+
+        private string? _pmTitle = "Project Manager";
+        public string? PMTitle { get => _pmTitle; set => SetProperty(ref _pmTitle, value); }
+
+        private string? _finalTitle = "Head of Association";
+        public string? FinalTitle { get => _finalTitle; set => SetProperty(ref _finalTitle, value); }
+
         private int? _requesterEmployeeId;
         public int? RequesterEmployeeId { get => _requesterEmployeeId; set => SetProperty(ref _requesterEmployeeId, value); }
 

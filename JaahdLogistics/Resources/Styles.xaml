@@ -295,7 +295,7 @@
                     <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="0,0,5,0">
                         <StackPanel>
                             <Border Background="#D5D8DC" Padding="2"><TextBlock Text="Verified / تم المراجعة" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
-                            <TextBlock Text="Logistic Manager / مدير اللوجستيات" FontSize="8" HorizontalAlignment="Center" Margin="0,2" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding CurrentPR.LogisticsTitle}" FontSize="8" HorizontalAlignment="Center" Margin="0,2" FontWeight="Bold"/>
                             <Separator/>
                             <Image Source="{Binding CurrentPR.LogisticsSignature, Converter={StaticResource ImageBytesConverter}}" Height="50" Margin="2" Stretch="Uniform"/>
                             <TextBlock Text="{Binding CurrentPR.LogisticsName}" FontSize="9" HorizontalAlignment="Center" FontWeight="Bold" Margin="0,0,0,2"/>
@@ -305,7 +305,7 @@
                     <Border Grid.Column="2" BorderBrush="Black" BorderThickness="1" Margin="0,0,5,0">
                         <StackPanel>
                             <Border Background="#D5D8DC" Padding="2"><TextBlock Text="Verified / تم المراجعة" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
-                            <TextBlock Text="Finance Manager / المدير المالي" FontSize="8" HorizontalAlignment="Center" Margin="0,2" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding CurrentPR.FinanceTitle}" FontSize="8" HorizontalAlignment="Center" Margin="0,2" FontWeight="Bold"/>
                             <Separator/>
                             <Image Source="{Binding CurrentPR.FinanceSignature, Converter={StaticResource ImageBytesConverter}}" Height="50" Margin="2" Stretch="Uniform"/>
                             <TextBlock Text="{Binding CurrentPR.FinanceName}" FontSize="9" HorizontalAlignment="Center" FontWeight="Bold" Margin="0,0,0,2"/>
@@ -315,7 +315,7 @@
                     <Border Grid.Column="3" BorderBrush="Black" BorderThickness="1">
                         <StackPanel>
                             <Border Background="#D5D8DC" Padding="2"><TextBlock Text="Approved / تم الاعتماد" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
-                            <TextBlock Text="Head of Association / مدير الجمعية" FontSize="8" HorizontalAlignment="Center" Margin="0,2" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding CurrentPR.FinalTitle}" FontSize="8" HorizontalAlignment="Center" Margin="0,2" FontWeight="Bold"/>
                             <Separator/>
                             <Image Source="{Binding CurrentPR.FinalSignature, Converter={StaticResource ImageBytesConverter}}" Height="50" Margin="2" Stretch="Uniform"/>
                             <TextBlock Text="{Binding CurrentPR.FinalName}" FontSize="9" HorizontalAlignment="Center" FontWeight="Bold" Margin="0,0,0,2"/>
@@ -1118,10 +1118,10 @@
                             <Border Background="#AED6F1" Margin="-5,-5,-5,5">
                                 <TextBlock Text="{DynamicResource CheckedBy}" FontWeight="Bold" HorizontalAlignment="Center" FontSize="9"/>
                             </Border>
-                            <TextBlock Text="{DynamicResource LogisticManager}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding CurrentPO.LogisticsTitle}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
                             <Separator Margin="0,2"/>
                             <TextBlock Text="{Binding CurrentPO.LogisticsName}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center" TextWrapping="Wrap"/>
-                            <Image Source="{Binding CurrentPO.LogisticsSignature, Converter={StaticResource ImageBytesConverter}}" Height="35" HorizontalAlignment="Center" Margin="0,2"/>
+                            <Image Source="{Binding CurrentPO.LogisticsSignature, Converter={StaticResource ImageBytesConverter}}" Height="50" HorizontalAlignment="Center" Margin="0,2" Stretch="Uniform"/>
                         </StackPanel>
                     </Border>
 
@@ -1131,10 +1131,10 @@
                             <Border Background="#D5D8DC" Margin="-5,-5,-5,5">
                                 <TextBlock Text="{DynamicResource ReviewedBy}" FontWeight="Bold" HorizontalAlignment="Center" FontSize="9"/>
                             </Border>
-                            <TextBlock Text="{DynamicResource FinanceManager}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding CurrentPO.FinanceTitle}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
                             <Separator Margin="0,2"/>
                             <TextBlock Text="{Binding CurrentPO.FinanceName}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center" TextWrapping="Wrap"/>
-                            <Image Source="{Binding CurrentPO.FinanceSignature, Converter={StaticResource ImageBytesConverter}}" Height="35" HorizontalAlignment="Center" Margin="0,2"/>
+                            <Image Source="{Binding CurrentPO.FinanceSignature, Converter={StaticResource ImageBytesConverter}}" Height="50" HorizontalAlignment="Center" Margin="0,2" Stretch="Uniform"/>
                         </StackPanel>
                     </Border>
 
@@ -1144,10 +1144,10 @@
                             <Border Background="#D5D8DC" Margin="-5,-5,-5,5">
                                 <TextBlock Text="{DynamicResource FinalApproved}" FontWeight="Bold" HorizontalAlignment="Center" FontSize="9"/>
                             </Border>
-                            <TextBlock Text="Head / مدير الجمعية" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding CurrentPO.FinalTitle}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
                             <Separator Margin="0,2"/>
                             <TextBlock Text="{Binding CurrentPO.FinalName}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center" TextWrapping="Wrap"/>
-                            <Image Source="{Binding CurrentPO.FinalSignature, Converter={StaticResource ImageBytesConverter}}" Height="35" HorizontalAlignment="Center" Margin="0,2"/>
+                            <Image Source="{Binding CurrentPO.FinalSignature, Converter={StaticResource ImageBytesConverter}}" Height="50" HorizontalAlignment="Center" Margin="0,2" Stretch="Uniform"/>
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -1541,7 +1541,7 @@
                         <StackPanel>
                             <Border Padding="4" Background="#D5D8DC"><TextBlock Text="Checked by / فحص بواسطة" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
                             <StackPanel Margin="8">
-                                <TextBlock Text="Logistic Manager / مدير اللوجستيات" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding LogisticsTitleTWM}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
                                 <Separator Margin="0,5"/>
                                 <TextBlock Text="{Binding LogisticsNameTWM}" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center"/>
                                 <Image Source="{Binding LogisticsSignatureTWM, Converter={StaticResource ImageBytesConverter}}" Height="50" Margin="0,5" Stretch="Uniform"/>
@@ -1554,7 +1554,7 @@
                         <StackPanel>
                             <Border Padding="4" Background="#D5D8DC"><TextBlock Text="Reviewed by / مراجعة بواسطة" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
                             <StackPanel Margin="8">
-                                <TextBlock Text="Finance Manager / المدير المالي" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding FinanceTitleTWM}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
                                 <Separator Margin="0,5"/>
                                 <TextBlock Text="{Binding FinanceNameTWM}" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center"/>
                                 <Image Source="{Binding FinanceSignatureTWM, Converter={StaticResource ImageBytesConverter}}" Height="50" Margin="0,5" Stretch="Uniform"/>
@@ -1567,7 +1567,7 @@
                         <StackPanel>
                             <Border Padding="4" Background="#D5D8DC"><TextBlock Text="Approved by / اعتمد بواسطة" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
                             <StackPanel Margin="8">
-                                <TextBlock Text="Head / PM" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding HeadTitleTWM}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
                                 <Separator Margin="0,5"/>
                                 <TextBlock Text="{Binding HeadNameTWM}" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center"/>
                                 <Image Source="{Binding HeadSignatureTWM, Converter={StaticResource ImageBytesConverter}}" Height="50" Margin="0,5" Stretch="Uniform"/>

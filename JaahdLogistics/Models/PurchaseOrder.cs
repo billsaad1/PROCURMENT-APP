@@ -94,6 +94,15 @@ namespace JaahdLogistics.Models
         private string? _finalName;
 
         [ObservableProperty]
+        private string? _logisticsTitle = "Logistics Manager";
+
+        [ObservableProperty]
+        private string? _financeTitle = "Finance Manager";
+
+        [ObservableProperty]
+        private string? _finalTitle = "Head of Association";
+
+        [ObservableProperty]
         private int? _logisticsEmployeeId;
 
         [ObservableProperty]
