@@ -61,27 +61,29 @@ namespace JaahdLogistics.ViewModels
         {
             if (CurrentPR == null) return;
 
-            // 1. Initial Fallback (Names/Titles from Employee records or Settings)
+            // 1. Initial Defaults (Names/Titles/Signatures from Employee records or Settings)
             if (CurrentPR.RequesterEmployeeId.HasValue) UpdateRequesterSignature();
 
             var logEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPR.LogisticsEmployeeId ?? Settings.DefaultLogisticsEmployeeId));
             CurrentPR.LogisticsName = logEmp?.NameEN ?? Settings.LogisticsManager;
-            CurrentPR.LogisticsSignature = null;
+            CurrentPR.LogisticsSignature = logEmp?.SignatureImage;
 
             var finEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPR.FinanceEmployeeId ?? Settings.DefaultFinanceEmployeeId));
             CurrentPR.FinanceName = finEmp?.NameEN ?? Settings.FinanceManager;
-            CurrentPR.FinanceSignature = null;
+            CurrentPR.FinanceSignature = finEmp?.SignatureImage;
 
             CurrentPR.PMName = CurrentPR.Project?.ProjectManager ?? "";
+            // PM signature usually comes from an employee but Project model doesn't link directly to Employee ID yet.
+            // For now, if PM matches an employee name, we could try to find it, but standard approval record is safer.
             CurrentPR.PMSignature = null;
 
             var headEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPR.HeadEmployeeId ?? Settings.DefaultHeadEmployeeId));
             CurrentPR.FinalName = headEmp?.NameEN ?? Settings.HeadOfAssociation;
-            CurrentPR.FinalSignature = null;
+            CurrentPR.FinalSignature = headEmp?.SignatureImage;
 
             if (CurrentPR.Id == 0) return;
 
-            // 2. Override with formal approval records if they exist
+            // 2. Override with formal approval records if they exist (contains real approval timestamped signatures)
             var approvals = _dataService.GetApprovals("PR", CurrentPR.Id);
             foreach (var app in approvals)
             {

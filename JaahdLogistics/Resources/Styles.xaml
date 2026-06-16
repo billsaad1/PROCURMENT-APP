@@ -285,40 +285,40 @@
                     <Border BorderBrush="Black" BorderThickness="1" Margin="0,0,5,0">
                         <StackPanel>
                             <Border Background="#D5D8DC" Padding="2"><TextBlock Text="Requester / جهة الطلب" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
-                            <TextBlock Text="{Binding CurrentPR.RequesterTitle}" FontSize="8" HorizontalAlignment="Center" Margin="0,2"/>
+                            <TextBlock Text="{Binding CurrentPR.RequesterTitle}" FontSize="8" HorizontalAlignment="Center" Margin="0,2" FontWeight="Bold"/>
                             <Separator/>
-                            <Image Source="{Binding CurrentPR.RequesterSignature, Converter={StaticResource ImageBytesConverter}}" Height="40" Margin="2"/>
-                            <TextBlock Text="{Binding CurrentPR.RequesterName}" FontSize="8" HorizontalAlignment="Center"/>
+                            <Image Source="{Binding CurrentPR.RequesterSignature, Converter={StaticResource ImageBytesConverter}}" Height="50" Margin="2" Stretch="Uniform"/>
+                            <TextBlock Text="{Binding CurrentPR.RequesterName}" FontSize="9" HorizontalAlignment="Center" FontWeight="Bold" Margin="0,0,0,2"/>
                         </StackPanel>
                     </Border>
 
                     <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="0,0,5,0">
                         <StackPanel>
                             <Border Background="#D5D8DC" Padding="2"><TextBlock Text="Verified / تم المراجعة" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
-                            <TextBlock Text="Logistic Manager" FontSize="8" HorizontalAlignment="Center" Margin="0,2"/>
+                            <TextBlock Text="Logistic Manager / مدير اللوجستيات" FontSize="8" HorizontalAlignment="Center" Margin="0,2" FontWeight="Bold"/>
                             <Separator/>
-                            <Image Source="{Binding CurrentPR.LogisticsSignature, Converter={StaticResource ImageBytesConverter}}" Height="40" Margin="2"/>
-                            <TextBlock Text="{Binding CurrentPR.LogisticsName}" FontSize="8" HorizontalAlignment="Center"/>
+                            <Image Source="{Binding CurrentPR.LogisticsSignature, Converter={StaticResource ImageBytesConverter}}" Height="50" Margin="2" Stretch="Uniform"/>
+                            <TextBlock Text="{Binding CurrentPR.LogisticsName}" FontSize="9" HorizontalAlignment="Center" FontWeight="Bold" Margin="0,0,0,2"/>
                         </StackPanel>
                     </Border>
 
                     <Border Grid.Column="2" BorderBrush="Black" BorderThickness="1" Margin="0,0,5,0">
                         <StackPanel>
                             <Border Background="#D5D8DC" Padding="2"><TextBlock Text="Verified / تم المراجعة" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
-                            <TextBlock Text="Finance Manager" FontSize="8" HorizontalAlignment="Center" Margin="0,2"/>
+                            <TextBlock Text="Finance Manager / المدير المالي" FontSize="8" HorizontalAlignment="Center" Margin="0,2" FontWeight="Bold"/>
                             <Separator/>
-                            <Image Source="{Binding CurrentPR.FinanceSignature, Converter={StaticResource ImageBytesConverter}}" Height="40" Margin="2"/>
-                            <TextBlock Text="{Binding CurrentPR.FinanceName}" FontSize="8" HorizontalAlignment="Center"/>
+                            <Image Source="{Binding CurrentPR.FinanceSignature, Converter={StaticResource ImageBytesConverter}}" Height="50" Margin="2" Stretch="Uniform"/>
+                            <TextBlock Text="{Binding CurrentPR.FinanceName}" FontSize="9" HorizontalAlignment="Center" FontWeight="Bold" Margin="0,0,0,2"/>
                         </StackPanel>
                     </Border>
 
                     <Border Grid.Column="3" BorderBrush="Black" BorderThickness="1">
                         <StackPanel>
                             <Border Background="#D5D8DC" Padding="2"><TextBlock Text="Approved / تم الاعتماد" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
-                            <TextBlock Text="Head of Association" FontSize="8" HorizontalAlignment="Center" Margin="0,2"/>
+                            <TextBlock Text="Head of Association / مدير الجمعية" FontSize="8" HorizontalAlignment="Center" Margin="0,2" FontWeight="Bold"/>
                             <Separator/>
-                            <Image Source="{Binding CurrentPR.FinalSignature, Converter={StaticResource ImageBytesConverter}}" Height="40" Margin="2"/>
-                            <TextBlock Text="{Binding CurrentPR.FinalName}" FontSize="8" HorizontalAlignment="Center"/>
+                            <Image Source="{Binding CurrentPR.FinalSignature, Converter={StaticResource ImageBytesConverter}}" Height="50" Margin="2" Stretch="Uniform"/>
+                            <TextBlock Text="{Binding CurrentPR.FinalName}" FontSize="9" HorizontalAlignment="Center" FontWeight="Bold" Margin="0,0,0,2"/>
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -435,7 +435,20 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="10,0,0,0">
+                        <Border BorderBrush="Black" BorderThickness="1" Margin="0,0,10,0">
+                            <StackPanel>
+                                <Border Background="#D5D8DC" Padding="2"><TextBlock Text="Service Provider Details / تفاصيل مزود الخدمة" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
+                                <Grid Margin="5">
+                                    <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                    <TextBlock Text="Name:" FontSize="8" FontWeight="Bold"/> <Border Grid.Column="1" BorderBrush="LightGray" BorderThickness="0,0,0,1" Margin="5,0,0,5" Height="15"/>
+                                    <TextBlock Grid.Row="1" Text="Contact:" FontSize="8" FontWeight="Bold"/> <Border Grid.Row="1" Grid.Column="1" BorderBrush="LightGray" BorderThickness="0,0,0,1" Margin="5,0,0,5" Height="15"/>
+                                    <TextBlock Grid.Row="2" Text="Tel:" FontSize="8" FontWeight="Bold"/> <Border Grid.Row="2" Grid.Column="1" BorderBrush="LightGray" BorderThickness="0,0,0,1" Margin="5,0,0,5" Height="15"/>
+                                    <TextBlock Grid.Row="3" Text="Email:" FontSize="8" FontWeight="Bold"/> <Border Grid.Row="3" Grid.Column="1" BorderBrush="LightGray" BorderThickness="0,0,0,1" Margin="5,0,0,5" Height="15"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1">
                             <StackPanel>
                                 <Border Background="#D5D8DC" Padding="2"><TextBlock Text="Vendor Signature &amp; Stamp / توقيع وختم المورد" FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/></Border>
                                 <Border Height="80"/>
@@ -725,7 +738,7 @@
                             <ColumnDefinition Width="300"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#FCF3CF" Padding="2"><TextBlock Text="{DynamicResource RecommendationReasons}" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
+                        <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#FCF3CF" Padding="2"><TextBlock Text="Recommendation Reasons / مبررات الاختيار" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
                         <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2"><TextBlock Text="{Binding CurrentBidAnalysis.RecommendationReasons}" FontSize="10" HorizontalAlignment="Center" FontWeight="Bold" TextWrapping="Wrap"/></Border>
                     </Grid>
 
@@ -1524,48 +1537,42 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Border BorderBrush="Black" BorderThickness="1" Margin="0,0,0,0" Background="#D6EAF8">
+                    <Border BorderBrush="Black" BorderThickness="1" Margin="0,0,5,0">
                         <StackPanel>
-                            <Border Padding="3" Background="#AED6F1"><TextBlock Text="Checked by / فحص بواسطة" FontWeight="Bold" FontSize="10" HorizontalAlignment="Center"/></Border>
-                            <Grid Margin="5">
-                                <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                <TextBlock Text="Position / المنصب :" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Column="1" Text="Logistic Manager / مدير اللوجستيات" FontSize="10" Margin="10,0" HorizontalAlignment="Right" FontWeight="Bold"/>
-                                <TextBlock Grid.Row="1" Text="Name / الاسم :" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding LogisticsNameTWM}" FontSize="10" Margin="10,0" HorizontalAlignment="Right" FontWeight="Bold"/>
-                                <TextBlock Grid.Row="2" Text="Date / التاريخ :" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentMatch.Date, StringFormat=MM/dd/yyyy}" FontSize="10" Margin="10,0" HorizontalAlignment="Right" FontWeight="Bold"/>
-                                <TextBlock Grid.Row="3" Text="Signature / التوقيع" FontWeight="Bold" FontSize="9"/>
-                                <Image Grid.Row="3" Grid.Column="1" Source="{Binding LogisticsSignatureTWM, Converter={StaticResource ImageBytesConverter}}" Height="40" HorizontalAlignment="Right"/>
-                            </Grid>
+                            <Border Padding="4" Background="#D5D8DC"><TextBlock Text="Checked by / فحص بواسطة" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
+                            <StackPanel Margin="8">
+                                <TextBlock Text="Logistic Manager / مدير اللوجستيات" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <Separator Margin="0,5"/>
+                                <TextBlock Text="{Binding LogisticsNameTWM}" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <Image Source="{Binding LogisticsSignatureTWM, Converter={StaticResource ImageBytesConverter}}" Height="50" Margin="0,5" Stretch="Uniform"/>
+                                <TextBlock Text="{Binding CurrentMatch.Date, StringFormat=MM/dd/yyyy}" FontSize="8" HorizontalAlignment="Center" Foreground="Gray"/>
+                            </StackPanel>
                         </StackPanel>
                     </Border>
 
-                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1" Margin="0,0,0,0" Background="#D6EAF8">
+                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="0,0,5,0">
                         <StackPanel>
-                            <Border Padding="3" Background="#D5D8DC"><TextBlock Text="Reviewed by / مراجعة بواسطة" FontWeight="Bold" FontSize="10" HorizontalAlignment="Center"/></Border>
-                            <Grid Margin="5">
-                                <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                <TextBlock Text="Position / المنصب :" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Column="1" Text="Finance Manager / المدير المالي" FontSize="10" Margin="10,0" HorizontalAlignment="Right" FontWeight="Bold"/>
-                                <TextBlock Grid.Row="1" Text="Name / الاسم :" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding FinanceNameTWM}" FontSize="10" Margin="10,0" HorizontalAlignment="Right" FontWeight="Bold"/>
-                                <TextBlock Grid.Row="2" Text="Date / التاريخ :" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentMatch.Date, StringFormat=MM/dd/yyyy}" FontSize="10" Margin="10,0" HorizontalAlignment="Right" FontWeight="Bold"/>
-                                <TextBlock Grid.Row="3" Text="Signature / التوقيع" FontWeight="Bold" FontSize="9"/>
-                                <Image Grid.Row="3" Grid.Column="1" Source="{Binding FinanceSignatureTWM, Converter={StaticResource ImageBytesConverter}}" Height="40" HorizontalAlignment="Right"/>
-                            </Grid>
+                            <Border Padding="4" Background="#D5D8DC"><TextBlock Text="Reviewed by / مراجعة بواسطة" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
+                            <StackPanel Margin="8">
+                                <TextBlock Text="Finance Manager / المدير المالي" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <Separator Margin="0,5"/>
+                                <TextBlock Text="{Binding FinanceNameTWM}" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <Image Source="{Binding FinanceSignatureTWM, Converter={StaticResource ImageBytesConverter}}" Height="50" Margin="0,5" Stretch="Uniform"/>
+                                <TextBlock Text="{Binding CurrentMatch.Date, StringFormat=MM/dd/yyyy}" FontSize="8" HorizontalAlignment="Center" Foreground="Gray"/>
+                            </StackPanel>
                         </StackPanel>
                     </Border>
 
-                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,1,1,1" Background="#D6EAF8">
+                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="1">
                         <StackPanel>
-                            <Border Padding="3" Background="#D5D8DC"><TextBlock Text="Approved by / اعتمد بواسطة" FontWeight="Bold" FontSize="10" HorizontalAlignment="Center"/></Border>
-                            <Grid Margin="5">
-                                <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                <TextBlock Text="Position / المنصب :" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Column="1" Text="Head / PM" FontSize="10" Margin="10,0" HorizontalAlignment="Right" FontWeight="Bold"/>
-                                <TextBlock Grid.Row="1" Text="Name / الاسم :" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding HeadNameTWM}" FontSize="10" Margin="10,0" HorizontalAlignment="Right" FontWeight="Bold"/>
-                                <TextBlock Grid.Row="2" Text="Date / التاريخ :" FontWeight="Bold" FontSize="9"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentMatch.Date, StringFormat=MM/dd/yyyy}" FontSize="10" Margin="10,0" HorizontalAlignment="Right" FontWeight="Bold"/>
-                                <TextBlock Grid.Row="3" Text="Signature / التوقيع" FontWeight="Bold" FontSize="9"/>
-                                <Image Grid.Row="3" Grid.Column="1" Source="{Binding HeadSignatureTWM, Converter={StaticResource ImageBytesConverter}}" Height="40" HorizontalAlignment="Right"/>
-                            </Grid>
+                            <Border Padding="4" Background="#D5D8DC"><TextBlock Text="Approved by / اعتمد بواسطة" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
+                            <StackPanel Margin="8">
+                                <TextBlock Text="Head / PM" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <Separator Margin="0,5"/>
+                                <TextBlock Text="{Binding HeadNameTWM}" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <Image Source="{Binding HeadSignatureTWM, Converter={StaticResource ImageBytesConverter}}" Height="50" Margin="0,5" Stretch="Uniform"/>
+                                <TextBlock Text="{Binding CurrentMatch.Date, StringFormat=MM/dd/yyyy}" FontSize="8" HorizontalAlignment="Center" Foreground="Gray"/>
+                            </StackPanel>
                         </StackPanel>
                     </Border>
                 </Grid>
