@@ -771,8 +771,8 @@
                             <Grid Margin="5">
                                 <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                <TextBlock Text="POSITION :" FontWeight="Bold" FontSize="8"/> <TextBlock Grid.Column="1" Text="Logistic Manager" FontSize="8" Margin="5,0"/>
-                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding LogisticsNameBA}" FontSize="8" Margin="5,0"/>
+                                <TextBlock Text="POSITION :" FontWeight="Bold" FontSize="8"/> <TextBlock Grid.Column="1" Text="{Binding LogisticsTitleBA}" FontSize="8" Margin="5,0"/>
+                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding LogisticsNameBA}" FontSize="8" Margin="5,0" FontWeight="Bold"/>
                                 <TextBlock Grid.Row="2" Text="Date :" FontSize="8"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentBidAnalysis.Date, StringFormat=d}" FontSize="8" Margin="5,0"/>
                                 <TextBlock Grid.Row="3" Text="Signature" FontSize="8"/>
                                 <Image Grid.Row="3" Grid.Column="1" Source="{Binding LogisticsSignatureBA, Converter={StaticResource ImageBytesConverter}}" Height="30" HorizontalAlignment="Left"/>
@@ -786,8 +786,8 @@
                             <Grid Margin="5">
                                 <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                <TextBlock Text="POSITION :" FontWeight="Bold" FontSize="8"/> <TextBlock Grid.Column="1" Text="Finance Manager" FontSize="8" Margin="5,0"/>
-                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding FinanceNameBA}" FontSize="8" Margin="5,0"/>
+                                <TextBlock Text="POSITION :" FontWeight="Bold" FontSize="8"/> <TextBlock Grid.Column="1" Text="{Binding FinanceTitleBA}" FontSize="8" Margin="5,0"/>
+                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding FinanceNameBA}" FontSize="8" Margin="5,0" FontWeight="Bold"/>
                                 <TextBlock Grid.Row="2" Text="Date :" FontSize="8"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentBidAnalysis.Date, StringFormat=d}" FontSize="8" Margin="5,0"/>
                                 <TextBlock Grid.Row="3" Text="Signature" FontSize="8"/>
                                 <Image Grid.Row="3" Grid.Column="1" Source="{Binding FinanceSignatureBA, Converter={StaticResource ImageBytesConverter}}" Height="30" HorizontalAlignment="Left"/>
@@ -801,8 +801,8 @@
                             <Grid Margin="5">
                                 <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                <TextBlock Text="POSITION :" FontWeight="Bold" FontSize="8"/> <TextBlock Grid.Column="1" Text="Head of Association" FontSize="8" Margin="5,0"/>
-                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding HeadNameBA}" FontSize="8" Margin="5,0"/>
+                                <TextBlock Text="POSITION :" FontWeight="Bold" FontSize="8"/> <TextBlock Grid.Column="1" Text="{Binding HeadTitleBA}" FontSize="8" Margin="5,0"/>
+                                <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding HeadNameBA}" FontSize="8" Margin="5,0" FontWeight="Bold"/>
                                 <TextBlock Grid.Row="2" Text="Date :" FontSize="8"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentBidAnalysis.Date, StringFormat=d}" FontSize="8" Margin="5,0"/>
                                 <TextBlock Grid.Row="3" Text="Signature" FontSize="8"/>
                                 <Image Grid.Row="3" Grid.Column="1" Source="{Binding HeadSignatureBA, Converter={StaticResource ImageBytesConverter}}" Height="30" HorizontalAlignment="Left"/>

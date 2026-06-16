@@ -90,19 +90,25 @@ namespace JaahdLogistics.ViewModels
         {
             if (CurrentMatch == null) return;
 
+            // 0. Refresh Settings
+            Settings = _dataService.GetSettings();
+
             // 1. Initial Fallback
             var logEmp = Employees.FirstOrDefault(e => e.Id == Settings.DefaultLogisticsEmployeeId);
             LogisticsNameTWM = logEmp?.NameEN ?? Settings.LogisticsManager;
+            if (string.IsNullOrEmpty(LogisticsNameTWM)) LogisticsNameTWM = "Logistics Manager";
             LogisticsTitleTWM = logEmp?.PositionEN ?? "Logistics Manager / مدير اللوجستيات";
             LogisticsSignatureTWM = logEmp?.SignatureImage;
 
             var finEmp = Employees.FirstOrDefault(e => e.Id == Settings.DefaultFinanceEmployeeId);
             FinanceNameTWM = finEmp?.NameEN ?? Settings.FinanceManager;
+            if (string.IsNullOrEmpty(FinanceNameTWM)) FinanceNameTWM = "Finance Manager";
             FinanceTitleTWM = finEmp?.PositionEN ?? "Finance Manager / المدير المالي";
             FinanceSignatureTWM = finEmp?.SignatureImage;
 
             var headEmp = Employees.FirstOrDefault(e => e.Id == Settings.DefaultHeadEmployeeId);
             HeadNameTWM = headEmp?.NameEN ?? Settings.HeadOfAssociation;
+            if (string.IsNullOrEmpty(HeadNameTWM)) HeadNameTWM = "Head of Association";
             HeadTitleTWM = headEmp?.PositionEN ?? "Head / PM";
             HeadSignatureTWM = headEmp?.SignatureImage;
 
