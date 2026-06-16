@@ -739,7 +739,9 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Border BorderBrush="Black" BorderThickness="1,0,1,1" Background="#FCF3CF" Padding="2"><TextBlock Text="Recommendation Reasons / مبررات الاختيار" FontWeight="Bold" FontSize="9" HorizontalAlignment="Center"/></Border>
-                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2"><TextBlock Text="{Binding CurrentBidAnalysis.RecommendationReasons}" FontSize="10" HorizontalAlignment="Center" FontWeight="Bold" TextWrapping="Wrap"/></Border>
+                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2">
+                            <TextBlock Text="{Binding CurrentBidAnalysis.RecommendationReasons}" FontSize="10" HorizontalAlignment="Center" FontWeight="Bold" TextWrapping="Wrap" MinHeight="40"/>
+                        </Border>
                     </Grid>
 
                     <Border Grid.Row="6" BorderBrush="Black" BorderThickness="1,0,1,1" Background="#D5D8DC" Padding="5">
@@ -775,7 +777,7 @@
                                 <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding LogisticsNameBA}" FontSize="8" Margin="5,0" FontWeight="Bold"/>
                                 <TextBlock Grid.Row="2" Text="Date :" FontSize="8"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentBidAnalysis.Date, StringFormat=d}" FontSize="8" Margin="5,0"/>
                                 <TextBlock Grid.Row="3" Text="Signature" FontSize="8"/>
-                                <Image Grid.Row="3" Grid.Column="1" Source="{Binding LogisticsSignatureBA, Converter={StaticResource ImageBytesConverter}}" Height="30" HorizontalAlignment="Left"/>
+                                <Image Grid.Row="3" Grid.Column="1" Source="{Binding LogisticsSignatureBA, Converter={StaticResource ImageBytesConverter}}" Height="50" HorizontalAlignment="Left"/>
                             </Grid>
                         </StackPanel>
                     </Border>
@@ -790,7 +792,7 @@
                                 <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding FinanceNameBA}" FontSize="8" Margin="5,0" FontWeight="Bold"/>
                                 <TextBlock Grid.Row="2" Text="Date :" FontSize="8"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentBidAnalysis.Date, StringFormat=d}" FontSize="8" Margin="5,0"/>
                                 <TextBlock Grid.Row="3" Text="Signature" FontSize="8"/>
-                                <Image Grid.Row="3" Grid.Column="1" Source="{Binding FinanceSignatureBA, Converter={StaticResource ImageBytesConverter}}" Height="30" HorizontalAlignment="Left"/>
+                                <Image Grid.Row="3" Grid.Column="1" Source="{Binding FinanceSignatureBA, Converter={StaticResource ImageBytesConverter}}" Height="50" HorizontalAlignment="Left"/>
                             </Grid>
                         </StackPanel>
                     </Border>
@@ -805,7 +807,7 @@
                                 <TextBlock Grid.Row="1" Text="Name :" FontSize="8"/> <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding HeadNameBA}" FontSize="8" Margin="5,0" FontWeight="Bold"/>
                                 <TextBlock Grid.Row="2" Text="Date :" FontSize="8"/> <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentBidAnalysis.Date, StringFormat=d}" FontSize="8" Margin="5,0"/>
                                 <TextBlock Grid.Row="3" Text="Signature" FontSize="8"/>
-                                <Image Grid.Row="3" Grid.Column="1" Source="{Binding HeadSignatureBA, Converter={StaticResource ImageBytesConverter}}" Height="30" HorizontalAlignment="Left"/>
+                                <Image Grid.Row="3" Grid.Column="1" Source="{Binding HeadSignatureBA, Converter={StaticResource ImageBytesConverter}}" Height="50" HorizontalAlignment="Left"/>
                             </Grid>
                         </StackPanel>
                     </Border>

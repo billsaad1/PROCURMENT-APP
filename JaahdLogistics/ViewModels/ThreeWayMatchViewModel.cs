@@ -114,17 +114,16 @@ namespace JaahdLogistics.ViewModels
 
             if (CurrentMatch.Id == 0) return;
 
-            // 2. Override with formal approval records
+            // 2. Overwrite ONLY signatures from formal approval records if they exist
             var approvals = _dataService.GetApprovals("ThreeWayMatch", CurrentMatch.Id);
             foreach (var app in approvals)
             {
                 string status = (string)app.Status;
                 byte[]? sig = (byte[]?)app.SignatureImage;
-                string? name = (string?)app.FullName;
 
-                if (status == "LogisticsApproved") { LogisticsSignatureTWM = sig; LogisticsNameTWM = name; }
-                else if (status == "FinanceApproved") { FinanceSignatureTWM = sig; FinanceNameTWM = name; }
-                else if (status == "PMApproved") { HeadSignatureTWM = sig; HeadNameTWM = name; } // Head of Association or PM
+                if (status == "LogisticsApproved") { LogisticsSignatureTWM = sig; }
+                else if (status == "FinanceApproved") { FinanceSignatureTWM = sig; }
+                else if (status == "PMApproved") { HeadSignatureTWM = sig; } // Head of Association or PM
             }
         }
 

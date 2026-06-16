@@ -206,17 +206,16 @@ namespace JaahdLogistics.ViewModels
 
             if (CurrentBidAnalysis.Id == 0) return;
 
-            // 2. Approvals
+            // 2. Overwrite ONLY signatures from formal approval records if they exist
             var approvals = _dataService.GetApprovals("BidAnalysis", CurrentBidAnalysis.Id);
             foreach (var app in approvals)
             {
                 string status = (string)app.Status;
                 byte[]? sig = (byte[]?)app.SignatureImage;
-                string? name = (string?)app.FullName;
 
-                if (status == "CheckedByLogistics") { LogisticsSignatureBA = sig; LogisticsNameBA = name; }
-                else if (status == "ReviewedByFinance") { FinanceSignatureBA = sig; FinanceNameBA = name; }
-                else if (status == "FinalApproved" || status == "ApprovedByHead") { HeadSignatureBA = sig; HeadNameBA = name; }
+                if (status == "CheckedByLogistics") { LogisticsSignatureBA = sig; }
+                else if (status == "ReviewedByFinance") { FinanceSignatureBA = sig; }
+                else if (status == "FinalApproved" || status == "ApprovedByHead") { HeadSignatureBA = sig; }
             }
         }
 
@@ -334,17 +333,16 @@ namespace JaahdLogistics.ViewModels
 
             if (CurrentPO.Id == 0) return;
 
-            // 2. Approvals
+            // 2. Overwrite ONLY signatures from formal approval records if they exist
             var approvals = _dataService.GetApprovals("PO", CurrentPO.Id);
             foreach (var app in approvals)
             {
                 string status = (string)app.Status;
                 byte[]? sig = (byte[]?)app.SignatureImage;
-                string? name = (string?)app.FullName;
 
-                if (status == "CheckedByLogistics") { CurrentPO.LogisticsSignature = sig; CurrentPO.LogisticsName = name; }
-                else if (status == "ReviewedByFinance") { CurrentPO.FinanceSignature = sig; CurrentPO.FinanceName = name; }
-                else if (status == "FinalApproved" || status == "ApprovedByHead") { CurrentPO.FinalSignature = sig; CurrentPO.FinalName = name; }
+                if (status == "CheckedByLogistics") { CurrentPO.LogisticsSignature = sig; }
+                else if (status == "ReviewedByFinance") { CurrentPO.FinanceSignature = sig; }
+                else if (status == "FinalApproved" || status == "ApprovedByHead") { CurrentPO.FinalSignature = sig; }
             }
         }
 
