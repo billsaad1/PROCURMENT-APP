@@ -1582,4 +1582,41 @@
             </Grid>
         </Border>
     </ControlTemplate>
+
+    <ControlTemplate x:Key="ReportPrintTemplate">
+        <Border Background="White" Width="1122" Height="793" Padding="30">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="80"/><ColumnDefinition Width="*"/><ColumnDefinition Width="80"/></Grid.ColumnDefinitions>
+                    <Image Source="{Binding Data.Settings.LogoImage, Source={StaticResource Proxy}, Converter={StaticResource ImageBytesConverter}}" Height="60" Width="60" Stretch="Uniform"/>
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Data.Settings.AssociationName, Source={StaticResource Proxy}}" FontSize="20" FontWeight="Bold" TextDecorations="Underline"/>
+                        <TextBlock Text="LOGISTICS SUMMARY REPORT / تقرير ملخص اللوجستيات" FontSize="14" FontWeight="Bold" Margin="0,5,0,0"/>
+                    </StackPanel>
+                </Grid>
+
+                <Separator Grid.Row="1" Background="Black" Height="2" Margin="0,0,0,15"/>
+
+                <TextBlock Grid.Row="2" Text="{Binding ReportTitle}" FontSize="16" FontWeight="Bold" Foreground="#1B4F72" Margin="0,0,0,15" HorizontalAlignment="Center"/>
+
+                <Grid Grid.Row="3">
+                    <ContentControl Content="{Binding ReportContent}"/>
+                </Grid>
+
+                <Grid Grid.Row="4" Margin="0,20,0,0">
+                    <TextBlock Text="{Binding Source={x:Static s:DateTime.Now}, StringFormat='Generated on: {0:f}'}" FontSize="9" Foreground="Gray" xmlns:s="clr-namespace:System;assembly=mscorlib"/>
+                    <TextBlock Text="Page 1 of 1" FontSize="9" Foreground="Gray" HorizontalAlignment="Right"/>
+                </Grid>
+            </Grid>
+        </Border>
+    </ControlTemplate>
 </ResourceDictionary>

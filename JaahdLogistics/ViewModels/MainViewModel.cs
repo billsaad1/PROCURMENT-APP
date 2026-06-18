@@ -95,7 +95,7 @@ namespace JaahdLogistics.ViewModels
                     CurrentViewModel = new SettingsViewModel(_dataService);
                     break;
                 case "Reports":
-                    CurrentViewModel = new ReportViewModel(new ReportService(ConnectionString));
+                    CurrentViewModel = new ReportViewModel(new ReportService(ConnectionString), _dataService);
                     break;
             }
         }

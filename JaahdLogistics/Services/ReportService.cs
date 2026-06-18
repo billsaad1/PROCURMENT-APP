@@ -46,17 +46,43 @@ namespace JaahdLogistics.Services
         {
             using var connection = new SqliteConnection(_connectionString);
             var results = connection.Query(
-                "SELECT b.Name as VendorName, poi.Quantity, poi.UnitPrice " +
-                "FROM Bidders b " +
-                "JOIN PurchaseOrders po ON b.Id = po.VendorId " +
+                "SELECT v.Name as VendorName, poi.Quantity, poi.UnitPrice, po.Currency, po.ExchangeRate " +
+                "FROM Vendors v " +
+                "JOIN PurchaseOrders po ON v.Id = po.VendorId " +
                 "JOIN POItems poi ON po.Id = poi.POId " +
-                "WHERE po.Status = 'FinalApproved'");
+                "WHERE po.Status = 'FinalApproved' OR po.Status = 'ApprovedByHead'");
 
-            return results.GroupBy(r => r.VendorName).Select(g => new {
+            return results.GroupBy(r => (string)r.VendorName).Select(g => new {
                 VendorName = g.Key,
-                OrderCount = g.Count(), // This is actually item count, but simpler for demo
-                TotalValue = g.Sum(r => Convert.ToDecimal(r.Quantity) * Convert.ToDecimal(r.UnitPrice))
-            }).ToList();
+                OrderCount = g.Count(),
+                TotalValue = g.Sum(r => {
+                    decimal q = Convert.ToDecimal(r.Quantity);
+                    decimal p = Convert.ToDecimal(r.UnitPrice);
+                    decimal rate = Convert.ToDecimal(r.ExchangeRate ?? 1.0);
+                    decimal total = q * p;
+                    if (r.Currency == "YER" && rate > 0) return total / rate;
+                    return total;
+                })
+            }).OrderByDescending(x => x.TotalValue).ToList();
+        }
+
+        public dynamic GetProcurementPipeline()
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            var prs = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM PurchaseRequisitions");
+            var rfqs = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM RFQs");
+            var bas = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM BidAnalyses");
+            var pos = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM PurchaseOrders");
+            var grns = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM GoodsReceivingNotes");
+
+            return new List<dynamic>
+            {
+                new { Stage = "Purchase Requisitions", Count = prs, Icon = "📄" },
+                new { Stage = "Requests for Quotation", Count = rfqs, Icon = "✉️" },
+                new { Stage = "Bid Analyses", Count = bas, Icon = "📊" },
+                new { Stage = "Purchase Orders", Count = pos, Icon = "💰" },
+                new { Stage = "Goods Receiving Notes", Count = grns, Icon = "📦" }
+            };
         }
 
         public dynamic GetInventoryStatus()
