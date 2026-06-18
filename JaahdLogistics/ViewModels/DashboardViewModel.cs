@@ -13,19 +13,39 @@ namespace JaahdLogistics.ViewModels
         private readonly IDataService _dataService;
         private readonly SyncService _syncService;
 
-        [ObservableProperty]
-        private string _syncStatus = "Ready";
+        [ObservableProperty] private string _syncStatus = "Ready";
+        [ObservableProperty] private bool _isSyncing;
 
-        [ObservableProperty]
-        private bool _isSyncing;
+        [ObservableProperty] private int _totalProjects;
+        [ObservableProperty] private int _pendingPRs;
+        [ObservableProperty] private int _approvedPOs;
+        [ObservableProperty] private decimal _totalSpending;
 
         public ObservableCollection<PurchaseRequisition> UserPRs { get; } = new();
+        public ObservableCollection<PurchaseRequisition> ActionItems { get; } = new();
+        public ObservableCollection<ProjectSpendingSummary> ProjectSpending { get; } = new();
+
+        public class ProjectSpendingSummary
+        {
+            public string Name { get; set; } = string.Empty;
+            public decimal Budget { get; set; }
+            public decimal Spent { get; set; }
+            public double PercentSpent => Budget > 0 ? (double)(Spent / Budget) * 100 : 0;
+            public string ProgressColor => PercentSpent > 90 ? "Red" : (PercentSpent > 75 ? "Orange" : "Green");
+        }
 
         public DashboardViewModel(IDataService dataService)
         {
             _dataService = dataService;
             _syncService = new SyncService(_dataService);
+            RefreshDashboard();
+        }
+
+        [RelayCommand]
+        public void RefreshDashboard()
+        {
             LoadData();
+            LoadAnalytics();
         }
 
         [RelayCommand]
@@ -54,16 +74,62 @@ namespace JaahdLogistics.ViewModels
             var user = AuthService.CurrentUser;
             if (user == null) return;
 
-            var allPRs = _dataService.GetPRs();
+            UserPRs.Clear();
+            ActionItems.Clear();
+
+            var allPRs = _dataService.GetPRs().ToList();
             
-            // If user is PM/Officer, only show their PRs. Admins see all.
-            var filtered = (user.Role == "Admin" || user.Role == "FinanceManager") 
+            // 1. My PRs
+            var myPRs = (user.Role == "Admin" || user.Role == "FinanceManager" || user.Role == "LogisticsManager" || user.Role == "HeadOfAssociation")
                 ? allPRs 
                 : allPRs.Where(p => p.RequesterId == user.Id);
 
-            foreach (var pr in filtered)
-            {
+            foreach (var pr in myPRs.OrderByDescending(p => p.Date))
                 UserPRs.Add(pr);
+
+            // 2. Action Required (Approvals)
+            IEnumerable<PurchaseRequisition> needsApproval = new List<PurchaseRequisition>();
+            if (user.Role == "LogisticsManager") needsApproval = allPRs.Where(p => p.Status == "Pending");
+            else if (user.Role == "FinanceManager") needsApproval = allPRs.Where(p => p.Status == "CheckedByLogistics");
+            else if (user.Role == "ProjectManager") needsApproval = allPRs.Where(p => p.Status == "ReviewedByFinance");
+            else if (user.Role == "HeadOfAssociation") needsApproval = allPRs.Where(p => p.Status == "ApprovedByPM");
+            else if (user.Role == "Admin") needsApproval = allPRs.Where(p => p.Status != "FinalApproved" && p.Status != "Rejected");
+
+            foreach (var pr in needsApproval.Take(10))
+                ActionItems.Add(pr);
+        }
+
+        private void LoadAnalytics()
+        {
+            var projects = _dataService.GetProjects().ToList();
+            var allPRs = _dataService.GetPRs().ToList();
+            var allPOs = _dataService.GetPOs().ToList();
+
+            TotalProjects = projects.Count;
+            PendingPRs = allPRs.Count(p => p.Status != "FinalApproved" && p.Status != "Rejected");
+            ApprovedPOs = allPOs.Count(p => p.Status == "FinalApproved" || p.Status == "ApprovedByHead");
+
+            ProjectSpending.Clear();
+            TotalSpending = 0;
+
+            foreach (var proj in projects.Take(5)) // Show top 5 for visual clarity
+            {
+                var budgetLines = _dataService.GetBudgetLines(proj.Id);
+                decimal totalBudget = budgetLines.Sum(b => b.TotalAmount);
+                decimal spent = 0;
+
+                foreach(var bl in budgetLines)
+                {
+                    spent += _dataService.GetSpentBudget(bl.Id);
+                }
+
+                ProjectSpending.Add(new ProjectSpendingSummary
+                {
+                    Name = proj.Name,
+                    Budget = totalBudget,
+                    Spent = spent
+                });
+                TotalSpending += spent;
             }
         }
     }

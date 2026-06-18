@@ -65,7 +65,16 @@
     <s:String x:Key="RFQTerms">شروط طلب عروض الأسعار</s:String>
     <s:String x:Key="POTerms">شروط أمر الشراء</s:String>
     <s:String x:Key="Dashboard">لوحة التحكم</s:String>
+    <s:String x:Key="LogisticsDashboard">لوحة تحكم الخدمات اللوجستية</s:String>
     <s:String x:Key="MyPRStatus">حالة طلباتي</s:String>
+    <s:String x:Key="ActionRequired">إجراءات مطلوبة</s:String>
+    <s:String x:Key="NoPendingApprovals">لا توجد اعتمادات معلقة</s:String>
+    <s:String x:Key="ProjectBudgets">ميزانيات المشاريع</s:String>
+    <s:String x:Key="TotalProjects">إجمالي المشاريع</s:String>
+    <s:String x:Key="PendingPRs">طلبات قيد الانتظار</s:String>
+    <s:String x:Key="ApprovedPOs">أوامر معتمدة</s:String>
+    <s:String x:Key="TotalSpending">إجمالي الإنفاق</s:String>
+    <s:String x:Key="ForceSync">مزامنة الآن</s:String>
     <s:String x:Key="Reports">التقارير</s:String>
     <s:String x:Key="List">القائمة</s:String>
     <s:String x:Key="Details">التفاصيل</s:String>

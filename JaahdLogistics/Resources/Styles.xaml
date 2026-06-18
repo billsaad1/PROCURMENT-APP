@@ -6,6 +6,7 @@
     <helpers:ImageBytesConverter x:Key="ImageBytesConverter"/>
     <helpers:CurrencyWordsConverter x:Key="CurrencyWordsConverter"/>
     <helpers:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+    <helpers:BoolToColorConverter x:Key="BoolToColorConverter"/>
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     <helpers:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
     <helpers:BindingProxy x:Key="Proxy"/>

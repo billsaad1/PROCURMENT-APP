@@ -63,7 +63,16 @@
     <s:String x:Key="RFQTerms">RFQ Terms</s:String>
     <s:String x:Key="POTerms">PO Terms</s:String>
     <s:String x:Key="Dashboard">Dashboard</s:String>
+    <s:String x:Key="LogisticsDashboard">Logistics Dashboard</s:String>
     <s:String x:Key="MyPRStatus">My Requisitions Status</s:String>
+    <s:String x:Key="ActionRequired">Action Required</s:String>
+    <s:String x:Key="NoPendingApprovals">No pending approvals</s:String>
+    <s:String x:Key="ProjectBudgets">Project Budgets</s:String>
+    <s:String x:Key="TotalProjects">Total Projects</s:String>
+    <s:String x:Key="PendingPRs">Pending PRs</s:String>
+    <s:String x:Key="ApprovedPOs">Approved POs</s:String>
+    <s:String x:Key="TotalSpending">Total Spending</s:String>
+    <s:String x:Key="ForceSync">Force Sync</s:String>
     <s:String x:Key="Reports">Reports</s:String>
     <s:String x:Key="List">List</s:String>
     <s:String x:Key="Details">Details</s:String>
