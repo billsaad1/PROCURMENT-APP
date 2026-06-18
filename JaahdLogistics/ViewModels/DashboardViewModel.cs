@@ -1,6 +1,9 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using JaahdLogistics.Models;
@@ -24,6 +27,21 @@ namespace JaahdLogistics.ViewModels
         public ObservableCollection<PurchaseRequisition> UserPRs { get; } = new();
         public ObservableCollection<PurchaseRequisition> ActionItems { get; } = new();
         public ObservableCollection<ProjectSpendingSummary> ProjectSpending { get; } = new();
+        public ObservableCollection<PipelineSummary> PipelineDistribution { get; } = new();
+        public ObservableCollection<MonthlyTrend> MonthlySpending { get; } = new();
+
+        public class MonthlyTrend
+        {
+            public string Month { get; set; } = string.Empty;
+            public int Count { get; set; }
+        }
+
+        public class PipelineSummary
+        {
+            public string Stage { get; set; } = string.Empty;
+            public int Count { get; set; }
+            public string Color { get; set; } = "#3498DB";
+        }
 
         public class ProjectSpendingSummary
         {
@@ -38,14 +56,16 @@ namespace JaahdLogistics.ViewModels
         {
             _dataService = dataService;
             _syncService = new SyncService(_dataService);
-            RefreshDashboard();
+            Task.Run(() => RefreshDashboard()); // Run in background to avoid blocking UI
         }
 
         [RelayCommand]
         public void RefreshDashboard()
         {
-            LoadData();
-            LoadAnalytics();
+            Application.Current.Dispatcher.Invoke(() => {
+                LoadData();
+                LoadAnalytics();
+            });
         }
 
         [RelayCommand]
@@ -104,13 +124,33 @@ namespace JaahdLogistics.ViewModels
             var projects = _dataService.GetProjects().ToList();
             var allPRs = _dataService.GetPRs().ToList();
             var allPOs = _dataService.GetPOs().ToList();
+            var allRFQs = _dataService.GetRFQs().ToList();
+            var allBAs = _dataService.GetBidAnalyses().ToList();
+            var allGRNs = _dataService.GetGRNs().ToList();
 
             TotalProjects = projects.Count;
             PendingPRs = allPRs.Count(p => p.Status != "FinalApproved" && p.Status != "Rejected");
             ApprovedPOs = allPOs.Count(p => p.Status == "FinalApproved" || p.Status == "ApprovedByHead");
 
             ProjectSpending.Clear();
+            PipelineDistribution.Clear();
             TotalSpending = 0;
+
+            // Pipeline Distribution
+            PipelineDistribution.Add(new PipelineSummary { Stage = "PR", Count = allPRs.Count, Color = "#3498DB" });
+            PipelineDistribution.Add(new PipelineSummary { Stage = "RFQ", Count = allRFQs.Count, Color = "#9B59B6" });
+            PipelineDistribution.Add(new PipelineSummary { Stage = "BA", Count = allBAs.Count, Color = "#F1C40F" });
+            PipelineDistribution.Add(new PipelineSummary { Stage = "PO", Count = allPOs.Count, Color = "#27AE60" });
+            PipelineDistribution.Add(new PipelineSummary { Stage = "GRN", Count = allGRNs.Count, Color = "#E67E22" });
+
+            // Monthly Trends (Last 6 months)
+            MonthlySpending.Clear();
+            var months = Enumerable.Range(0, 6).Select(i => DateTime.Now.AddMonths(-i)).Reverse();
+            foreach(var m in months)
+            {
+                int count = allPOs.Count(p => p.Date.Month == m.Month && p.Date.Year == m.Year);
+                MonthlySpending.Add(new MonthlyTrend { Month = m.ToString("MMM"), Count = count });
+            }
 
             foreach (var proj in projects.Take(5)) // Show top 5 for visual clarity
             {

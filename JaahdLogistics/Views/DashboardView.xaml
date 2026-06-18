@@ -122,19 +122,20 @@
                                                 <Run Text="{Binding Spent, StringFormat=N0}"/> / <Run Text="{Binding Budget, StringFormat=N0}"/>
                                             </TextBlock>
                                         </Grid>
-                                        <Grid Height="12">
-                                            <Border Background="#F2F3F4" CornerRadius="6"/>
-                                            <Border HorizontalAlignment="Left" CornerRadius="6" Width="{Binding PercentSpent, StringFormat={}{0}%}">
-                                                <Border.Style>
-                                                    <Style TargetType="Border">
-                                                        <Setter Property="Background" Value="#2ECC71"/>
+                                        <Grid Height="14">
+                                            <ProgressBar Value="{Binding PercentSpent}" Minimum="0" Maximum="100" Height="10">
+                                                <ProgressBar.Style>
+                                                    <Style TargetType="ProgressBar">
+                                                        <Setter Property="Foreground" Value="#2ECC71"/>
+                                                        <Setter Property="Background" Value="#F2F3F4"/>
+                                                        <Setter Property="BorderThickness" Value="0"/>
                                                         <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding ProgressColor}" Value="Orange"><Setter Property="Background" Value="#F1C40F"/></DataTrigger>
-                                                            <DataTrigger Binding="{Binding ProgressColor}" Value="Red"><Setter Property="Background" Value="#E74C3C"/></DataTrigger>
+                                                            <DataTrigger Binding="{Binding ProgressColor}" Value="Orange"><Setter Property="Foreground" Value="#F1C40F"/></DataTrigger>
+                                                            <DataTrigger Binding="{Binding ProgressColor}" Value="Red"><Setter Property="Foreground" Value="#E74C3C"/></DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
-                                                </Border.Style>
-                                            </Border>
+                                                </ProgressBar.Style>
+                                            </ProgressBar>
                                         </Grid>
                                     </StackPanel>
                                 </DataTemplate>
@@ -142,10 +143,63 @@
                         </ItemsControl>
                     </Border>
                 </TabItem>
+
+                <TabItem Header="Activity Trend">
+                    <Border Background="White" CornerRadius="8" Padding="15">
+                        <StackPanel>
+                            <TextBlock Text="Monthly PO Volume (Last 6 Months)" FontWeight="Bold" Margin="0,0,0,20"/>
+                            <ItemsControl ItemsSource="{Binding MonthlySpending}">
+                                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Height="200"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="10,0" VerticalAlignment="Bottom">
+                                            <TextBlock Text="{Binding Count}" HorizontalAlignment="Center" FontSize="10" Margin="0,0,0,5"/>
+                                            <Border Width="30" Background="#3498DB" CornerRadius="3,3,0,0">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Height" Value="0"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Count, Converter={StaticResource NullToVisibilityConverter}}" Value="Visible">
+                                                                <!-- Scale height to fit 200px container -->
+                                                                <Setter Property="Height" Value="{Binding Count, StringFormat={}{0}0}"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                            </Border>
+                                            <TextBlock Text="{Binding Month}" HorizontalAlignment="Center" FontSize="10" Margin="0,5,0,0"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </TabItem>
             </TabControl>
 
             <!-- Right: Action Center -->
             <StackPanel Grid.Column="1">
+                <!-- Pipeline Visual -->
+                <Border Background="White" CornerRadius="8" Padding="15" Margin="0,0,0,20">
+                    <Border.Effect><DropShadowEffect BlurRadius="10" Opacity="0.1" ShadowDepth="2"/></Border.Effect>
+                    <StackPanel>
+                        <TextBlock Text="Procurement Volume" FontSize="14" FontWeight="Bold" Margin="0,0,0,15" Foreground="#1B4F72"/>
+                        <ItemsControl ItemsSource="{Binding PipelineDistribution}">
+                            <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="5"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <Border Width="40" Height="40" CornerRadius="20" Background="{Binding Color}">
+                                            <TextBlock Text="{Binding Count}" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
+                                        </Border>
+                                        <TextBlock Text="{Binding Stage}" FontSize="10" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
                 <TextBlock Text="Action Required" FontSize="18" FontWeight="Bold" Margin="0,0,0,15" Foreground="#1B4F72"/>
                 <Border Background="White" CornerRadius="8" Padding="10">
                     <Border.Effect><DropShadowEffect BlurRadius="10" Opacity="0.1" ShadowDepth="2"/></Border.Effect>
