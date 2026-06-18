@@ -59,6 +59,9 @@ namespace JaahdLogistics.Data
                 AddColumnIfMissing(connection, "Settings", "LogisticsManager", "TEXT");
                 AddColumnIfMissing(connection, "Settings", "FinanceManager", "TEXT");
                 AddColumnIfMissing(connection, "Settings", "HeadOfAssociation", "TEXT");
+                AddColumnIfMissing(connection, "Settings", "LogisticsTitle", "TEXT");
+                AddColumnIfMissing(connection, "Settings", "FinanceTitle", "TEXT");
+                AddColumnIfMissing(connection, "Settings", "HeadTitle", "TEXT");
 
                 // Repair Users
                 AddColumnIfMissing(connection, "Users", "SignatureImage", "BLOB");

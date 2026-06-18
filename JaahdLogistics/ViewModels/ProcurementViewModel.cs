@@ -189,19 +189,19 @@ namespace JaahdLogistics.ViewModels
             var logEmp = Employees.FirstOrDefault(e => e.Id == (CurrentBidAnalysis.LogisticsEmployeeId ?? Settings.DefaultLogisticsEmployeeId));
             LogisticsNameBA = logEmp?.NameEN ?? Settings.LogisticsManager;
             if (string.IsNullOrEmpty(LogisticsNameBA)) LogisticsNameBA = "Logistics Manager";
-            LogisticsTitleBA = logEmp?.PositionEN ?? "Logistics Manager";
+            LogisticsTitleBA = logEmp?.PositionEN ?? Settings.LogisticsTitle ?? "Logistics Manager";
             LogisticsSignatureBA = logEmp?.SignatureImage;
 
             var finEmp = Employees.FirstOrDefault(e => e.Id == (CurrentBidAnalysis.FinanceEmployeeId ?? Settings.DefaultFinanceEmployeeId));
             FinanceNameBA = finEmp?.NameEN ?? Settings.FinanceManager;
             if (string.IsNullOrEmpty(FinanceNameBA)) FinanceNameBA = "Finance Manager";
-            FinanceTitleBA = finEmp?.PositionEN ?? "Finance Manager";
+            FinanceTitleBA = finEmp?.PositionEN ?? Settings.FinanceTitle ?? "Finance Manager";
             FinanceSignatureBA = finEmp?.SignatureImage;
 
             var headEmp = Employees.FirstOrDefault(e => e.Id == (CurrentBidAnalysis.HeadEmployeeId ?? Settings.DefaultHeadEmployeeId));
             HeadNameBA = headEmp?.NameEN ?? Settings.HeadOfAssociation;
             if (string.IsNullOrEmpty(HeadNameBA)) HeadNameBA = "Head of Association";
-            HeadTitleBA = headEmp?.PositionEN ?? "Head of Association";
+            HeadTitleBA = headEmp?.PositionEN ?? Settings.HeadTitle ?? "Head of Association";
             HeadSignatureBA = headEmp?.SignatureImage;
 
             if (CurrentBidAnalysis.Id == 0) return;
@@ -316,19 +316,19 @@ namespace JaahdLogistics.ViewModels
             var logEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPO.LogisticsEmployeeId ?? Settings.DefaultLogisticsEmployeeId));
             CurrentPO.LogisticsName = logEmp?.NameEN ?? Settings.LogisticsManager;
             if (string.IsNullOrEmpty(CurrentPO.LogisticsName)) CurrentPO.LogisticsName = "Logistics Manager";
-            CurrentPO.LogisticsTitle = logEmp?.PositionEN ?? "Logistics Manager";
+            CurrentPO.LogisticsTitle = logEmp?.PositionEN ?? Settings.LogisticsTitle ?? "Logistics Manager";
             CurrentPO.LogisticsSignature = logEmp?.SignatureImage;
 
             var finEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPO.FinanceEmployeeId ?? Settings.DefaultFinanceEmployeeId));
             CurrentPO.FinanceName = finEmp?.NameEN ?? Settings.FinanceManager;
             if (string.IsNullOrEmpty(CurrentPO.FinanceName)) CurrentPO.FinanceName = "Finance Manager";
-            CurrentPO.FinanceTitle = finEmp?.PositionEN ?? "Finance Manager";
+            CurrentPO.FinanceTitle = finEmp?.PositionEN ?? Settings.FinanceTitle ?? "Finance Manager";
             CurrentPO.FinanceSignature = finEmp?.SignatureImage;
 
             var headEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPO.HeadEmployeeId ?? Settings.DefaultHeadEmployeeId));
             CurrentPO.FinalName = headEmp?.NameEN ?? Settings.HeadOfAssociation;
             if (string.IsNullOrEmpty(CurrentPO.FinalName)) CurrentPO.FinalName = "Head of Association";
-            CurrentPO.FinalTitle = headEmp?.PositionEN ?? "Head / مدير الجمعية";
+            CurrentPO.FinalTitle = headEmp?.PositionEN ?? Settings.HeadTitle ?? "Head / مدير الجمعية";
             CurrentPO.FinalSignature = headEmp?.SignatureImage;
 
             if (CurrentPO.Id == 0) return;

@@ -15,6 +15,9 @@ namespace JaahdLogistics.Models
         public string? LogisticsManager { get; set; }
         public string? FinanceManager { get; set; }
         public string? HeadOfAssociation { get; set; }
+        public string? LogisticsTitle { get; set; }
+        public string? FinanceTitle { get; set; }
+        public string? HeadTitle { get; set; }
         public int? DefaultLogisticsEmployeeId { get; set; }
         public int? DefaultFinanceEmployeeId { get; set; }
         public int? DefaultHeadEmployeeId { get; set; }

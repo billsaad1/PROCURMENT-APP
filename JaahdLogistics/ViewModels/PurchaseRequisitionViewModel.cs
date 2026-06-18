@@ -71,13 +71,13 @@ namespace JaahdLogistics.ViewModels
             CurrentPR.LogisticsName = logEmp?.NameEN ?? Settings.LogisticsManager;
             if (string.IsNullOrEmpty(CurrentPR.LogisticsName)) CurrentPR.LogisticsName = "Logistics Manager";
             CurrentPR.LogisticsSignature = logEmp?.SignatureImage;
-            CurrentPR.LogisticsTitle = logEmp?.PositionEN ?? "Logistics Manager";
+            CurrentPR.LogisticsTitle = logEmp?.PositionEN ?? Settings.LogisticsTitle ?? "Logistics Manager";
 
             var finEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPR.FinanceEmployeeId ?? Settings.DefaultFinanceEmployeeId));
             CurrentPR.FinanceName = finEmp?.NameEN ?? Settings.FinanceManager;
             if (string.IsNullOrEmpty(CurrentPR.FinanceName)) CurrentPR.FinanceName = "Finance Manager";
             CurrentPR.FinanceSignature = finEmp?.SignatureImage;
-            CurrentPR.FinanceTitle = finEmp?.PositionEN ?? "Finance Manager";
+            CurrentPR.FinanceTitle = finEmp?.PositionEN ?? Settings.FinanceTitle ?? "Finance Manager";
 
             CurrentPR.PMName = CurrentPR.Project?.ProjectManager ?? "";
             if (string.IsNullOrEmpty(CurrentPR.PMName)) CurrentPR.PMName = "Project Manager";
@@ -88,7 +88,7 @@ namespace JaahdLogistics.ViewModels
             CurrentPR.FinalName = headEmp?.NameEN ?? Settings.HeadOfAssociation;
             if (string.IsNullOrEmpty(CurrentPR.FinalName)) CurrentPR.FinalName = "Head of Association";
             CurrentPR.FinalSignature = headEmp?.SignatureImage;
-            CurrentPR.FinalTitle = headEmp?.PositionEN ?? "Head of Association";
+            CurrentPR.FinalTitle = headEmp?.PositionEN ?? Settings.HeadTitle ?? "Head of Association";
 
             if (CurrentPR.Id == 0)
             {

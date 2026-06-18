@@ -97,19 +97,19 @@ namespace JaahdLogistics.ViewModels
             var logEmp = Employees.FirstOrDefault(e => e.Id == Settings.DefaultLogisticsEmployeeId);
             LogisticsNameTWM = logEmp?.NameEN ?? Settings.LogisticsManager;
             if (string.IsNullOrEmpty(LogisticsNameTWM)) LogisticsNameTWM = "Logistics Manager";
-            LogisticsTitleTWM = logEmp?.PositionEN ?? "Logistics Manager / مدير اللوجستيات";
+            LogisticsTitleTWM = logEmp?.PositionEN ?? Settings.LogisticsTitle ?? "Logistics Manager / مدير اللوجستيات";
             LogisticsSignatureTWM = logEmp?.SignatureImage;
 
             var finEmp = Employees.FirstOrDefault(e => e.Id == Settings.DefaultFinanceEmployeeId);
             FinanceNameTWM = finEmp?.NameEN ?? Settings.FinanceManager;
             if (string.IsNullOrEmpty(FinanceNameTWM)) FinanceNameTWM = "Finance Manager";
-            FinanceTitleTWM = finEmp?.PositionEN ?? "Finance Manager / المدير المالي";
+            FinanceTitleTWM = finEmp?.PositionEN ?? Settings.FinanceTitle ?? "Finance Manager / المدير المالي";
             FinanceSignatureTWM = finEmp?.SignatureImage;
 
             var headEmp = Employees.FirstOrDefault(e => e.Id == Settings.DefaultHeadEmployeeId);
             HeadNameTWM = headEmp?.NameEN ?? Settings.HeadOfAssociation;
             if (string.IsNullOrEmpty(HeadNameTWM)) HeadNameTWM = "Head of Association";
-            HeadTitleTWM = headEmp?.PositionEN ?? "Head / PM";
+            HeadTitleTWM = headEmp?.PositionEN ?? Settings.HeadTitle ?? "Head / PM";
             HeadSignatureTWM = headEmp?.SignatureImage;
 
             if (CurrentMatch.Id == 0) return;

@@ -247,6 +247,9 @@ CREATE TABLE IF NOT EXISTS Settings (
     LogisticsManager TEXT,
     FinanceManager TEXT,
     HeadOfAssociation TEXT,
+    LogisticsTitle TEXT,
+    FinanceTitle TEXT,
+    HeadTitle TEXT,
     DefaultLogisticsEmployeeId INTEGER,
     DefaultFinanceEmployeeId INTEGER,
     DefaultHeadEmployeeId INTEGER
