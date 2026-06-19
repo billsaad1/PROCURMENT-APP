@@ -62,16 +62,120 @@ namespace JaahdLogistics.ViewModels
         {
             _dataService = dataService;
             _syncService = new SyncService(_dataService);
-            Task.Run(() => RefreshDashboard()); // Run in background to avoid blocking UI
+            _ = RefreshDashboard();
         }
 
         [RelayCommand]
-        public void RefreshDashboard()
+        public async Task RefreshDashboard()
         {
-            Application.Current.Dispatcher.Invoke(() => {
-                LoadData();
-                LoadAnalytics();
-            });
+            try
+            {
+                await Task.Run(() => {
+                    var user = AuthService.CurrentUser;
+                    if (user == null) return;
+
+                    // 1. Data Retrieval (Background)
+                    var allProjects = _dataService.GetProjects().ToList();
+                    var allPRs = _dataService.GetPRs().ToList();
+                    var allPOs = _dataService.GetPOs().ToList();
+                    var allRFQs = _dataService.GetRFQs().ToList();
+                    var allBAs = _dataService.GetBidAnalyses().ToList();
+                    var allGRNs = _dataService.GetGRNs().ToList();
+
+                    var myPRs = (user.Role == "Admin" || user.Role == "FinanceManager" || user.Role == "LogisticsManager" || user.Role == "HeadOfAssociation")
+                        ? allPRs
+                        : allPRs.Where(p => p.RequesterId == user.Id).ToList();
+
+                    IEnumerable<PurchaseRequisition> needsApproval = new List<PurchaseRequisition>();
+                    if (user.Role == "LogisticsManager") needsApproval = allPRs.Where(p => p.Status == "Pending");
+                    else if (user.Role == "FinanceManager") needsApproval = allPRs.Where(p => p.Status == "CheckedByLogistics");
+                    else if (user.Role == "ProjectManager") needsApproval = allPRs.Where(p => p.Status == "ReviewedByFinance");
+                    else if (user.Role == "HeadOfAssociation") needsApproval = allPRs.Where(p => p.Status == "ApprovedByPM");
+                    else if (user.Role == "Admin") needsApproval = allPRs.Where(p => p.Status != "FinalApproved" && p.Status != "Rejected");
+
+                    var actionItems = needsApproval.Take(10).ToList();
+
+                    // Analytics data prep
+                    var projectSummaries = new List<ProjectSpendingSummary>();
+                    decimal totalSpendingAcrossAll = 0;
+                    var pieSeries = new SeriesCollection();
+
+                    foreach (var proj in allProjects.OrderByDescending(p => _dataService.GetBudgetLines(p.Id).Sum(bl => _dataService.GetSpentBudget(bl.Id))).Take(5))
+                    {
+                        var budgetLines = _dataService.GetBudgetLines(proj.Id);
+                        decimal totalBudget = budgetLines.Sum(b => b.TotalAmount);
+                        decimal spent = budgetLines.Sum(bl => _dataService.GetSpentBudget(bl.Id));
+
+                        projectSummaries.Add(new ProjectSpendingSummary { Name = proj.Name, Budget = totalBudget, Spent = spent });
+                        totalSpendingAcrossAll += spent;
+
+                        if (spent > 0)
+                        {
+                            Application.Current.Dispatcher.Invoke(() => {
+                                pieSeries.Add(new PieSeries
+                                {
+                                    Title = proj.Code,
+                                    Values = new ChartValues<double> { (double)spent },
+                                    DataLabels = true,
+                                    LabelPoint = chartPoint => $"{proj.Code}: {chartPoint.Y:N0} ({chartPoint.Participation:P1})"
+                                });
+                            });
+                        }
+                    }
+
+                    // Trend Data
+                    var trendValues = new ChartValues<int>();
+                    var labelsList = new List<string>();
+                    var months = Enumerable.Range(0, 6).Select(i => DateTime.Now.AddMonths(-i)).Reverse();
+                    foreach(var m in months)
+                    {
+                        trendValues.Add(allPOs.Count(p => p.Date.Month == m.Month && p.Date.Year == m.Year));
+                        labelsList.Add(m.ToString("MMM"));
+                    }
+
+                    // 2. UI Updates (Dispatcher)
+                    Application.Current.Dispatcher.Invoke(() => {
+                        TotalProjects = allProjects.Count;
+                        PendingPRs = allPRs.Count(p => p.Status != "FinalApproved" && p.Status != "Rejected");
+                        ApprovedPOs = allPOs.Count(p => p.Status == "FinalApproved" || p.Status == "ApprovedByHead");
+                        TotalSpending = totalSpendingAcrossAll;
+
+                        UserPRs.Clear();
+                        foreach (var pr in myPRs.OrderByDescending(p => p.Date)) UserPRs.Add(pr);
+
+                        ActionItems.Clear();
+                        foreach (var pr in actionItems) ActionItems.Add(pr);
+
+                        ProjectSpending.Clear();
+                        foreach (var s in projectSummaries) ProjectSpending.Add(s);
+
+                        PipelineDistribution.Clear();
+                        PipelineDistribution.Add(new PipelineSummary { Stage = "PR", Count = allPRs.Count, Color = "#3498DB" });
+                        PipelineDistribution.Add(new PipelineSummary { Stage = "RFQ", Count = allRFQs.Count, Color = "#9B59B6" });
+                        PipelineDistribution.Add(new PipelineSummary { Stage = "BA", Count = allBAs.Count, Color = "#F1C40F" });
+                        PipelineDistribution.Add(new PipelineSummary { Stage = "PO", Count = allPOs.Count, Color = "#27AE60" });
+                        PipelineDistribution.Add(new PipelineSummary { Stage = "GRN", Count = allGRNs.Count, Color = "#E67E22" });
+
+                        SpendingSeries = pieSeries;
+                        Labels = labelsList;
+                        MonthlyTrendSeries = new SeriesCollection
+                        {
+                            new LineSeries
+                            {
+                                Title = "Orders Issued",
+                                Values = trendValues,
+                                StrokeThickness = 3,
+                                PointGeometrySize = 10,
+                                Fill = System.Windows.Media.Brushes.Transparent
+                            }
+                        };
+                    });
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Dashboard Refresh Error: {ex.Message}");
+            }
         }
 
         [RelayCommand]
@@ -83,6 +187,7 @@ namespace JaahdLogistics.ViewModels
             {
                 await _syncService.SyncWithCloud();
                 SyncStatus = $"Last sync: {System.DateTime.Now:HH:mm:ss}";
+                await RefreshDashboard();
             }
             catch (System.Exception ex)
             {
@@ -92,117 +197,6 @@ namespace JaahdLogistics.ViewModels
             finally
             {
                 IsSyncing = false;
-            }
-        }
-
-        private void LoadData()
-        {
-            var user = AuthService.CurrentUser;
-            if (user == null) return;
-
-            UserPRs.Clear();
-            ActionItems.Clear();
-
-            var allPRs = _dataService.GetPRs().ToList();
-            
-            // 1. My PRs
-            var myPRs = (user.Role == "Admin" || user.Role == "FinanceManager" || user.Role == "LogisticsManager" || user.Role == "HeadOfAssociation")
-                ? allPRs 
-                : allPRs.Where(p => p.RequesterId == user.Id);
-
-            foreach (var pr in myPRs.OrderByDescending(p => p.Date))
-                UserPRs.Add(pr);
-
-            // 2. Action Required (Approvals)
-            IEnumerable<PurchaseRequisition> needsApproval = new List<PurchaseRequisition>();
-            if (user.Role == "LogisticsManager") needsApproval = allPRs.Where(p => p.Status == "Pending");
-            else if (user.Role == "FinanceManager") needsApproval = allPRs.Where(p => p.Status == "CheckedByLogistics");
-            else if (user.Role == "ProjectManager") needsApproval = allPRs.Where(p => p.Status == "ReviewedByFinance");
-            else if (user.Role == "HeadOfAssociation") needsApproval = allPRs.Where(p => p.Status == "ApprovedByPM");
-            else if (user.Role == "Admin") needsApproval = allPRs.Where(p => p.Status != "FinalApproved" && p.Status != "Rejected");
-
-            foreach (var pr in needsApproval.Take(10))
-                ActionItems.Add(pr);
-        }
-
-        private void LoadAnalytics()
-        {
-            var projects = _dataService.GetProjects().ToList();
-            var allPRs = _dataService.GetPRs().ToList();
-            var allPOs = _dataService.GetPOs().ToList();
-            var allRFQs = _dataService.GetRFQs().ToList();
-            var allBAs = _dataService.GetBidAnalyses().ToList();
-            var allGRNs = _dataService.GetGRNs().ToList();
-
-            TotalProjects = projects.Count;
-            PendingPRs = allPRs.Count(p => p.Status != "FinalApproved" && p.Status != "Rejected");
-            ApprovedPOs = allPOs.Count(p => p.Status == "FinalApproved" || p.Status == "ApprovedByHead");
-
-            ProjectSpending.Clear();
-            PipelineDistribution.Clear();
-            TotalSpending = 0;
-
-            // Pipeline Distribution
-            PipelineDistribution.Add(new PipelineSummary { Stage = "PR", Count = allPRs.Count, Color = "#3498DB" });
-            PipelineDistribution.Add(new PipelineSummary { Stage = "RFQ", Count = allRFQs.Count, Color = "#9B59B6" });
-            PipelineDistribution.Add(new PipelineSummary { Stage = "BA", Count = allBAs.Count, Color = "#F1C40F" });
-            PipelineDistribution.Add(new PipelineSummary { Stage = "PO", Count = allPOs.Count, Color = "#27AE60" });
-            PipelineDistribution.Add(new PipelineSummary { Stage = "GRN", Count = allGRNs.Count, Color = "#E67E22" });
-
-            // 1. Monthly Trends (Last 6 months)
-            var trendValues = new ChartValues<int>();
-            var labelsList = new List<string>();
-            var months = Enumerable.Range(0, 6).Select(i => DateTime.Now.AddMonths(-i)).Reverse();
-
-            foreach(var m in months)
-            {
-                int count = allPOs.Count(p => p.Date.Month == m.Month && p.Date.Year == m.Year);
-                trendValues.Add(count);
-                labelsList.Add(m.ToString("MMM"));
-            }
-
-            MonthlyTrendSeries = new SeriesCollection
-            {
-                new ColumnSeries
-                {
-                    Title = "POs Issued",
-                    Values = trendValues,
-                    Fill = System.Windows.Media.Brushes.DodgerBlue
-                }
-            };
-            Labels = labelsList;
-
-            // 2. Spending Pie Chart
-            SpendingSeries = new SeriesCollection();
-            foreach (var proj in projects.Take(5)) // Show top 5 for visual clarity
-            {
-                var budgetLines = _dataService.GetBudgetLines(proj.Id);
-                decimal totalBudget = budgetLines.Sum(b => b.TotalAmount);
-                decimal spent = 0;
-
-                foreach(var bl in budgetLines)
-                {
-                    spent += _dataService.GetSpentBudget(bl.Id);
-                }
-
-                ProjectSpending.Add(new ProjectSpendingSummary
-                {
-                    Name = proj.Name,
-                    Budget = totalBudget,
-                    Spent = spent
-                });
-
-                if (spent > 0)
-                {
-                    SpendingSeries.Add(new PieSeries
-                    {
-                        Title = proj.Code,
-                        Values = new ChartValues<double> { (double)spent },
-                        DataLabels = true
-                    });
-                }
-
-                TotalSpending += spent;
             }
         }
     }

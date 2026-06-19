@@ -172,6 +172,38 @@ namespace JaahdLogistics.Services
                 {
                     pr.Items.Add(item);
                 }
+
+                // Load Signatories from Employees table
+                if (pr.RequesterEmployeeId > 0)
+                {
+                    var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = pr.RequesterEmployeeId });
+                    if (emp != null) { pr.RequesterSignature = emp.SignatureImage; pr.RequesterName = emp.NameEN; }
+                }
+                if (pr.LogisticsEmployeeId > 0)
+                {
+                    var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = pr.LogisticsEmployeeId });
+                    if (emp != null) { pr.LogisticsSignature = emp.SignatureImage; pr.LogisticsName = emp.NameEN; pr.LogisticsTitle = emp.PositionEN; }
+                }
+                if (pr.FinanceEmployeeId > 0)
+                {
+                    var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = pr.FinanceEmployeeId });
+                    if (emp != null) { pr.FinanceSignature = emp.SignatureImage; pr.FinanceName = emp.NameEN; pr.FinanceTitle = emp.PositionEN; }
+                }
+                if (pr.HeadEmployeeId > 0)
+                {
+                    var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = pr.HeadEmployeeId });
+                    if (emp != null) { pr.FinalSignature = emp.SignatureImage; pr.FinalName = emp.NameEN; pr.FinalTitle = emp.PositionEN; }
+                }
+
+                // Overlay with dynamic Approvals
+                var approvals = GetApprovals("PR", pr.Id);
+                foreach (var app in approvals)
+                {
+                    if (app.Status == "CheckedByLogistics") { pr.LogisticsSignature = app.SignatureImage; pr.LogisticsName = app.FullName; }
+                    if (app.Status == "ReviewedByFinance") { pr.FinanceSignature = app.SignatureImage; pr.FinanceName = app.FullName; }
+                    if (app.Status == "ApprovedByPM") { /* Add if needed */ }
+                    if (app.Status == "FinalApproved") { pr.FinalSignature = app.SignatureImage; pr.FinalName = app.FullName; }
+                }
             }
             return prs;
         }
@@ -229,7 +261,24 @@ namespace JaahdLogistics.Services
                     po.VendorId = null; // Clean up 0s
                 }
 
-                // Load Approvals for PO
+                // Load Signatories from Employees table if assigned
+                if (po.LogisticsEmployeeId > 0)
+                {
+                    var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = po.LogisticsEmployeeId });
+                    if (emp != null) { po.LogisticsSignature = emp.SignatureImage; po.LogisticsName = emp.NameEN; po.LogisticsTitle = emp.PositionEN; }
+                }
+                if (po.FinanceEmployeeId > 0)
+                {
+                    var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = po.FinanceEmployeeId });
+                    if (emp != null) { po.FinanceSignature = emp.SignatureImage; po.FinanceName = emp.NameEN; po.FinanceTitle = emp.PositionEN; }
+                }
+                if (po.HeadEmployeeId > 0)
+                {
+                    var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = po.HeadEmployeeId });
+                    if (emp != null) { po.FinalSignature = emp.SignatureImage; po.FinalName = emp.NameEN; po.FinalTitle = emp.PositionEN; }
+                }
+
+                // Overlay with dynamic Approvals if any (historical or overrides)
                 var approvals = GetApprovals("PO", po.Id);
                 foreach (var app in approvals)
                 {
