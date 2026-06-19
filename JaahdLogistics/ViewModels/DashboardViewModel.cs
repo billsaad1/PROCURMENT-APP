@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using LiveCharts;
+using LiveCharts.Wpf;
 using JaahdLogistics.Models;
 using JaahdLogistics.Services;
 
@@ -28,7 +30,11 @@ namespace JaahdLogistics.ViewModels
         public ObservableCollection<PurchaseRequisition> ActionItems { get; } = new();
         public ObservableCollection<ProjectSpendingSummary> ProjectSpending { get; } = new();
         public ObservableCollection<PipelineSummary> PipelineDistribution { get; } = new();
-        public ObservableCollection<MonthlyTrend> MonthlySpending { get; } = new();
+
+        [ObservableProperty] private SeriesCollection _spendingSeries = new();
+        [ObservableProperty] private SeriesCollection _monthlyTrendSeries = new();
+        [ObservableProperty] private List<string> _labels = new();
+        public Func<double, string> Formatter { get; set; } = value => value.ToString("N0");
 
         public class MonthlyTrend
         {
@@ -143,15 +149,31 @@ namespace JaahdLogistics.ViewModels
             PipelineDistribution.Add(new PipelineSummary { Stage = "PO", Count = allPOs.Count, Color = "#27AE60" });
             PipelineDistribution.Add(new PipelineSummary { Stage = "GRN", Count = allGRNs.Count, Color = "#E67E22" });
 
-            // Monthly Trends (Last 6 months)
-            MonthlySpending.Clear();
+            // 1. Monthly Trends (Last 6 months)
+            var trendValues = new ChartValues<int>();
+            var labelsList = new List<string>();
             var months = Enumerable.Range(0, 6).Select(i => DateTime.Now.AddMonths(-i)).Reverse();
+
             foreach(var m in months)
             {
                 int count = allPOs.Count(p => p.Date.Month == m.Month && p.Date.Year == m.Year);
-                MonthlySpending.Add(new MonthlyTrend { Month = m.ToString("MMM"), Count = count });
+                trendValues.Add(count);
+                labelsList.Add(m.ToString("MMM"));
             }
 
+            MonthlyTrendSeries = new SeriesCollection
+            {
+                new ColumnSeries
+                {
+                    Title = "POs Issued",
+                    Values = trendValues,
+                    Fill = System.Windows.Media.Brushes.DodgerBlue
+                }
+            };
+            Labels = labelsList;
+
+            // 2. Spending Pie Chart
+            SpendingSeries = new SeriesCollection();
             foreach (var proj in projects.Take(5)) // Show top 5 for visual clarity
             {
                 var budgetLines = _dataService.GetBudgetLines(proj.Id);
@@ -169,6 +191,17 @@ namespace JaahdLogistics.ViewModels
                     Budget = totalBudget,
                     Spent = spent
                 });
+
+                if (spent > 0)
+                {
+                    SpendingSeries.Add(new PieSeries
+                    {
+                        Title = proj.Code,
+                        Values = new ChartValues<double> { (double)spent },
+                        DataLabels = true
+                    });
+                }
+
                 TotalSpending += spent;
             }
         }
