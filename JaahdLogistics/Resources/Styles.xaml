@@ -462,7 +462,7 @@
     </ControlTemplate>
 
     <ControlTemplate x:Key="BidAnalysisPrintTemplate">
-        <Border Background="White" Width="1122" Height="793" Padding="20">
+        <Border Background="White" Width="1080" Height="750" Padding="20">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/> <!-- Header -->
@@ -1584,7 +1584,7 @@
     </ControlTemplate>
 
     <ControlTemplate x:Key="ReportPrintTemplate">
-        <Border Background="White" Width="1122" Height="793" Padding="30">
+        <Border Background="White" Width="1080" Height="750" Padding="30">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
