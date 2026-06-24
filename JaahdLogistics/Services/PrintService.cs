@@ -37,21 +37,19 @@ namespace JaahdLogistics.Services
                     printDialog.PrintTicket.PageOrientation = System.Printing.PageOrientation.Portrait;
                 }
 
-                var border = new Border { Child = control, Background = Brushes.White };
+                var border = new Border { Child = control, Background = Brushes.White, Padding = new Thickness(0), Margin = new Thickness(0), BorderThickness = new Thickness(0) };
                 border.Measure(new Size(control.Width, control.Height));
                 border.Arrange(new Rect(0, 0, control.Width, control.Height));
                 border.UpdateLayout();
 
-                // Scale to fit
+                // Scale to fit EXACTLY the printable area (removes white space margins)
                 double scale = Math.Min(printDialog.PrintableAreaWidth / control.Width,
                                         printDialog.PrintableAreaHeight / control.Height);
 
-                if (scale < 1.0)
-                {
-                    border.LayoutTransform = new ScaleTransform(scale, scale);
-                    border.Measure(new Size(printDialog.PrintableAreaWidth, printDialog.PrintableAreaHeight));
-                    border.Arrange(new Rect(0, 0, printDialog.PrintableAreaWidth, printDialog.PrintableAreaHeight));
-                }
+                border.LayoutTransform = new ScaleTransform(scale, scale);
+                border.Measure(new Size(printDialog.PrintableAreaWidth, printDialog.PrintableAreaHeight));
+                border.Arrange(new Rect(0, 0, printDialog.PrintableAreaWidth, printDialog.PrintableAreaHeight));
+                border.UpdateLayout();
 
                 printDialog.PrintVisual(border, "Jaahd Logistics Document");
             }
