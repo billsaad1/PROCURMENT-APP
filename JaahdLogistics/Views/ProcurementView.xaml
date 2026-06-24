@@ -72,7 +72,8 @@
                         <Button Content="🔄" Command="{Binding LoadApprovedPRsCommand}" Margin="5,0,0,0" ToolTip="Refresh PR List"/>
                         <Button Content="{DynamicResource Generate}" Command="{Binding CreateRFQCommand}" Margin="10,0,0,0"/>
                         <Button Content="{DynamicResource Save}" Command="{Binding SaveRFQCommand}" Margin="10,0,0,0" Background="#27AE60"/>
-                        <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" Margin="10,0,0,0" Background="#34495E"/>
+                        <Button Content="🖨️ Direct" Command="{Binding DirectPrintCommand}" Margin="10,0,0,0" Background="#1B4F72"/>
+                        <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" Margin="5,0,0,0" Background="#34495E"/>
                     </StackPanel>
                     <Grid Grid.Row="2">
                         <Grid.ColumnDefinitions>
@@ -157,6 +158,7 @@
                         <Button Content="{DynamicResource AddBidder}" Command="{Binding AddBidderCommand}" Margin="5,0,0,0"/>
                         <Button Content="{DynamicResource Save}" Command="{Binding SaveBidAnalysisCommand}" Margin="5,0,0,0" Background="#27AE60"/>
                         <Button Content="{DynamicResource Approve}" Command="{Binding ApproveBidAnalysisCommand}" Margin="5,0,0,0"/>
+                        <Button Content="🖨️ Direct" Command="{Binding DirectPrintCommand}" Margin="5,0,0,0" Background="#1B4F72"/>
                         <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" Margin="5,0,0,0" Background="#34495E"/>
                     </StackPanel>
 
@@ -536,6 +538,7 @@
                 <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
                     <Button Content="{DynamicResource Save}" Command="{Binding SavePOCommand}" Width="120" Margin="0,0,10,0" Background="#27AE60"/>
                     <Button Content="{DynamicResource Approve}" Command="{Binding ApprovePOCommand}" Width="120" Margin="0,0,10,0"/>
+                    <Button Content="🖨️ Direct Print" Command="{Binding DirectPrintCommand}" Width="120" Margin="0,0,10,0" Background="#1B4F72"/>
                     <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" CommandParameter="{Binding ElementName=POPrintRoot}" Width="120"/>
                 </StackPanel>
                 </Grid>

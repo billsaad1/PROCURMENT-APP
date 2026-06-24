@@ -6,15 +6,19 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
+using JaahdLogistics.Helpers.Export;
 
 namespace JaahdLogistics.Views
 {
     public partial class PrintPreviewWindow : Window
     {
+        private string _currentTemplateName;
+
         public PrintPreviewWindow(object dataContext, string templateName)
         {
             InitializeComponent();
             DataContext = dataContext;
+            _currentTemplateName = templateName;
             
             // Set the template based on the form type
             var template = Application.Current.TryFindResource(templateName) as ControlTemplate;
@@ -34,67 +38,73 @@ namespace JaahdLogistics.Views
             }
         }
 
-        private void ExportExcel_Click(object sender, RoutedEventArgs e)
+        private void SavePDF_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // Find any DataGrid in the DataContext or Content to export its data
-                DataGrid? grid = null;
-
-                // Case 1: ReportViewModel has the grid in ReportContent
-                var property = DataContext.GetType().GetProperty("ReportContent");
-                if (property != null)
-                {
-                    grid = property.GetValue(DataContext) as DataGrid;
-                }
-
-                if (grid == null)
-                {
-                    MessageBox.Show("Export is only available for Report data at this time.", "Export Info");
-                    return;
-                }
-
                 SaveFileDialog saveFile = new SaveFileDialog
                 {
-                    Filter = "Excel CSV (*.csv)|*.csv",
-                    FileName = "Logistics_Report_" + DateTime.Now.ToString("yyyyMMdd_HHmmss")
+                    Filter = "PDF Document (*.pdf)|*.pdf",
+                    FileName = "Logistics_Doc_" + DateTime.Now.ToString("yyyyMMdd_HHmmss")
                 };
 
                 if (saveFile.ShowDialog() == true)
                 {
-                    StringBuilder sb = new StringBuilder();
+                    PrintDialog printDialog = new PrintDialog();
+                    // Setup for background PDF printing
+                    printDialog.PrintQueue = new System.Printing.PrintQueue(new System.Printing.PrintServer(), "Microsoft Print to PDF");
+                    printDialog.PrintTicket.PageOrientation = (PreviewContent.Width > PreviewContent.Height)
+                        ? System.Printing.PageOrientation.Landscape
+                        : System.Printing.PageOrientation.Portrait;
 
-                    // Headers (Handle Arabic characters with UTF8 encoding)
-                    var headers = grid.Columns.Select(c => "\"" + c.Header?.ToString()?.Replace("\"", "\"\"") + "\"");
-                    sb.AppendLine(string.Join(",", headers));
+                    // Temporarily reset zoom to 1.0 for printing
+                    var originalTransform = PrintBorder.LayoutTransform;
+                    PrintBorder.LayoutTransform = null;
+                    PrintBorder.UpdateLayout();
 
-                    // Data
-                    foreach (var item in grid.ItemsSource)
+                    // Scale to fit
+                    double scale = Math.Min(printDialog.PrintableAreaWidth / PrintBorder.ActualWidth,
+                                            printDialog.PrintableAreaHeight / PrintBorder.ActualHeight);
+                    if (scale < 1.0)
                     {
-                        var row = new List<string>();
-                        foreach (var col in grid.Columns)
-                        {
-                            if (col is DataGridTextColumn textCol && textCol.Binding is System.Windows.Data.Binding binding)
-                            {
-                                var propName = binding.Path.Path;
-                                var val = item.GetType().GetProperty(propName)?.GetValue(item, null);
-                                row.Add("\"" + val?.ToString()?.Replace("\"", "\"\"") + "\"");
-                            }
-                            else
-                            {
-                                row.Add("");
-                            }
-                        }
-                        sb.AppendLine(string.Join(",", row));
+                        PrintBorder.LayoutTransform = new System.Windows.Media.ScaleTransform(scale, scale);
+                        PrintBorder.UpdateLayout();
                     }
 
-                    File.WriteAllText(saveFile.FileName, sb.ToString(), Encoding.UTF8);
-                    MessageBox.Show("Report exported successfully to:\n" + saveFile.FileName, "Export Success");
+                    printDialog.PrintVisual(PrintBorder, "Jaahd Logistics PDF");
+
+                    // Restore
+                    PrintBorder.LayoutTransform = originalTransform;
+                    PrintBorder.UpdateLayout();
+
+                    MessageBox.Show("Document saved as PDF successfully.", "PDF Export");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Export failed: " + ex.Message);
+                MessageBox.Show("PDF Saving failed: " + ex.Message);
+            }
+        }
+
+        private void SaveExcel_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                SaveFileDialog saveFile = new SaveFileDialog
+                {
+                    Filter = "Excel Workbook (*.xlsx)|*.xlsx",
+                    FileName = "Logistics_Export_" + DateTime.Now.ToString("yyyyMMdd_HHmmss")
+                };
+
+                if (saveFile.ShowDialog() == true)
+                {
+                    ExcelExportHelper.ExportToExcel(DataContext, _currentTemplateName, saveFile.FileName);
+                    MessageBox.Show("Document saved as Excel successfully.", "Excel Export");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Excel Saving failed: " + ex.Message);
             }
         }
 

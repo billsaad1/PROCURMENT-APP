@@ -89,6 +89,7 @@
             </DataGrid>
 
             <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+                <Button Content="🖨️ Direct Print" Command="{Binding DirectPrintCommand}" Width="120" Height="35" Margin="0,0,10,0" Background="#1B4F72"/>
                 <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
                 <Button Content="{DynamicResource SaveGRN}" Command="{Binding SaveGRNCommand}" Width="120" Height="35"/>
             </StackPanel>

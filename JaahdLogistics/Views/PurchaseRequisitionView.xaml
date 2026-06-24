@@ -197,6 +197,7 @@
 
                 <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Right" x:Name="ControlButtons">
                     <TextBlock Text="{Binding CurrentPR.Status}" VerticalAlignment="Center" Margin="0,0,20,0" FontWeight="Bold" Foreground="{StaticResource SecondaryBlueBrush}"/>
+                    <Button Content="🖨️ Direct Print" Command="{Binding DirectPrintCommand}" Width="120" Height="35" Margin="0,0,10,0" Background="#1B4F72"/>
                     <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
                     <Button Content="{DynamicResource Approve}" Command="{Binding ApproveCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
             <Button Content="{DynamicResource Save}" Command="{Binding SavePRCommand}" Width="120" Height="35" Margin="0,0,10,0"/>

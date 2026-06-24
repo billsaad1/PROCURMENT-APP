@@ -387,5 +387,11 @@ namespace JaahdLogistics.ViewModels
         {
             new PrintService().ShowPreview(this, "PRPrintTemplate");
         }
+
+        [RelayCommand]
+        private void DirectPrint()
+        {
+            new PrintService().DirectPrint(this, "PRPrintTemplate");
+        }
     }
 }

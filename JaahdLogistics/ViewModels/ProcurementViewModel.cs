@@ -994,15 +994,26 @@ namespace JaahdLogistics.ViewModels
         [RelayCommand]
         private void Print()
         {
-            string template = SelectedTabIndex switch
+            string template = GetCurrentTemplate();
+            new PrintService().ShowPreview(this, template);
+        }
+
+        [RelayCommand]
+        private void DirectPrint()
+        {
+            string template = GetCurrentTemplate();
+            new PrintService().DirectPrint(this, template);
+        }
+
+        private string GetCurrentTemplate()
+        {
+            return SelectedTabIndex switch
             {
                 0 => "RFQPrintTemplate",
                 1 => "BidAnalysisPrintTemplate",
                 2 => "POPrintTemplate",
                 _ => "POPrintTemplate"
             };
-
-            new PrintService().ShowPreview(this, template);
         }
     }
 }

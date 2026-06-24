@@ -83,5 +83,21 @@ namespace JaahdLogistics.ViewModels
             ReportContent = printGrid;
             new PrintService().ShowPreview(this, "ReportPrintTemplate");
         }
+
+        [RelayCommand]
+        private void DirectPrintReport(System.Windows.Controls.DataGrid grid)
+        {
+            if (grid == null) return;
+            ReportTitle = SelectedTabIndex switch
+            {
+                0 => "Project Spending Summary (USD)",
+                1 => "Inventory Status Report",
+                2 => "Vendor Performance History",
+                3 => "Procurement Pipeline Overview",
+                _ => "Logistics Report"
+            };
+            ReportContent = grid; // Use grid directly for direct print
+            new PrintService().DirectPrint(this, "ReportPrintTemplate");
+        }
     }
 }

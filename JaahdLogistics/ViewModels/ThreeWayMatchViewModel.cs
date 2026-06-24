@@ -242,5 +242,11 @@ namespace JaahdLogistics.ViewModels
         {
             new PrintService().ShowPreview(this, "ThreeWayMatchPrintTemplate");
         }
+
+        [RelayCommand]
+        private void DirectPrint()
+        {
+            new PrintService().DirectPrint(this, "ThreeWayMatchPrintTemplate");
+        }
     }
 }

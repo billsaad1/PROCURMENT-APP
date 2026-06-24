@@ -27,8 +27,12 @@
                             <DataGridTextColumn Header="Total Spent (USD)" Binding="{Binding TotalSpent, StringFormat=N2}" Width="200"/>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Button Grid.Row="1" Content="Print Spending Report" Command="{Binding PrintReportCommand}" CommandParameter="{Binding ElementName=SpendingGrid}"
-                            HorizontalAlignment="Right" Margin="0,15,0,0" Padding="15,10" Background="#27AE60"/>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+                        <Button Content="🖨️ Direct Print" Command="{Binding DirectPrintReportCommand}" CommandParameter="{Binding ElementName=SpendingGrid}"
+                                Padding="15,10" Background="#1B4F72" Margin="0,0,10,0"/>
+                        <Button Content="Print Preview" Command="{Binding PrintReportCommand}" CommandParameter="{Binding ElementName=SpendingGrid}"
+                                Padding="15,10" Background="#27AE60"/>
+                    </StackPanel>
                 </Grid>
             </TabItem>
 
@@ -42,8 +46,12 @@
                             <DataGridTextColumn Header="Current Quantity" Binding="{Binding CurrentQuantity}" Width="150"/>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Button Grid.Row="1" Content="Print Inventory Report" Command="{Binding PrintReportCommand}" CommandParameter="{Binding ElementName=InventoryGrid}"
-                            HorizontalAlignment="Right" Margin="0,15,0,0" Padding="15,10" Background="#27AE60"/>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+                        <Button Content="🖨️ Direct Print" Command="{Binding DirectPrintReportCommand}" CommandParameter="{Binding ElementName=InventoryGrid}"
+                                Padding="15,10" Background="#1B4F72" Margin="0,0,10,0"/>
+                        <Button Content="Print Preview" Command="{Binding PrintReportCommand}" CommandParameter="{Binding ElementName=InventoryGrid}"
+                                Padding="15,10" Background="#27AE60"/>
+                    </StackPanel>
                 </Grid>
             </TabItem>
 
@@ -57,8 +65,12 @@
                             <DataGridTextColumn Header="Total Volume (USD)" Binding="{Binding TotalValue, StringFormat=N2}" Width="200"/>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Button Grid.Row="1" Content="Print Vendor Report" Command="{Binding PrintReportCommand}" CommandParameter="{Binding ElementName=VendorGrid}"
-                            HorizontalAlignment="Right" Margin="0,15,0,0" Padding="15,10" Background="#27AE60"/>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+                        <Button Content="🖨️ Direct Print" Command="{Binding DirectPrintReportCommand}" CommandParameter="{Binding ElementName=VendorGrid}"
+                                Padding="15,10" Background="#1B4F72" Margin="0,0,10,0"/>
+                        <Button Content="Print Preview" Command="{Binding PrintReportCommand}" CommandParameter="{Binding ElementName=VendorGrid}"
+                                Padding="15,10" Background="#27AE60"/>
+                    </StackPanel>
                 </Grid>
             </TabItem>
 
@@ -71,8 +83,12 @@
                             <DataGridTextColumn Header="Document Count" Binding="{Binding Count}" Width="200"/>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Button Grid.Row="1" Content="Print Pipeline Summary" Command="{Binding PrintReportCommand}" CommandParameter="{Binding ElementName=PipelineGrid}"
-                            HorizontalAlignment="Right" Margin="0,15,0,0" Padding="15,10" Background="#27AE60"/>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+                        <Button Content="🖨️ Direct Print" Command="{Binding DirectPrintReportCommand}" CommandParameter="{Binding ElementName=PipelineGrid}"
+                                Padding="15,10" Background="#1B4F72" Margin="0,0,10,0"/>
+                        <Button Content="Print Preview" Command="{Binding PrintReportCommand}" CommandParameter="{Binding ElementName=PipelineGrid}"
+                                Padding="15,10" Background="#27AE60"/>
+                    </StackPanel>
                 </Grid>
             </TabItem>
         </TabControl>

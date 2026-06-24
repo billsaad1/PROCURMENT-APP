@@ -157,5 +157,11 @@ namespace JaahdLogistics.ViewModels
         {
             new PrintService().ShowPreview(this, "GRNPrintTemplate");
         }
+
+        [RelayCommand]
+        private void DirectPrint()
+        {
+            new PrintService().DirectPrint(this, "GRNPrintTemplate");
+        }
     }
 }
