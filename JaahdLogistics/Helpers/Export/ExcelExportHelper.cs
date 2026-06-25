@@ -15,7 +15,8 @@ namespace JaahdLogistics.Helpers.Export
             using (var workbook = new XLWorkbook())
             {
                 var worksheet = workbook.Worksheets.Add("Logistics Document");
-                worksheet.RightToLeft = true; // Support Arabic layouts
+                worksheet.RightToLeft = true;
+                worksheet.ShowGridLines = false; // Hide gridlines for a clean form look
 
                 if (templateName.Contains("PR")) ExportPR(worksheet, viewModel);
                 else if (templateName.Contains("PO")) ExportPO(worksheet, viewModel);
@@ -26,25 +27,38 @@ namespace JaahdLogistics.Helpers.Export
                 else if (templateName.Contains("Report")) ExportReport(worksheet, viewModel);
                 else ExportGeneric(worksheet, viewModel);
 
-                // Adjust column widths for professional look
-                worksheet.Columns().AdjustToContents();
+                // Setup Page for Printing - Exact A4 Fit
+                worksheet.PageSetup.PaperSize = XLPaperSize.A4Paper;
+                worksheet.PageSetup.Margins.SetTop(0.25).SetBottom(0.25).SetLeft(0.25).SetRight(0.25);
+                worksheet.PageSetup.CenterHorizontally = true;
+                worksheet.PageSetup.FitToPages(1, 0); // Fit to 1 page wide
+
                 workbook.SaveAs(filePath);
             }
         }
 
         private static void AddHeader(IXLWorksheet ws, string title, int colSpan, Settings? settings = null)
         {
-            // Standardize Column Widths for A4 Feel (Total ~80-90 units)
-            ws.Column(1).Width = 5; // SI NO
-            ws.Column(2).Width = 35; // Description
-            ws.Column(3).Width = 10;
-            ws.Column(4).Width = 10;
-            ws.Column(5).Width = 12;
-            ws.Column(6).Width = 15;
-            if (colSpan > 6) ws.Column(7).Width = 15;
+            // Standardize Column Widths for A4 Portrait Feel
+            if (ws.PageSetup.PageOrientation == XLPageOrientation.Portrait)
+            {
+                ws.Column(1).Width = 6;   // SI NO
+                ws.Column(2).Width = 38;  // Description
+                ws.Column(3).Width = 10;  // Unit / Budget
+                ws.Column(4).Width = 8;   // Qty
+                ws.Column(5).Width = 12;  // Price
+                ws.Column(6).Width = 14;  // Total
+                if (colSpan > 6) ws.Column(7).Width = 12;
+            }
+            else
+            {
+                // Landscape default
+                ws.Columns(1, colSpan).Width = 12;
+                ws.Column(2).Width = 30;
+            }
 
             // Row 1: Logo and Association Name
-            ws.Row(1).Height = 65;
+            ws.Row(1).Height = 75;
             if (settings?.LogoImage != null && settings.LogoImage.Length > 0)
             {
                 try
@@ -81,10 +95,10 @@ namespace JaahdLogistics.Helpers.Export
                 .Alignment.SetVertical(XLAlignmentVerticalValues.Center);
         }
 
-        private static void ApplyBoxStyle(IXLRange range, string bgColor = "#FFFFFF", bool bold = false)
+        private static void ApplyBoxStyle(IXLRange range, string bgColor = "#FFFFFF", bool bold = false, bool mediumBorder = false)
         {
             range.Style
-                .Border.SetOutsideBorder(XLBorderStyleValues.Thin)
+                .Border.SetOutsideBorder(mediumBorder ? XLBorderStyleValues.Medium : XLBorderStyleValues.Thin)
                 .Fill.SetBackgroundColor(XLColor.FromHtml(bgColor))
                 .Font.SetBold(bold)
                 .Alignment.SetVertical(XLAlignmentVerticalValues.Center)
@@ -98,6 +112,8 @@ namespace JaahdLogistics.Helpers.Export
             var pr = prVM.CurrentPR;
 
             AddHeader(ws, "Purchase Requisition / طلب شراء", 7, prVM.Settings);
+            // Outer Box Border
+            ws.Range(1, 1, 58, 7).Style.Border.SetOutsideBorder(XLBorderStyleValues.Medium);
 
             // Row 3: Info Bar
             ws.Row(3).Height = 25;
@@ -158,6 +174,14 @@ namespace JaahdLogistics.Helpers.Export
                 ws.Cell(row, 2).Style.Alignment.SetWrapText(true);
             }
 
+            // Fill empty rows to maintain box shape if needed
+            while (i <= 10)
+            {
+                row++;
+                ws.Cell(row, 1).Value = i++;
+                ws.Range(row, 1, row, 7).Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin).Border.SetInsideBorder(XLBorderStyleValues.Thin);
+            }
+
             row++;
             ws.Cell(row, 1).Value = "Total in Words / الإجمالي كتابة:";
             ws.Range(row, 1, row, 5).Merge().Style.Font.SetBold().Fill.SetBackgroundColor(XLColor.FromHtml("#F2F4F4")).Border.SetOutsideBorder(XLBorderStyleValues.Thin);
@@ -199,6 +223,7 @@ namespace JaahdLogistics.Helpers.Export
             var po = pVM.CurrentPO;
 
             AddHeader(ws, "PURCHASE ORDER / أمر شراء", 6, pVM.Settings);
+            ws.Range(1, 1, 58, 6).Style.Border.SetOutsideBorder(XLBorderStyleValues.Medium);
 
             // Row 3: Info Bar
             ws.Row(3).Height = 25;
@@ -252,15 +277,22 @@ namespace JaahdLogistics.Helpers.Export
             for (int h = 1; h < headers.Length; h++) ws.Cell(row, h + 2).Value = headers[h];
             ws.Range(row, 1, row, 6).Style.Font.SetBold().Fill.SetBackgroundColor(XLColor.FromHtml("#D5D8DC")).Border.SetOutsideBorder(XLBorderStyleValues.Thin).Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
 
+            int poItemCount = 0;
             foreach (var item in po.Items)
             {
-                row++;
+                row++; poItemCount++;
                 ws.Cell(row, 1).Value = item.Description;
                 ws.Range(row, 1, row, 2).Merge().Style.Alignment.SetWrapText(true);
                 ws.Cell(row, 3).Value = item.Unit;
                 ws.Cell(row, 4).Value = item.Quantity;
                 ws.Cell(row, 5).Value = item.UnitPrice;
                 ws.Cell(row, 6).Value = item.TotalPrice;
+                ws.Range(row, 1, row, 6).Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin).Border.SetInsideBorder(XLBorderStyleValues.Thin);
+            }
+            while (poItemCount < 8)
+            {
+                row++; poItemCount++;
+                ws.Range(row, 1, row, 2).Merge();
                 ws.Range(row, 1, row, 6).Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin).Border.SetInsideBorder(XLBorderStyleValues.Thin);
             }
 
@@ -307,6 +339,7 @@ namespace JaahdLogistics.Helpers.Export
             var rfq = pVM.CurrentRFQ;
 
             AddHeader(ws, "Request for Quotation (RFQ) / طلب عرض سعر", 6, pVM.Settings);
+            ws.Range(1, 1, 58, 6).Style.Border.SetOutsideBorder(XLBorderStyleValues.Medium);
 
             // Row 3: Info Bar
             ws.Row(3).Height = 25;
@@ -330,13 +363,13 @@ namespace JaahdLogistics.Helpers.Export
                 ws.Cell(row, h + 1).Style.Font.SetBold().Fill.SetBackgroundColor(XLColor.FromHtml("#D5D8DC")).Border.SetOutsideBorder(XLBorderStyleValues.Thin).Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
             }
 
+            int rfqI = 1;
             if (pVM.SelectedPR != null)
             {
-                int i = 1;
                 foreach (var item in pVM.SelectedPR.Items)
                 {
                     row++;
-                    ws.Cell(row, 1).Value = i++;
+                    ws.Cell(row, 1).Value = rfqI++;
                     ws.Cell(row, 2).Value = item.Description;
                     ws.Cell(row, 3).Value = item.Unit;
                     ws.Cell(row, 4).Value = item.Quantity;
@@ -344,6 +377,12 @@ namespace JaahdLogistics.Helpers.Export
                     ws.Cell(row, 2).Style.Alignment.SetWrapText(true);
                     ws.Range(row, 5, row, 6).Style.Fill.SetBackgroundColor(XLColor.FromHtml("#FDFEFE"));
                 }
+            }
+            while (rfqI <= 12)
+            {
+                row++;
+                ws.Cell(row, 1).Value = rfqI++;
+                ws.Range(row, 1, row, 6).Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin).Border.SetInsideBorder(XLBorderStyleValues.Thin);
             }
 
             row += 2;
@@ -373,9 +412,10 @@ namespace JaahdLogistics.Helpers.Export
             // Matrix documents need landscape feel
             ws.PageSetup.PageOrientation = XLPageOrientation.Landscape;
             int bidderCount = pVM.Bidders.Count;
-            int colSpan = 5 + (bidderCount * 2);
+            int colSpan = 6 + (bidderCount * 2);
 
             AddHeader(ws, "Analysis of RFQs / تحليل العروض", colSpan, pVM.Settings);
+            ws.Range(1, 1, 50, colSpan).Style.Border.SetOutsideBorder(XLBorderStyleValues.Medium);
 
             // Info Bar
             ws.Row(3).Height = 25;
@@ -494,6 +534,7 @@ namespace JaahdLogistics.Helpers.Export
             var grn = wVM.CurrentGRN;
 
             AddHeader(ws, "GOODS RECEIVING NOTE / مذكرة استلام بضائع", 7, wVM.Settings);
+            ws.Range(1, 1, 58, 7).Style.Border.SetOutsideBorder(XLBorderStyleValues.Medium);
 
             // Row 3: Info Bar
             ws.Row(3).Height = 25;
@@ -541,6 +582,12 @@ namespace JaahdLogistics.Helpers.Export
                 ws.Cell(row, 7).Value = item.RejectReason;
                 ws.Range(row, 1, row, 7).Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin).Border.SetInsideBorder(XLBorderStyleValues.Thin);
             }
+            while (i <= 10)
+            {
+                row++;
+                ws.Cell(row, 1).Value = i++;
+                ws.Range(row, 1, row, 7).Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin).Border.SetInsideBorder(XLBorderStyleValues.Thin);
+            }
 
             // Remarks
             row += 2;
@@ -576,6 +623,7 @@ namespace JaahdLogistics.Helpers.Export
             var match = tVM.CurrentMatch;
 
             AddHeader(ws, "THREE-WAY MATCH / مطابقة ثلاثية", 7, tVM.Settings);
+            ws.Range(1, 1, 58, 7).Style.Border.SetOutsideBorder(XLBorderStyleValues.Medium);
 
             // Info Bar 1
             ws.Row(3).Height = 25;

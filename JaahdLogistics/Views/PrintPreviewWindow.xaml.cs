@@ -47,19 +47,15 @@ namespace JaahdLogistics.Views
 
                 PrintDialog printDialog = new PrintDialog();
 
-                // Attempt to auto-select PDF printer to save user time
-                try {
-                    var pdfQueue = new System.Printing.LocalPrintServer().GetPrintQueues()
-                        .FirstOrDefault(q => q.Name.Contains("PDF") || q.Description.Contains("PDF"));
-                    if (pdfQueue != null) printDialog.PrintQueue = pdfQueue;
-                } catch { }
+                // Let the user choose the printer and settings (e.g. Save As PDF)
+                // This ensures we don't conflict with system dialogs.
+                if (printDialog.ShowDialog() != true) return;
 
-                // Set Orientation and A4 Paper Size
+                // Set Orientation and A4 Paper Size if the user selected a PDF-like printer
                 printDialog.PrintTicket.PageOrientation = (PreviewContent.Width > PreviewContent.Height)
                     ? System.Printing.PageOrientation.Landscape
                     : System.Printing.PageOrientation.Portrait;
 
-                // Force A4
                 try {
                     printDialog.PrintTicket.PageMediaSize = new System.Printing.PageMediaSize(System.Printing.PageMediaSizeName.ISOA4);
                 } catch { }
@@ -83,12 +79,8 @@ namespace JaahdLogistics.Views
                 PrintBorder.LayoutTransform = new System.Windows.Media.ScaleTransform(scale, scale);
                 PrintBorder.UpdateLayout();
 
-                // Show the print dialog only if we couldn't find a PDF printer or if we want to let user confirm
-                if (printDialog.PrintQueue?.Name.Contains("PDF") == true || printDialog.ShowDialog() == true)
-                {
-                    printDialog.PrintVisual(PrintBorder, "Jaahd Logistics PDF Export");
-                    MessageBox.Show("Document sent to PDF driver. Please choose the save location in the next window.", "PDF Export");
-                }
+                printDialog.PrintVisual(PrintBorder, "Jaahd Logistics PDF Export");
+                MessageBox.Show("Document export initiated.", "Export");
 
                 // Restore UI state
                 PrintBorder.Margin = originalMargin;
