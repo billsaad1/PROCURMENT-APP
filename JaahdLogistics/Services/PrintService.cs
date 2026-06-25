@@ -38,6 +38,19 @@ namespace JaahdLogistics.Services
                 }
 
                 var border = new Border { Child = control, Background = Brushes.White, Padding = new Thickness(0), Margin = new Thickness(0), BorderThickness = new Thickness(0) };
+
+                // IMPORTANT: Ensure the visual is prepared for the specific orientation
+                if (printDialog.PrintTicket.PageOrientation == System.Printing.PageOrientation.Landscape)
+                {
+                    control.Width = 1080;
+                    control.Height = 750;
+                }
+                else
+                {
+                    control.Width = 794;
+                    control.Height = 1123;
+                }
+
                 border.Measure(new Size(control.Width, control.Height));
                 border.Arrange(new Rect(0, 0, control.Width, control.Height));
                 border.UpdateLayout();

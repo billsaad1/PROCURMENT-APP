@@ -39,11 +39,14 @@ namespace JaahdLogistics.Helpers.Export
 
         private static void AddHeader(IXLWorksheet ws, string title, int colSpan, Settings? settings = null)
         {
+            // Set worksheet background to White
+            ws.Style.Fill.BackgroundColor = XLColor.White;
+
             // Standardize Column Widths for A4 Portrait Feel
             if (ws.PageSetup.PageOrientation == XLPageOrientation.Portrait)
             {
                 ws.Column(1).Width = 6;   // SI NO
-                ws.Column(2).Width = 38;  // Description
+                ws.Column(2).Width = 42;  // Description
                 ws.Column(3).Width = 10;  // Unit / Budget
                 ws.Column(4).Width = 8;   // Qty
                 ws.Column(5).Width = 12;  // Price
@@ -103,6 +106,11 @@ namespace JaahdLogistics.Helpers.Export
                 .Font.SetBold(bold)
                 .Alignment.SetVertical(XLAlignmentVerticalValues.Center)
                 .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+            if (mediumBorder)
+            {
+                range.Style.Border.SetInsideBorder(XLBorderStyleValues.Thin);
+            }
         }
 
         private static void ExportPR(IXLWorksheet ws, object vm)
@@ -112,8 +120,8 @@ namespace JaahdLogistics.Helpers.Export
             var pr = prVM.CurrentPR;
 
             AddHeader(ws, "Purchase Requisition / طلب شراء", 7, prVM.Settings);
-            // Outer Box Border
-            ws.Range(1, 1, 58, 7).Style.Border.SetOutsideBorder(XLBorderStyleValues.Medium);
+            // Outer Box Border - Approximate A4 length
+            ws.Range(1, 1, 55, 7).Style.Border.SetOutsideBorder(XLBorderStyleValues.Medium);
 
             // Row 3: Info Bar
             ws.Row(3).Height = 25;
@@ -197,17 +205,16 @@ namespace JaahdLogistics.Helpers.Export
 
             row += 3;
             // Signatures
-            void AddPRSig(int r, int c, string role, string? name, string? title)
+        void AddPRSig(int r, int c, string role, string? name, string? title)
             {
                 ws.Cell(r, c).Value = role;
                 ws.Cell(r, c).Style.Font.SetBold().Fill.SetBackgroundColor(XLColor.FromHtml("#D5D8DC")).Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center).Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                 ws.Cell(r + 1, c).Value = title ?? "";
-                ws.Cell(r + 1, c).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center).Font.SetBold().Font.SetFontSize(8);
+            ws.Cell(r + 1, c).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center).Font.SetBold().Font.SetFontSize(8).Border.SetLeftBorder(XLBorderStyleValues.Thin).Border.SetRightBorder(XLBorderStyleValues.Thin);
                 ws.Cell(r + 2, c).Value = "(Signed Electronically)";
-                ws.Cell(r + 2, c).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center).Font.SetItalic().Font.SetFontSize(7);
+            ws.Cell(r + 2, c).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center).Font.SetItalic().Font.SetFontSize(7).Border.SetLeftBorder(XLBorderStyleValues.Thin).Border.SetRightBorder(XLBorderStyleValues.Thin);
                 ws.Cell(r + 3, c).Value = name ?? "";
-                ws.Cell(r + 3, c).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center).Font.SetBold();
-                ws.Range(r, c, r + 3, c).Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
+            ws.Cell(r + 3, c).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center).Font.SetBold().Border.SetBottomBorder(XLBorderStyleValues.Thin).Border.SetLeftBorder(XLBorderStyleValues.Thin).Border.SetRightBorder(XLBorderStyleValues.Thin);
             }
 
             AddPRSig(row, 1, "Requester / جهة الطلب", pr.RequesterName, pr.RequesterTitle);
@@ -223,7 +230,7 @@ namespace JaahdLogistics.Helpers.Export
             var po = pVM.CurrentPO;
 
             AddHeader(ws, "PURCHASE ORDER / أمر شراء", 6, pVM.Settings);
-            ws.Range(1, 1, 58, 6).Style.Border.SetOutsideBorder(XLBorderStyleValues.Medium);
+            ws.Range(1, 1, 55, 6).Style.Border.SetOutsideBorder(XLBorderStyleValues.Medium);
 
             // Row 3: Info Bar
             ws.Row(3).Height = 25;
@@ -316,15 +323,14 @@ namespace JaahdLogistics.Helpers.Export
 
             row += 5;
             // Signatures
-            void AddPOSig(int r, int c, string role, string? name, string? title, XLColor color)
+        void AddPOSig(int r, int c, string role, string? name, string? title, XLColor color)
             {
                 ws.Cell(r, c).Value = role;
                 ws.Range(r, c, r, c + 1).Merge().Style.Font.SetBold().Fill.SetBackgroundColor(color).Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center).Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                 ws.Cell(r + 1, c).Value = title ?? "";
-                ws.Range(r + 1, c, r + 1, c + 1).Merge().Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center).Font.SetBold().Font.SetFontSize(8);
+            ws.Range(r + 1, c, r + 1, c + 1).Merge().Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center).Font.SetBold().Font.SetFontSize(8).Border.SetLeftBorder(XLBorderStyleValues.Thin).Border.SetRightBorder(XLBorderStyleValues.Thin);
                 ws.Cell(r + 2, c).Value = name ?? "";
-                ws.Range(r + 2, c, r + 2, c + 1).Merge().Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center).Font.SetBold();
-                ws.Range(r, c, r + 3, c + 1).Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
+            ws.Range(r + 2, c, r + 2, c + 1).Merge().Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center).Font.SetBold().Border.SetBottomBorder(XLBorderStyleValues.Thin).Border.SetLeftBorder(XLBorderStyleValues.Thin).Border.SetRightBorder(XLBorderStyleValues.Thin);
             }
 
             AddPOSig(row, 1, "Checked By", po.LogisticsName, po.LogisticsTitle, XLColor.FromHtml("#AED6F1"));
@@ -339,7 +345,7 @@ namespace JaahdLogistics.Helpers.Export
             var rfq = pVM.CurrentRFQ;
 
             AddHeader(ws, "Request for Quotation (RFQ) / طلب عرض سعر", 6, pVM.Settings);
-            ws.Range(1, 1, 58, 6).Style.Border.SetOutsideBorder(XLBorderStyleValues.Medium);
+            ws.Range(1, 1, 55, 6).Style.Border.SetOutsideBorder(XLBorderStyleValues.Medium);
 
             // Row 3: Info Bar
             ws.Row(3).Height = 25;
@@ -415,7 +421,7 @@ namespace JaahdLogistics.Helpers.Export
             int colSpan = 6 + (bidderCount * 2);
 
             AddHeader(ws, "Analysis of RFQs / تحليل العروض", colSpan, pVM.Settings);
-            ws.Range(1, 1, 50, colSpan).Style.Border.SetOutsideBorder(XLBorderStyleValues.Medium);
+            ws.Range(1, 1, 45, colSpan).Style.Border.SetOutsideBorder(XLBorderStyleValues.Medium);
 
             // Info Bar
             ws.Row(3).Height = 25;
@@ -534,7 +540,7 @@ namespace JaahdLogistics.Helpers.Export
             var grn = wVM.CurrentGRN;
 
             AddHeader(ws, "GOODS RECEIVING NOTE / مذكرة استلام بضائع", 7, wVM.Settings);
-            ws.Range(1, 1, 58, 7).Style.Border.SetOutsideBorder(XLBorderStyleValues.Medium);
+            ws.Range(1, 1, 55, 7).Style.Border.SetOutsideBorder(XLBorderStyleValues.Medium);
 
             // Row 3: Info Bar
             ws.Row(3).Height = 25;
@@ -623,7 +629,7 @@ namespace JaahdLogistics.Helpers.Export
             var match = tVM.CurrentMatch;
 
             AddHeader(ws, "THREE-WAY MATCH / مطابقة ثلاثية", 7, tVM.Settings);
-            ws.Range(1, 1, 58, 7).Style.Border.SetOutsideBorder(XLBorderStyleValues.Medium);
+            ws.Range(1, 1, 55, 7).Style.Border.SetOutsideBorder(XLBorderStyleValues.Medium);
 
             // Info Bar 1
             ws.Row(3).Height = 25;

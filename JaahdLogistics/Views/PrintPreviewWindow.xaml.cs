@@ -42,52 +42,20 @@ namespace JaahdLogistics.Views
         {
             try
             {
-                // We remove our own SaveFileDialog because "Microsoft Print to PDF"
-                // will show its own mandatory save dialog. This avoids the "double save" issue.
+                SaveFileDialog saveFile = new SaveFileDialog
+                {
+                    Filter = "PDF Document (*.pdf)|*.pdf",
+                    FileName = "Logistics_Doc_" + DateTime.Now.ToString("yyyyMMdd_HHmmss")
+                };
 
-                PrintDialog printDialog = new PrintDialog();
+                if (saveFile.ShowDialog() == true)
+                {
+                    // Use the Direct PDF Export helper
+                    PDFExportHelper.ExportToPDF(DataContext, _currentTemplateName, saveFile.FileName);
 
-                // Let the user choose the printer and settings (e.g. Save As PDF)
-                // This ensures we don't conflict with system dialogs.
-                if (printDialog.ShowDialog() != true) return;
-
-                // Set Orientation and A4 Paper Size if the user selected a PDF-like printer
-                printDialog.PrintTicket.PageOrientation = (PreviewContent.Width > PreviewContent.Height)
-                    ? System.Printing.PageOrientation.Landscape
-                    : System.Printing.PageOrientation.Portrait;
-
-                try {
-                    printDialog.PrintTicket.PageMediaSize = new System.Printing.PageMediaSize(System.Printing.PageMediaSizeName.ISOA4);
-                } catch { }
-
-                // Remove UI visual margins/borders for clean PDF output
-                var originalMargin = PrintBorder.Margin;
-                var originalBorder = PrintBorder.BorderThickness;
-                var originalPadding = PrintBorder.Padding;
-                var originalTransform = PrintBorder.LayoutTransform;
-
-                PrintBorder.Margin = new Thickness(0);
-                PrintBorder.BorderThickness = new Thickness(0);
-                PrintBorder.Padding = new Thickness(0);
-                PrintBorder.LayoutTransform = null;
-                PrintBorder.UpdateLayout();
-
-                // Scale to fit the ACTUAL printable area of the PDF driver (removes white margins)
-                double scale = Math.Min(printDialog.PrintableAreaWidth / PrintBorder.ActualWidth,
-                                        printDialog.PrintableAreaHeight / PrintBorder.ActualHeight);
-
-                PrintBorder.LayoutTransform = new System.Windows.Media.ScaleTransform(scale, scale);
-                PrintBorder.UpdateLayout();
-
-                printDialog.PrintVisual(PrintBorder, "Jaahd Logistics PDF Export");
-                MessageBox.Show("Document export initiated.", "Export");
-
-                // Restore UI state
-                PrintBorder.Margin = originalMargin;
-                PrintBorder.BorderThickness = originalBorder;
-                PrintBorder.Padding = originalPadding;
-                PrintBorder.LayoutTransform = originalTransform;
-                PrintBorder.UpdateLayout();
+                    // Show success but do NOT open system print dialog
+                    MessageBox.Show("Document saved as PDF successfully.", "PDF Export", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
             }
             catch (Exception ex)
             {
