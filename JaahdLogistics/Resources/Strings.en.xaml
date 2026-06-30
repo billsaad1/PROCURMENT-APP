@@ -129,4 +129,7 @@
     <s:String x:Key="MiscCosts">Misc/other costs</s:String>
     <s:String x:Key="GeneralTotal">General Total</s:String>
     <s:String x:Key="TotalInWords">Total in Words:</s:String>
+    <s:String x:Key="DatabaseManagement">Database Management</s:String>
+    <s:String x:Key="FormatDatabase">Format Database (Clean Data)</s:String>
+    <s:String x:Key="BackupDatabase">Backup Database</s:String>
 </ResourceDictionary>

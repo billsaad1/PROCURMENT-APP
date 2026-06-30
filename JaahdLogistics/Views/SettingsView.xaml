@@ -122,7 +122,7 @@
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="{DynamicResource TermsConditions}" Padding="10">
+            <GroupBox Header="{DynamicResource TermsConditions}" Margin="0,0,0,20" Padding="10">
                 <StackPanel>
                     <TextBlock Text="{DynamicResource PRTerms}" FontWeight="Bold" Margin="0,10,0,5"/>
                     <TextBox Text="{Binding Settings.PRTerms}" TextWrapping="Wrap" AcceptsReturn="True" Height="80" Margin="0,0,0,10"/>
@@ -132,6 +132,13 @@
 
                     <TextBlock Text="{DynamicResource POTerms}" FontWeight="Bold" Margin="0,10,0,5"/>
                     <TextBox Text="{Binding Settings.POTerms}" TextWrapping="Wrap" AcceptsReturn="True" Height="80" Margin="0,0,0,10"/>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="{DynamicResource DatabaseManagement}" Padding="10">
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="{DynamicResource BackupDatabase}" Command="{Binding BackupDatabaseCommand}" Width="150" Height="35" Margin="5" Background="#2E86C1"/>
+                    <Button Content="{DynamicResource FormatDatabase}" Command="{Binding FormatDatabaseCommand}" Width="250" Height="35" Margin="5" Background="#C0392B"/>
                 </StackPanel>
             </GroupBox>
 

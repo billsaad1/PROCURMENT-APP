@@ -1073,5 +1073,50 @@ namespace JaahdLogistics.Services
                 "JOIN RFQs r ON pi.PRId = r.PRId " +
                 "WHERE r.Id = @rfqId", new { rfqId });
         }
+
+        public void FormatDatabase()
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            connection.Execute("PRAGMA foreign_keys = OFF;");
+            using var transaction = connection.BeginTransaction();
+            try
+            {
+                // List of all tables to clear, except Settings and Users (preserving Admin)
+                string[] tables = {
+                    "ThreeWayMatchItems", "ThreeWayMatch", "GRNItems", "GoodsReceivingNotes",
+                    "Inventory", "POItems", "PurchaseOrders", "BidItems", "Bidders",
+                    "BidAnalyses", "RFQs", "PRItems", "PurchaseRequisitions",
+                    "BudgetLines", "Projects", "Vendors", "Employees", "Approvals"
+                };
+
+                foreach (var table in tables)
+                {
+                    connection.Execute($"DELETE FROM {table};", null, transaction);
+                    connection.Execute($"DELETE FROM sqlite_sequence WHERE name='{table}';", null, transaction);
+                }
+
+                // Reset specific settings if needed, or keep them
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+            finally
+            {
+                connection.Execute("PRAGMA foreign_keys = ON;");
+            }
+        }
+
+        public void BackupDatabase(string destinationPath)
+        {
+            using var source = new SqliteConnection(_connectionString);
+            source.Open();
+            using var destination = new SqliteConnection($"Data Source={destinationPath}");
+            destination.Open();
+            source.BackupDatabase(destination);
+        }
     }
 }

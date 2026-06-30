@@ -130,4 +130,7 @@
     <s:String x:Key="MiscCosts">تكاليف أخرى / Misc/other costs</s:String>
     <s:String x:Key="GeneralTotal">الإجمالي العام / General Total</s:String>
     <s:String x:Key="TotalInWords">الإجمالي كتابة / Total in Words:</s:String>
+    <s:String x:Key="DatabaseManagement">إدارة قاعدة البيانات</s:String>
+    <s:String x:Key="FormatDatabase">تهيئة قاعدة البيانات (مسح البيانات)</s:String>
+    <s:String x:Key="BackupDatabase">نسخة احتياطية</s:String>
 </ResourceDictionary>

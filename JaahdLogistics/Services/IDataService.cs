@@ -49,5 +49,8 @@ namespace JaahdLogistics.Services
         IEnumerable<Employee> GetEmployees();
         void SaveEmployee(Employee employee);
         void DeleteEmployee(int id);
+
+        void FormatDatabase();
+        void BackupDatabase(string destinationPath);
     }
 }
