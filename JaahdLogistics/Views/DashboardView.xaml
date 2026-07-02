@@ -16,7 +16,7 @@
         <!-- 1. Header Area -->
         <Grid Margin="0,0,0,20">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Logistics Dashboard" FontSize="26" FontWeight="Bold" Foreground="#1B4F72"/>
+                <TextBlock Text="{DynamicResource LogisticsDashboard}" FontSize="26" FontWeight="Bold" Foreground="#1B4F72"/>
                 <Button Command="{Binding RefreshDashboardCommand}" Margin="15,0,0,0" Background="Transparent" BorderThickness="0" Cursor="Hand">
                     <TextBlock Text="🔄" FontSize="18" VerticalAlignment="Center"/>
                 </Button>
@@ -29,7 +29,7 @@
                          <TextBlock Text="{Binding SyncStatus}" FontSize="12" VerticalAlignment="Center" Foreground="#2E86C1"/>
                     </StackPanel>
                 </Border>
-                <Button Content="Force Sync" Command="{Binding SyncNowCommand}"
+                <Button Content="{DynamicResource ForceSync}" Command="{Binding SyncNowCommand}"
                         IsEnabled="{Binding IsSyncing, Converter={StaticResource InverseBooleanConverter}}"
                         Background="#1B4F72" Foreground="White" BorderThickness="0" Padding="15,7"/>
             </StackPanel>
@@ -41,9 +41,9 @@
             <Border Margin="5" Background="White" CornerRadius="8" Padding="15">
                 <Border.Effect><DropShadowEffect BlurRadius="10" Opacity="0.1" ShadowDepth="2"/></Border.Effect>
                 <StackPanel>
-                    <TextBlock Text="Total Projects" Foreground="Gray" FontSize="12"/>
+                    <TextBlock Text="{DynamicResource TotalProjects}" Foreground="Gray" FontSize="12"/>
                     <TextBlock Text="{Binding TotalProjects}" FontSize="24" FontWeight="Bold" Margin="0,5"/>
-                    <TextBlock Text="Active Contracts" FontSize="10" Foreground="#27AE60"/>
+                    <TextBlock Text="{DynamicResource Projects}" FontSize="10" Foreground="#27AE60"/>
                 </StackPanel>
             </Border>
 
@@ -51,9 +51,9 @@
             <Border Margin="5" Background="White" CornerRadius="8" Padding="15">
                 <Border.Effect><DropShadowEffect BlurRadius="10" Opacity="0.1" ShadowDepth="2"/></Border.Effect>
                 <StackPanel>
-                    <TextBlock Text="Pending PRs" Foreground="Gray" FontSize="12"/>
+                    <TextBlock Text="{DynamicResource PendingPRs}" Foreground="Gray" FontSize="12"/>
                     <TextBlock Text="{Binding PendingPRs}" FontSize="24" FontWeight="Bold" Margin="0,5" Foreground="#D35400"/>
-                    <TextBlock Text="Awaiting Approval" FontSize="10" Foreground="#E67E22"/>
+                    <TextBlock Text="{DynamicResource PRStatus}" FontSize="10" Foreground="#E67E22"/>
                 </StackPanel>
             </Border>
 
@@ -61,9 +61,9 @@
             <Border Margin="5" Background="White" CornerRadius="8" Padding="15">
                 <Border.Effect><DropShadowEffect BlurRadius="10" Opacity="0.1" ShadowDepth="2"/></Border.Effect>
                 <StackPanel>
-                    <TextBlock Text="Approved POs" Foreground="Gray" FontSize="12"/>
+                    <TextBlock Text="{DynamicResource ApprovedPOs}" Foreground="Gray" FontSize="12"/>
                     <TextBlock Text="{Binding ApprovedPOs}" FontSize="24" FontWeight="Bold" Margin="0,5" Foreground="#27AE60"/>
-                    <TextBlock Text="Ready for Delivery" FontSize="10" Foreground="#2ECC71"/>
+                    <TextBlock Text="{DynamicResource FinalApproved}" FontSize="10" Foreground="#2ECC71"/>
                 </StackPanel>
             </Border>
 
@@ -71,9 +71,9 @@
             <Border Margin="5" Background="White" CornerRadius="8" Padding="15">
                 <Border.Effect><DropShadowEffect BlurRadius="10" Opacity="0.1" ShadowDepth="2"/></Border.Effect>
                 <StackPanel>
-                    <TextBlock Text="Total Spending" Foreground="Gray" FontSize="12"/>
+                    <TextBlock Text="{DynamicResource TotalSpending}" Foreground="Gray" FontSize="12"/>
                     <TextBlock Text="{Binding TotalSpending, StringFormat=N0}" FontSize="24" FontWeight="Bold" Margin="0,5"/>
-                    <TextBlock Text="Across all Projects" FontSize="10" Foreground="Gray"/>
+                    <TextBlock Text="{DynamicResource ProjectBudgets}" FontSize="10" Foreground="Gray"/>
                 </StackPanel>
             </Border>
         </UniformGrid>
@@ -87,14 +87,14 @@
 
             <!-- Left: Main Tables -->
             <TabControl Background="Transparent" BorderThickness="0" Margin="0,0,10,0">
-                <TabItem Header="My Requisitions">
+                <TabItem Header="{DynamicResource MyPRStatus}">
                     <Border Background="White" CornerRadius="8" Padding="10">
                         <DataGrid ItemsSource="{Binding UserPRs}" AutoGenerateColumns="False" IsReadOnly="True" BorderThickness="0">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="PR No" Binding="{Binding PRNumber}" Width="120"/>
-                                <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=d}" Width="100"/>
-                                <DataGridTextColumn Header="Project" Binding="{Binding Project.Code}" Width="80"/>
-                                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*">
+                                <DataGridTextColumn Header="{DynamicResource PRNumber}" Binding="{Binding PRNumber}" Width="120"/>
+                                <DataGridTextColumn Header="{DynamicResource Date}" Binding="{Binding Date, StringFormat=d}" Width="100"/>
+                                <DataGridTextColumn Header="{DynamicResource Project}" Binding="{Binding Project.Code}" Width="80"/>
+                                <DataGridTextColumn Header="{DynamicResource PRStatus}" Binding="{Binding Status}" Width="*">
                                     <DataGridTextColumn.ElementStyle>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Padding" Value="5,2"/>
@@ -111,7 +111,7 @@
                     </Border>
                 </TabItem>
 
-                <TabItem Header="Spending Analysis">
+                <TabItem Header="{DynamicResource ProjectSpendingReport}">
                     <Grid Background="White">
                         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                         <lvc:PieChart Series="{Binding SpendingSeries}" LegendLocation="Bottom" InnerRadius="40" Margin="10"/>
@@ -147,14 +147,14 @@
                     </Grid>
                 </TabItem>
 
-                <TabItem Header="Activity Trend">
+                <TabItem Header="{DynamicResource Reports}">
                     <Border Background="White" Padding="15">
                          <lvc:CartesianChart Series="{Binding MonthlyTrendSeries}" LegendLocation="None">
                             <lvc:CartesianChart.AxisX>
-                                <lvc:Axis Title="Month" Labels="{Binding Labels}"/>
+                                <lvc:Axis Title="{DynamicResource Date}" Labels="{Binding Labels}"/>
                             </lvc:CartesianChart.AxisX>
                             <lvc:CartesianChart.AxisY>
-                                <lvc:Axis Title="Orders" LabelFormatter="{Binding Formatter}"/>
+                                <lvc:Axis Title="{DynamicResource PO}" LabelFormatter="{Binding Formatter}"/>
                             </lvc:CartesianChart.AxisY>
                         </lvc:CartesianChart>
                     </Border>
@@ -167,7 +167,7 @@
                 <Border Background="White" CornerRadius="8" Padding="15" Margin="0,0,0,20">
                     <Border.Effect><DropShadowEffect BlurRadius="10" Opacity="0.1" ShadowDepth="2"/></Border.Effect>
                     <StackPanel>
-                        <TextBlock Text="Procurement Volume" FontSize="14" FontWeight="Bold" Margin="0,0,0,15" Foreground="#1B4F72"/>
+                        <TextBlock Text="{DynamicResource ProcurementVolume}" FontSize="14" FontWeight="Bold" Margin="0,0,0,15" Foreground="#1B4F72"/>
                         <ItemsControl ItemsSource="{Binding PipelineDistribution}">
                             <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="5"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
@@ -184,7 +184,7 @@
                     </StackPanel>
                 </Border>
 
-                <TextBlock Text="Action Required" FontSize="18" FontWeight="Bold" Margin="0,0,0,15" Foreground="#1B4F72"/>
+                <TextBlock Text="{DynamicResource ActionRequired}" FontSize="18" FontWeight="Bold" Margin="0,0,0,15" Foreground="#1B4F72"/>
                 <Border Background="White" CornerRadius="8" Padding="10">
                     <Border.Effect><DropShadowEffect BlurRadius="10" Opacity="0.1" ShadowDepth="2"/></Border.Effect>
                     <StackPanel>
@@ -205,7 +205,7 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
-                        <TextBlock Text="No pending approvals" HorizontalAlignment="Center" Margin="20" Foreground="LightGray">
+                        <TextBlock Text="{DynamicResource NoPendingApprovals}" HorizontalAlignment="Center" Margin="20" Foreground="LightGray">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Visibility" Value="Collapsed"/>

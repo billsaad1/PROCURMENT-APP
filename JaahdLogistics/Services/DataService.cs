@@ -163,6 +163,8 @@ namespace JaahdLogistics.Services
         {
             using var connection = new SqliteConnection(_connectionString);
             var prs = connection.Query<PurchaseRequisition>("SELECT * FROM PurchaseRequisitions").ToList();
+            var lang = System.Windows.Application.Current.Resources.MergedDictionaries.Any(d => d.Source?.OriginalString.Contains("ar") == true) ? "ar" : "en";
+
             foreach (var pr in prs)
             {
                 pr.Project = connection.QuerySingleOrDefault<Project>("SELECT * FROM Projects WHERE Id = @ProjectId", new { pr.ProjectId });
@@ -177,22 +179,22 @@ namespace JaahdLogistics.Services
                 if (pr.RequesterEmployeeId > 0)
                 {
                     var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = pr.RequesterEmployeeId });
-                    if (emp != null) { pr.RequesterSignature = emp.SignatureImage; pr.RequesterName = emp.NameEN; }
+                    if (emp != null) { pr.RequesterSignature = emp.SignatureImage; pr.RequesterName = emp.GetLocalizedName(lang); }
                 }
                 if (pr.LogisticsEmployeeId > 0)
                 {
                     var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = pr.LogisticsEmployeeId });
-                    if (emp != null) { pr.LogisticsSignature = emp.SignatureImage; pr.LogisticsName = emp.NameEN; pr.LogisticsTitle = emp.PositionEN; }
+                    if (emp != null) { pr.LogisticsSignature = emp.SignatureImage; pr.LogisticsName = emp.GetLocalizedName(lang); pr.LogisticsTitle = emp.GetLocalizedPosition(lang); }
                 }
                 if (pr.FinanceEmployeeId > 0)
                 {
                     var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = pr.FinanceEmployeeId });
-                    if (emp != null) { pr.FinanceSignature = emp.SignatureImage; pr.FinanceName = emp.NameEN; pr.FinanceTitle = emp.PositionEN; }
+                    if (emp != null) { pr.FinanceSignature = emp.SignatureImage; pr.FinanceName = emp.GetLocalizedName(lang); pr.FinanceTitle = emp.GetLocalizedPosition(lang); }
                 }
                 if (pr.HeadEmployeeId > 0)
                 {
                     var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = pr.HeadEmployeeId });
-                    if (emp != null) { pr.FinalSignature = emp.SignatureImage; pr.FinalName = emp.NameEN; pr.FinalTitle = emp.PositionEN; }
+                    if (emp != null) { pr.FinalSignature = emp.SignatureImage; pr.FinalName = emp.GetLocalizedName(lang); pr.FinalTitle = emp.GetLocalizedPosition(lang); }
                 }
 
                 // Overlay with dynamic Approvals
@@ -245,6 +247,8 @@ namespace JaahdLogistics.Services
         {
             using var connection = new SqliteConnection(_connectionString);
             var pos = connection.Query<PurchaseOrder>("SELECT * FROM PurchaseOrders").ToList();
+            var lang = System.Windows.Application.Current.Resources.MergedDictionaries.Any(d => d.Source?.OriginalString.Contains("ar") == true) ? "ar" : "en";
+
             foreach (var po in pos)
             {
                 po.Project = connection.QuerySingleOrDefault<Project>("SELECT * FROM Projects WHERE Id = @ProjectId", new { po.ProjectId });
@@ -265,17 +269,17 @@ namespace JaahdLogistics.Services
                 if (po.LogisticsEmployeeId > 0)
                 {
                     var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = po.LogisticsEmployeeId });
-                    if (emp != null) { po.LogisticsSignature = emp.SignatureImage; po.LogisticsName = emp.NameEN; po.LogisticsTitle = emp.PositionEN; }
+                    if (emp != null) { po.LogisticsSignature = emp.SignatureImage; po.LogisticsName = emp.GetLocalizedName(lang); po.LogisticsTitle = emp.GetLocalizedPosition(lang); }
                 }
                 if (po.FinanceEmployeeId > 0)
                 {
                     var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = po.FinanceEmployeeId });
-                    if (emp != null) { po.FinanceSignature = emp.SignatureImage; po.FinanceName = emp.NameEN; po.FinanceTitle = emp.PositionEN; }
+                    if (emp != null) { po.FinanceSignature = emp.SignatureImage; po.FinanceName = emp.GetLocalizedName(lang); po.FinanceTitle = emp.GetLocalizedPosition(lang); }
                 }
                 if (po.HeadEmployeeId > 0)
                 {
                     var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = po.HeadEmployeeId });
-                    if (emp != null) { po.FinalSignature = emp.SignatureImage; po.FinalName = emp.NameEN; po.FinalTitle = emp.PositionEN; }
+                    if (emp != null) { po.FinalSignature = emp.SignatureImage; po.FinalName = emp.GetLocalizedName(lang); po.FinalTitle = emp.GetLocalizedPosition(lang); }
                 }
 
                 // Overlay with dynamic Approvals if any (historical or overrides)

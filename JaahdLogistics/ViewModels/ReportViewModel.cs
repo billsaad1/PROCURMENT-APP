@@ -11,6 +11,8 @@ namespace JaahdLogistics.ViewModels
         private readonly ReportService _reportService;
         private readonly IDataService _dataService;
 
+        private string T(string key) => System.Windows.Application.Current.TryFindResource(key)?.ToString() ?? key;
+
         [ObservableProperty] private ObservableCollection<dynamic> _spendingReport = new();
         [ObservableProperty] private ObservableCollection<dynamic> _inventoryReport = new();
         [ObservableProperty] private ObservableCollection<dynamic> _vendorReport = new();
@@ -45,11 +47,11 @@ namespace JaahdLogistics.ViewModels
 
             ReportTitle = SelectedTabIndex switch
             {
-                0 => "Project Spending Summary (USD)",
-                1 => "Inventory Status Report",
-                2 => "Vendor Performance History",
-                3 => "Procurement Pipeline Overview",
-                _ => "Logistics Report"
+                0 => T("ProjectSpendingReport"),
+                1 => T("InventoryStatusReport"),
+                2 => T("VendorHistoryReport"),
+                3 => T("ProcurementVolume"),
+                _ => T("Reports")
             };
 
             // Clone the grid or create a simplified view for printing
@@ -71,9 +73,15 @@ namespace JaahdLogistics.ViewModels
             {
                 if (col is System.Windows.Controls.DataGridTextColumn textCol)
                 {
+                    var header = textCol.Header;
+                    if (header is string s && s == "Stage")
+                    {
+                        // Pipeline stage names need translation or they stay as PR, RFQ...
+                    }
+
                     printGrid.Columns.Add(new System.Windows.Controls.DataGridTextColumn
                     {
-                        Header = textCol.Header,
+                        Header = header,
                         Binding = textCol.Binding,
                         Width = textCol.Width
                     });
@@ -90,11 +98,11 @@ namespace JaahdLogistics.ViewModels
             if (grid == null) return;
             ReportTitle = SelectedTabIndex switch
             {
-                0 => "Project Spending Summary (USD)",
-                1 => "Inventory Status Report",
-                2 => "Vendor Performance History",
-                3 => "Procurement Pipeline Overview",
-                _ => "Logistics Report"
+                0 => T("ProjectSpendingReport"),
+                1 => T("InventoryStatusReport"),
+                2 => T("VendorHistoryReport"),
+                3 => T("ProcurementVolume"),
+                _ => T("Reports")
             };
             ReportContent = grid; // Use grid directly for direct print
             new PrintService().DirectPrint(this, "ReportPrintTemplate");

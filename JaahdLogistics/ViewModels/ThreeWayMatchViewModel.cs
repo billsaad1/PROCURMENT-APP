@@ -92,24 +92,22 @@ namespace JaahdLogistics.ViewModels
 
             // 0. Refresh Settings
             Settings = _dataService.GetSettings();
+            var lang = System.Windows.Application.Current.Resources.MergedDictionaries.Any(d => d.Source?.OriginalString.Contains("ar") == true) ? "ar" : "en";
 
             // 1. Initial Fallback
             var logEmp = Employees.FirstOrDefault(e => e.Id == Settings.DefaultLogisticsEmployeeId);
-            LogisticsNameTWM = logEmp?.NameEN ?? Settings.LogisticsManager;
-            if (string.IsNullOrEmpty(LogisticsNameTWM)) LogisticsNameTWM = "Logistics Manager";
-            LogisticsTitleTWM = logEmp?.PositionEN ?? Settings.LogisticsTitle ?? "Logistics Manager / مدير اللوجستيات";
+            LogisticsNameTWM = logEmp?.GetLocalizedName(lang) ?? Settings.LogisticsManager;
+            LogisticsTitleTWM = logEmp?.GetLocalizedPosition(lang) ?? Settings.LogisticsTitle;
             LogisticsSignatureTWM = logEmp?.SignatureImage;
 
             var finEmp = Employees.FirstOrDefault(e => e.Id == Settings.DefaultFinanceEmployeeId);
-            FinanceNameTWM = finEmp?.NameEN ?? Settings.FinanceManager;
-            if (string.IsNullOrEmpty(FinanceNameTWM)) FinanceNameTWM = "Finance Manager";
-            FinanceTitleTWM = finEmp?.PositionEN ?? Settings.FinanceTitle ?? "Finance Manager / المدير المالي";
+            FinanceNameTWM = finEmp?.GetLocalizedName(lang) ?? Settings.FinanceManager;
+            FinanceTitleTWM = finEmp?.GetLocalizedPosition(lang) ?? Settings.FinanceTitle;
             FinanceSignatureTWM = finEmp?.SignatureImage;
 
             var headEmp = Employees.FirstOrDefault(e => e.Id == Settings.DefaultHeadEmployeeId);
-            HeadNameTWM = headEmp?.NameEN ?? Settings.HeadOfAssociation;
-            if (string.IsNullOrEmpty(HeadNameTWM)) HeadNameTWM = "Head of Association";
-            HeadTitleTWM = headEmp?.PositionEN ?? Settings.HeadTitle ?? "Head / PM";
+            HeadNameTWM = headEmp?.GetLocalizedName(lang) ?? Settings.HeadOfAssociation;
+            HeadTitleTWM = headEmp?.GetLocalizedPosition(lang) ?? Settings.HeadTitle;
             HeadSignatureTWM = headEmp?.SignatureImage;
 
             if (CurrentMatch.Id == 0) return;

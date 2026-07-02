@@ -60,7 +60,7 @@
                            Height="60" Width="60" Margin="0,0,15,0"/>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                         <TextBlock Text="{Binding Settings.AssociationName}" FontSize="16" FontWeight="Bold"/>
-                        <TextBlock Text="Logistics Management" FontSize="12"/>
+                    <TextBlock Text="{DynamicResource LogisticManager}" FontSize="12"/>
                     </StackPanel>
                 </Grid>
 
@@ -85,9 +85,17 @@
                     <TextBlock Grid.Column="2" Text="{DynamicResource Project}" VerticalAlignment="Center" Margin="5"/>
                     <ComboBox Grid.Column="3" ItemsSource="{Binding Projects}" SelectedItem="{Binding SelectedProject}" DisplayMemberPath="Name" Margin="5"/>
 
-                    <TextBlock Grid.Row="1" Text="PR Type" VerticalAlignment="Center" Margin="5"/>
+                    <TextBlock Grid.Row="1" Text="{DynamicResource PRType}" VerticalAlignment="Center" Margin="5"/>
                     <DockPanel Grid.Row="1" Grid.Column="1" Margin="5">
-                        <Button Content="+" Command="{Binding AddCustomTypeCommand}" DockPanel.Dock="Right" Width="25" Margin="5,0,0,0" ToolTip="Add Custom Type"/>
+                        <Popup IsOpen="{Binding IsAddTypePopupOpen}" Placement="MousePoint" StaysOpen="False">
+                            <Border Background="White" BorderBrush="Gray" BorderThickness="1" Padding="10">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBox Text="{Binding NewTypeName, UpdateSourceTrigger=PropertyChanged}" Width="150" Margin="0,0,5,0" />
+                                    <Button Content="OK" Command="{Binding ConfirmAddTypeCommand}" Width="40"/>
+                                </StackPanel>
+                            </Border>
+                        </Popup>
+                        <Button Content="+" Command="{Binding AddCustomTypeCommand}" DockPanel.Dock="Right" Width="25" Margin="5,0,0,0" ToolTip="{DynamicResource AddCustomType}"/>
                         <ComboBox ItemsSource="{Binding PRTypes}" SelectedItem="{Binding CurrentPR.PRType}" IsEditable="True"/>
                     </DockPanel>
 
@@ -103,7 +111,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Text="Justification / مبررات الطلب" FontWeight="Bold" Margin="5,0"/>
+                    <TextBlock Text="{DynamicResource Justification}" FontWeight="Bold" Margin="5,0"/>
                     <TextBox Grid.Row="1" Text="{Binding CurrentPR.Justification}" Margin="5" Height="60" TextWrapping="Wrap" AcceptsReturn="True" VerticalContentAlignment="Top"/>
                 </Grid>
 
@@ -173,21 +181,21 @@
                         <TextBlock Text="{Binding CurrentPR.RequesterName, FallbackValue='Name: ____________'}" FontSize="10" HorizontalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="Logistics Manager" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{DynamicResource LogisticManager}" FontWeight="Bold" HorizontalAlignment="Center"/>
                         <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5">
                             <Image Source="{Binding CurrentPR.LogisticsSignature, Converter={StaticResource ImageBytesConverter}}"/>
                         </Border>
                         <TextBlock Text="{Binding CurrentPR.LogisticsName, FallbackValue='Name: ____________'}" FontSize="10" HorizontalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="Finance Manager" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{DynamicResource FinanceManager}" FontWeight="Bold" HorizontalAlignment="Center"/>
                         <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5">
                             <Image Source="{Binding CurrentPR.FinanceSignature, Converter={StaticResource ImageBytesConverter}}"/>
                         </Border>
                         <TextBlock Text="{Binding CurrentPR.FinanceName, FallbackValue='Name: ____________'}" FontSize="10" HorizontalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="Head of Association" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{DynamicResource ApprovedBy}" FontWeight="Bold" HorizontalAlignment="Center"/>
                         <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5">
                             <Image Source="{Binding CurrentPR.FinalSignature, Converter={StaticResource ImageBytesConverter}}"/>
                         </Border>
@@ -197,7 +205,7 @@
 
                 <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Right" x:Name="ControlButtons">
                     <TextBlock Text="{Binding CurrentPR.Status}" VerticalAlignment="Center" Margin="0,0,20,0" FontWeight="Bold" Foreground="{StaticResource SecondaryBlueBrush}"/>
-                    <Button Content="🖨️ Direct Print" Command="{Binding DirectPrintCommand}" Width="120" Height="35" Margin="0,0,10,0" Background="#1B4F72"/>
+                    <Button Content="🖨️" Command="{Binding DirectPrintCommand}" Width="50" Height="35" Margin="0,0,10,0" Background="#1B4F72" ToolTip="{DynamicResource DirectPrint}"/>
                     <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
                     <Button Content="{DynamicResource Approve}" Command="{Binding ApproveCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
             <Button Content="{DynamicResource Save}" Command="{Binding SavePRCommand}" Width="120" Height="35" Margin="0,0,10,0"/>

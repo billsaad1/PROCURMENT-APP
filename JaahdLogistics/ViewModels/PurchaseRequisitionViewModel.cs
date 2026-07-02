@@ -18,6 +18,12 @@ namespace JaahdLogistics.ViewModels
         private PurchaseRequisition _currentPR = new();
 
         [ObservableProperty]
+        private bool _isAddTypePopupOpen;
+
+        [ObservableProperty]
+        private string _newTypeName = "";
+
+        [ObservableProperty]
         private ObservableCollection<PurchaseRequisition> _purchaseRequisitions = new();
 
         [ObservableProperty]
@@ -50,9 +56,10 @@ namespace JaahdLogistics.ViewModels
                 var emp = Employees.FirstOrDefault(e => e.Id == CurrentPR.RequesterEmployeeId);
                 if (emp != null)
                 {
+                    var lang = Application.Current.Resources.MergedDictionaries.Any(d => d.Source?.OriginalString.Contains("ar") == true) ? "ar" : "en";
                     CurrentPR.RequesterSignature = emp.SignatureImage;
-                    CurrentPR.RequesterName = emp.NameEN;
-                    if (!string.IsNullOrWhiteSpace(emp.PositionEN)) CurrentPR.RequesterTitle = emp.PositionEN;
+                    CurrentPR.RequesterName = emp.GetLocalizedName(lang);
+                    if (!string.IsNullOrWhiteSpace(emp.GetLocalizedPosition(lang))) CurrentPR.RequesterTitle = emp.GetLocalizedPosition(lang);
                 }
             }
         }
@@ -63,32 +70,29 @@ namespace JaahdLogistics.ViewModels
 
             // 0. Ensure settings are fresh
             Settings = _dataService.GetSettings();
+            var lang = Application.Current.Resources.MergedDictionaries.Any(d => d.Source?.OriginalString.Contains("ar") == true) ? "ar" : "en";
 
             // 1. Initial Defaults (Names/Titles/Signatures from Employee records or Settings)
             if (CurrentPR.RequesterEmployeeId.HasValue) UpdateRequesterSignature();
 
             var logEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPR.LogisticsEmployeeId ?? Settings.DefaultLogisticsEmployeeId));
-            CurrentPR.LogisticsName = logEmp?.NameEN ?? Settings.LogisticsManager;
-            if (string.IsNullOrEmpty(CurrentPR.LogisticsName)) CurrentPR.LogisticsName = "Logistics Manager";
+            CurrentPR.LogisticsName = logEmp?.GetLocalizedName(lang) ?? Settings.LogisticsManager;
             CurrentPR.LogisticsSignature = logEmp?.SignatureImage;
-            CurrentPR.LogisticsTitle = logEmp?.PositionEN ?? Settings.LogisticsTitle ?? "Logistics Manager";
+            CurrentPR.LogisticsTitle = logEmp?.GetLocalizedPosition(lang) ?? Settings.LogisticsTitle;
 
             var finEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPR.FinanceEmployeeId ?? Settings.DefaultFinanceEmployeeId));
-            CurrentPR.FinanceName = finEmp?.NameEN ?? Settings.FinanceManager;
-            if (string.IsNullOrEmpty(CurrentPR.FinanceName)) CurrentPR.FinanceName = "Finance Manager";
+            CurrentPR.FinanceName = finEmp?.GetLocalizedName(lang) ?? Settings.FinanceManager;
             CurrentPR.FinanceSignature = finEmp?.SignatureImage;
-            CurrentPR.FinanceTitle = finEmp?.PositionEN ?? Settings.FinanceTitle ?? "Finance Manager";
+            CurrentPR.FinanceTitle = finEmp?.GetLocalizedPosition(lang) ?? Settings.FinanceTitle;
 
             CurrentPR.PMName = CurrentPR.Project?.ProjectManager ?? "";
-            if (string.IsNullOrEmpty(CurrentPR.PMName)) CurrentPR.PMName = "Project Manager";
             CurrentPR.PMTitle = "Project Manager";
             CurrentPR.PMSignature = null;
 
             var headEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPR.HeadEmployeeId ?? Settings.DefaultHeadEmployeeId));
-            CurrentPR.FinalName = headEmp?.NameEN ?? Settings.HeadOfAssociation;
-            if (string.IsNullOrEmpty(CurrentPR.FinalName)) CurrentPR.FinalName = "Head of Association";
+            CurrentPR.FinalName = headEmp?.GetLocalizedName(lang) ?? Settings.HeadOfAssociation;
             CurrentPR.FinalSignature = headEmp?.SignatureImage;
-            CurrentPR.FinalTitle = headEmp?.PositionEN ?? Settings.HeadTitle ?? "Head of Association";
+            CurrentPR.FinalTitle = headEmp?.GetLocalizedPosition(lang) ?? Settings.HeadTitle;
 
             if (CurrentPR.Id == 0)
             {
@@ -371,15 +375,22 @@ namespace JaahdLogistics.ViewModels
         [RelayCommand]
         private void AddCustomType()
         {
-            var newType = Microsoft.VisualBasic.Interaction.InputBox("Enter Custom PR Type:", "Add Type", "");
-            if (!string.IsNullOrWhiteSpace(newType))
+            IsAddTypePopupOpen = true;
+        }
+
+        [RelayCommand]
+        private void ConfirmAddType()
+        {
+            if (!string.IsNullOrWhiteSpace(NewTypeName))
             {
-                if (!PRTypes.Contains(newType))
+                if (!PRTypes.Contains(NewTypeName))
                 {
-                    PRTypes.Add(newType);
+                    PRTypes.Add(NewTypeName);
                 }
-                CurrentPR.PRType = newType;
+                CurrentPR.PRType = NewTypeName;
+                NewTypeName = "";
             }
+            IsAddTypePopupOpen = false;
         }
 
         [RelayCommand]

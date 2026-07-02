@@ -18,10 +18,10 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Button Content="New Employee" Command="{Binding NewEmployeeCommand}" Margin="0,0,0,10"/>
+            <Button Content="{DynamicResource AddEmployee}" Command="{Binding NewEmployeeCommand}" Margin="0,0,0,10"/>
             <DataGrid Grid.Row="1" ItemsSource="{Binding Employees}" SelectedItem="{Binding SelectedEmployee}" AutoGenerateColumns="False" IsReadOnly="True">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Name (EN)" Binding="{Binding NameEN}" Width="*"/>
+                    <DataGridTextColumn Header="{DynamicResource NameEN}" Binding="{Binding NameEN}" Width="*"/>
                     <DataGridTemplateColumn Width="Auto">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -36,27 +36,27 @@
         <!-- Details -->
         <ScrollViewer Grid.Column="1">
             <StackPanel Margin="10">
-                <TextBlock Text="Employee Details" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+                <TextBlock Text="{DynamicResource Details}" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
 
-                <TextBlock Text="Name (English)"/>
+                <TextBlock Text="{DynamicResource NameEN}"/>
                 <TextBox Text="{Binding SelectedEmployee.NameEN}" Margin="0,5,0,10"/>
 
-                <TextBlock Text="Name (Arabic)"/>
+                <TextBlock Text="{DynamicResource NameAR}"/>
                 <TextBox Text="{Binding SelectedEmployee.NameAR}" Margin="0,5,0,10" FlowDirection="RightToLeft"/>
 
-                <TextBlock Text="Position (English)"/>
+                <TextBlock Text="{DynamicResource PositionEN}"/>
                 <TextBox Text="{Binding SelectedEmployee.PositionEN}" Margin="0,5,0,10"/>
 
-                <TextBlock Text="Position (Arabic)"/>
+                <TextBlock Text="{DynamicResource PositionAR}"/>
                 <TextBox Text="{Binding SelectedEmployee.PositionAR}" Margin="0,5,0,10" FlowDirection="RightToLeft"/>
 
-                <TextBlock Text="Signature Scan"/>
+                <TextBlock Text="{DynamicResource UserSignature}"/>
                 <Border BorderBrush="Gray" BorderThickness="1" Height="100" Width="200" HorizontalAlignment="Left" Margin="0,5">
                     <Image Source="{Binding SelectedEmployee.SignatureImage, Converter={StaticResource ImageBytesConverter}}"/>
                 </Border>
-                <Button Content="Upload Signature" Command="{Binding UploadSignatureCommand}" Width="150" HorizontalAlignment="Left" Margin="0,5"/>
+                <Button Content="{DynamicResource UploadSignature}" Command="{Binding UploadSignatureCommand}" Width="150" HorizontalAlignment="Left" Margin="0,5"/>
 
-                <Button Content="Save Employee" Command="{Binding SaveEmployeeCommand}" Width="150" HorizontalAlignment="Right" Margin="0,20,0,0" Background="#27AE60"/>
+                <Button Content="{DynamicResource Save}" Command="{Binding SaveEmployeeCommand}" Width="150" HorizontalAlignment="Right" Margin="0,20,0,0" Background="#27AE60"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>

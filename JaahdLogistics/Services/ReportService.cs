@@ -77,11 +77,11 @@ namespace JaahdLogistics.Services
 
             return new List<dynamic>
             {
-                new { Stage = "Purchase Requisitions", Count = prs, Icon = "📄" },
-                new { Stage = "Requests for Quotation", Count = rfqs, Icon = "✉️" },
-                new { Stage = "Bid Analyses", Count = bas, Icon = "📊" },
-                new { Stage = "Purchase Orders", Count = pos, Icon = "💰" },
-                new { Stage = "Goods Receiving Notes", Count = grns, Icon = "📦" }
+                new { Stage = "PR", Count = prs, Icon = "📄" },
+                new { Stage = "RFQ", Count = rfqs, Icon = "✉️" },
+                new { Stage = "BidAnalysis", Count = bas, Icon = "📊" },
+                new { Stage = "PO", Count = pos, Icon = "💰" },
+                new { Stage = "GRN", Count = grns, Icon = "📦" }
             };
         }
 

@@ -7,11 +7,11 @@
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="900">
     <DockPanel Margin="10">
-        <GroupBox Header="Global Filters" DockPanel.Dock="Top" Margin="0,0,0,10">
+        <GroupBox Header="{DynamicResource GlobalFilters}" DockPanel.Dock="Top" Margin="0,0,0,10">
             <StackPanel Orientation="Horizontal" Margin="5">
                 <TextBlock Text="{DynamicResource Project}" VerticalAlignment="Center" Margin="10,0,5,0"/>
                 <ComboBox ItemsSource="{Binding Projects}" SelectedItem="{Binding FilterProject}" DisplayMemberPath="Name" Width="150"/>
-                <Button Content="X" Command="{Binding ClearProjectFilterCommand}" Margin="2,0,10,0" Padding="5,0"/>
+                <Button Content="X" Command="{Binding ClearProjectFilterCommand}" Margin="2,0,10,0" Padding="5,0" ToolTip="{DynamicResource Clear}"/>
 
                 <TextBlock Text="{DynamicResource Year}" VerticalAlignment="Center" Margin="10,0,5,0"/>
                 <ComboBox ItemsSource="{Binding FilterYears}" SelectedItem="{Binding FilterYear}" Width="80"/>
@@ -42,8 +42,8 @@
                     </StackPanel>
                     <DataGrid Grid.Row="1" ItemsSource="{Binding FilteredRFQs}" SelectedItem="{Binding SelectedRFQ}" AutoGenerateColumns="False" IsReadOnly="True">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="RFQ #" Binding="{Binding RFQNumber}" Width="*"/>
-                            <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=d}" Width="Auto"/>
+                            <DataGridTextColumn Header="{DynamicResource RFQNumber}" Binding="{Binding RFQNumber}" Width="*"/>
+                            <DataGridTextColumn Header="{DynamicResource Date}" Binding="{Binding Date, StringFormat=d}" Width="Auto"/>
                             <DataGridTemplateColumn Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -66,13 +66,13 @@
                     <TextBlock Text="{DynamicResource CreateRFQ}" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
                     <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
                         <TextBlock Text="{DynamicResource SelectPR}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                        <TextBox Text="{Binding PRSearchText, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="0,0,5,0" Tag="Search PR..."/>
+                        <TextBox Text="{Binding PRSearchText, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="0,0,5,0" Tag="{DynamicResource Search}"/>
                         <ComboBox ItemsSource="{Binding FilteredApprovedPRs}" SelectedItem="{Binding SelectedPR}" DisplayMemberPath="PRNumber" Width="100"
                                   IsSynchronizedWithCurrentItem="True"/>
-                        <Button Content="🔄" Command="{Binding LoadApprovedPRsCommand}" Margin="5,0,0,0" ToolTip="Refresh PR List"/>
+                        <Button Content="🔄" Command="{Binding LoadApprovedPRsCommand}" Margin="5,0,0,0" ToolTip="{DynamicResource List}"/>
                         <Button Content="{DynamicResource Generate}" Command="{Binding CreateRFQCommand}" Margin="10,0,0,0"/>
                         <Button Content="{DynamicResource Save}" Command="{Binding SaveRFQCommand}" Margin="10,0,0,0" Background="#27AE60"/>
-                        <Button Content="🖨️ Direct" Command="{Binding DirectPrintCommand}" Margin="10,0,0,0" Background="#1B4F72"/>
+                        <Button Content="🖨️" Command="{Binding DirectPrintCommand}" Margin="10,0,0,0" Background="#1B4F72" ToolTip="{DynamicResource DirectPrint}"/>
                         <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" Margin="5,0,0,0" Background="#34495E"/>
                     </StackPanel>
                     <Grid Grid.Row="2">
@@ -90,19 +90,19 @@
                         <TextBlock Text="{DynamicResource RFQNumber}" Margin="5" VerticalAlignment="Center"/>
                         <TextBox Grid.Column="1" Text="{Binding CurrentRFQ.RFQNumber}" Margin="5"/>
                         
-                        <TextBlock Grid.Column="2" Text="Closing Date" Margin="5" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="{DynamicResource ClosingDate}" Margin="5" VerticalAlignment="Center"/>
                         <DatePicker Grid.Column="3" SelectedDate="{Binding CurrentRFQ.ClosingDate}" Margin="5"/>
                         
-                        <TextBlock Grid.Row="1" Text="Terms" Margin="5" VerticalAlignment="Top"/>
+                        <TextBlock Grid.Row="1" Text="{DynamicResource Terms}" Margin="5" VerticalAlignment="Top"/>
                         <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding CurrentRFQ.Terms}" TextWrapping="Wrap" AcceptsReturn="True" Height="60" Margin="5"/>
                     </Grid>
                     
-                    <GroupBox Grid.Row="3" Header="RFQ Items (from PR)" Margin="0,10,0,0">
+                    <GroupBox Grid.Row="3" Header="{DynamicResource RFQItemsFromPR}" Margin="0,10,0,0">
                         <DataGrid ItemsSource="{Binding SelectedPR.Items}" AutoGenerateColumns="False" IsReadOnly="True">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
-                                <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="60"/>
-                                <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="60"/>
+                                <DataGridTextColumn Header="{DynamicResource Description}" Binding="{Binding Description}" Width="*"/>
+                                <DataGridTextColumn Header="{DynamicResource Unit}" Binding="{Binding Unit}" Width="60"/>
+                                <DataGridTextColumn Header="{DynamicResource Quantity}" Binding="{Binding Quantity}" Width="60"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </GroupBox>
@@ -132,7 +132,7 @@
                     <DataGrid Grid.Row="1" ItemsSource="{Binding FilteredBidAnalyses}" SelectedItem="{Binding SelectedBidAnalysis}" AutoGenerateColumns="False" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto"/>
-                            <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=d}" Width="*"/>
+                            <DataGridTextColumn Header="{DynamicResource Date}" Binding="{Binding Date, StringFormat=d}" Width="*"/>
                             <DataGridTemplateColumn Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -152,13 +152,13 @@
                     </Grid.RowDefinitions>
                     
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                        <TextBlock Text="Select RFQ" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBlock Text="{DynamicResource SelectRFQ}" VerticalAlignment="Center" Margin="0,0,10,0"/>
                         <ComboBox ItemsSource="{Binding RFQs}" SelectedItem="{Binding SelectedRFQ}" DisplayMemberPath="RFQNumber" Width="120" Margin="0,0,10,0"/>
                         <Button Content="{DynamicResource CreateNew}" Command="{Binding CreateBidAnalysisCommand}"/>
                         <Button Content="{DynamicResource AddBidder}" Command="{Binding AddBidderCommand}" Margin="5,0,0,0"/>
                         <Button Content="{DynamicResource Save}" Command="{Binding SaveBidAnalysisCommand}" Margin="5,0,0,0" Background="#27AE60"/>
                         <Button Content="{DynamicResource Approve}" Command="{Binding ApproveBidAnalysisCommand}" Margin="5,0,0,0"/>
-                        <Button Content="🖨️ Direct" Command="{Binding DirectPrintCommand}" Margin="5,0,0,0" Background="#1B4F72"/>
+                        <Button Content="🖨️" Command="{Binding DirectPrintCommand}" Margin="5,0,0,0" Background="#1B4F72" ToolTip="{DynamicResource DirectPrint}"/>
                         <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" Margin="5,0,0,0" Background="#34495E"/>
                     </StackPanel>
 
@@ -177,11 +177,11 @@
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Text="Description" Foreground="White" FontWeight="Bold" Margin="10,5"/>
-                                        <TextBlock Grid.Column="1" Text="Unit" Foreground="White" FontWeight="Bold" Margin="10,5" Width="50"/>
-                                        <TextBlock Grid.Column="2" Text="Qty" Foreground="White" FontWeight="Bold" Margin="10,5" Width="50"/>
-                                        <TextBlock Grid.Column="3" Text="Est. Price" Foreground="White" FontWeight="Bold" Margin="10,5" Width="70"/>
-                                        <TextBlock Grid.Column="4" Text="Est. Total" Foreground="White" FontWeight="Bold" Margin="10,5" Width="70"/>
+                                        <TextBlock Text="{DynamicResource Description}" Foreground="White" FontWeight="Bold" Margin="10,5"/>
+                                        <TextBlock Grid.Column="1" Text="{DynamicResource Unit}" Foreground="White" FontWeight="Bold" Margin="10,5" Width="50"/>
+                                        <TextBlock Grid.Column="2" Text="{DynamicResource Quantity}" Foreground="White" FontWeight="Bold" Margin="10,5" Width="50"/>
+                                        <TextBlock Grid.Column="3" Text="{DynamicResource UnitPrice}" Foreground="White" FontWeight="Bold" Margin="10,5" Width="70"/>
+                                        <TextBlock Grid.Column="4" Text="{DynamicResource Total}" Foreground="White" FontWeight="Bold" Margin="10,5" Width="70"/>
                                         <ItemsControl Grid.Column="5" ItemsSource="{Binding Bidders}">
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
@@ -259,14 +259,14 @@
                                         <DataTemplate>
                                             <Border BorderBrush="SteelBlue" BorderThickness="1.5" Margin="5" Width="220" Padding="8" Background="White" CornerRadius="4">
                                                 <StackPanel>
-                                                    <TextBlock Text="Select Vendor" FontWeight="Bold" Margin="0,0,0,2" FontSize="11"/>
+                                                    <TextBlock Text="{DynamicResource SelectVendor}" FontWeight="Bold" Margin="0,0,0,2" FontSize="11"/>
                                                     <ComboBox ItemsSource="{Binding DataContext.Vendors, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                               SelectedValue="{Binding VendorId}"
                                                               SelectedValuePath="Id"
                                                               DisplayMemberPath="Name"
                                                               Margin="0,0,0,5" Height="24"/>
 
-                                                    <TextBlock Text="Bidder Name" FontWeight="Bold" Margin="0,0,0,2" FontSize="11"/>
+                                                    <TextBlock Text="{DynamicResource BidderName}" FontWeight="Bold" Margin="0,0,0,2" FontSize="11"/>
                                                     <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8" Height="24"/>
 
                                                     <Grid>
@@ -275,16 +275,16 @@
                                                             <ColumnDefinition Width="*"/>
                                                         </Grid.ColumnDefinitions>
                                                         <StackPanel>
-                                                            <TextBlock Text="Tel" Margin="0,0,0,2" FontSize="11"/>
+                                                            <TextBlock Text="{DynamicResource Tel}" Margin="0,0,0,2" FontSize="11"/>
                                                             <TextBox Text="{Binding Tel, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,5" Height="24"/>
                                                         </StackPanel>
                                                         <StackPanel Grid.Column="1" Margin="5,0,0,0">
-                                                            <TextBlock Text="Email" Margin="0,0,0,2" FontSize="11"/>
+                                                            <TextBlock Text="{DynamicResource Email}" Margin="0,0,0,2" FontSize="11"/>
                                                             <TextBox Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,5" Height="24"/>
                                                         </StackPanel>
                                                     </Grid>
 
-                                                    <TextBlock Text="Justification/Reasons" FontWeight="Bold" Margin="0,2,0,2" FontSize="11"/>
+                                                    <TextBlock Text="{DynamicResource JustificationReasons}" FontWeight="Bold" Margin="0,2,0,2" FontSize="11"/>
                                                     <TextBox Text="{Binding Justification, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" AcceptsReturn="True" Height="60" Margin="0,0,0,5"/>
 
                                                     <Grid>
@@ -293,33 +293,34 @@
                                                             <ColumnDefinition Width="*"/>
                                                         </Grid.ColumnDefinitions>
                                                         <StackPanel>
-                                                            <TextBlock Text="Discount" Margin="0,0,0,2" FontSize="11"/>
+                                                            <TextBlock Text="{DynamicResource Discount}" Margin="0,0,0,2" FontSize="11"/>
                                                             <TextBox Text="{Binding Discount, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,5" Height="24"/>
                                                         </StackPanel>
                                                         <StackPanel Grid.Column="1" Margin="5,0,0,0">
-                                                            <TextBlock Text="Misc Costs" Margin="0,0,0,2" FontSize="11"/>
+                                                            <TextBlock Text="{DynamicResource MiscOtherCosts}" Margin="0,0,0,2" FontSize="11"/>
                                                             <TextBox Text="{Binding MiscCosts, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,5" Height="24"/>
                                                         </StackPanel>
                                                     </Grid>
 
                                                     <Separator Margin="0,5"/>
                                                     <StackPanel Orientation="Horizontal">
-                                                        <TextBlock Text="Subtotal: " FontSize="11"/>
+                                                        <TextBlock Text="{DynamicResource SubTotal}" FontSize="11"/>
                                                         <TextBlock Text="{Binding CalculatedSubTotal, StringFormat=N2}" FontWeight="Bold" FontSize="11"/>
                                                     </StackPanel>
                                                     <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                                                        <TextBlock Text="GRAND TOTAL: " Foreground="DarkRed" FontSize="12" FontWeight="Bold"/>
+                                                        <TextBlock Text="{DynamicResource GrandTotal}" Foreground="DarkRed" FontSize="12" FontWeight="Bold"/>
                                                         <TextBlock Text="{Binding CalculatedTotal, StringFormat=N2}" FontWeight="Bold" Foreground="DarkRed" FontSize="12"/>
                                                     </StackPanel>
 
-                                                    <Button Content="Award Winner" Command="{Binding DataContext.SetRecommendedBidderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Margin="0,8,0,0" Height="30">
+                                                    <Button Command="{Binding DataContext.SetRecommendedBidderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Margin="0,8,0,0" Height="30">
                                                         <Button.Style>
                                                             <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
                                                                 <Setter Property="Background" Value="#F39C12"/>
+                                                                <Setter Property="Content" Value="{DynamicResource AwardWinner}"/>
                                                                 <Style.Triggers>
                                                                     <DataTrigger Binding="{Binding IsWinner}" Value="True">
                                                                         <Setter Property="Background" Value="#27AE60"/>
-                                                                        <Setter Property="Content" Value="WINNER!"/>
+                                                                        <Setter Property="Content" Value="{DynamicResource Winner}"/>
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
                                                             </Style>
@@ -327,9 +328,9 @@
                                                     </Button>
 
                                                     <UniformGrid Columns="3" Margin="0,8,0,0">
-                                                        <Button Content="📁" Command="{Binding DataContext.UploadQuoteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" ToolTip="Upload Quote Scan" Padding="5,2" Margin="0,0,2,0"/>
-                                                        <Button Content="👁" Command="{Binding DataContext.ViewQuoteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" ToolTip="View Quote Scan" Padding="5,2" Background="#34495E" Margin="0,0,2,0"/>
-                                                        <Button Content="🗑" Command="{Binding DataContext.RemoveBidderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" ToolTip="Remove Bidder" Padding="5,2" Background="#C0392B"/>
+                                                        <Button Content="📁" Command="{Binding DataContext.UploadQuoteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" ToolTip="{DynamicResource UploadQuote}" Padding="5,2" Margin="0,0,2,0"/>
+                                                        <Button Content="👁" Command="{Binding DataContext.ViewQuoteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" ToolTip="{DynamicResource ViewQuote}" Padding="5,2" Background="#34495E" Margin="0,0,2,0"/>
+                                                        <Button Content="🗑" Command="{Binding DataContext.RemoveBidderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" ToolTip="{DynamicResource RemoveBidder}" Padding="5,2" Background="#C0392B"/>
                                                     </UniformGrid>
                                                 </StackPanel>
                                             </Border>
@@ -365,7 +366,7 @@
                     <DataGrid Grid.Row="1" ItemsSource="{Binding FilteredPOs}" SelectedItem="{Binding SelectedPO}" AutoGenerateColumns="False" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="PO #" Binding="{Binding PONumber}" Width="*"/>
-                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="Auto"/>
+                            <DataGridTextColumn Header="{DynamicResource PRStatus}" Binding="{Binding Status}" Width="Auto"/>
                             <DataGridTemplateColumn Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -386,15 +387,15 @@
                     </Grid.RowDefinitions>
                     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                            <TextBlock Text="Select PR" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                            <TextBox Text="{Binding PRSearchText, UpdateSourceTrigger=PropertyChanged}" Width="80" Margin="0,0,5,0" Tag="Search..."/>
+                            <TextBlock Text="{DynamicResource SelectPR}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <TextBox Text="{Binding PRSearchText, UpdateSourceTrigger=PropertyChanged}" Width="80" Margin="0,0,5,0" Tag="{DynamicResource Search}"/>
                             <ComboBox ItemsSource="{Binding FilteredApprovedPRs}" SelectedItem="{Binding SelectedPR}" DisplayMemberPath="PRNumber" Width="100" Margin="0,0,10,0"/>
-                            <TextBlock Text="Select Bid Analysis" VerticalAlignment="Center" Margin="10,0,10,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                            <TextBlock Text="{DynamicResource BidAnalysis}" VerticalAlignment="Center" Margin="10,0,10,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
                             <ComboBox ItemsSource="{Binding FilteredBidAnalyses}" SelectedItem="{Binding SelectedBidAnalysis}" DisplayMemberPath="Id" Width="80" Margin="0,0,10,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
-                            <TextBlock Text="Vendor" VerticalAlignment="Center" Margin="10,0,5,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <TextBlock Text="{DynamicResource Vendor}" VerticalAlignment="Center" Margin="10,0,5,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                             <ComboBox ItemsSource="{Binding Vendors}" SelectedValue="{Binding CurrentPO.VendorId}" SelectedValuePath="Id" DisplayMemberPath="Name" Width="150" Margin="0,0,10,0" Visibility="{Binding SkipBidAnalysis, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                             <Button Content="{DynamicResource CreatePO}" Command="{Binding CreatePOCommand}"/>
-                            <CheckBox Content="Direct Purchase (Skip RFQ/Bid Analysis)" IsChecked="{Binding SkipBidAnalysis}" VerticalAlignment="Center" Margin="20,0,0,0"/>
+                            <CheckBox Content="{DynamicResource DirectPurchase}" IsChecked="{Binding SkipBidAnalysis}" VerticalAlignment="Center" Margin="20,0,0,0"/>
                         </StackPanel>
                     </ScrollViewer>
                 
@@ -445,7 +446,7 @@
                              </StackPanel>
                              <TextBox Grid.Column="1" Text="{Binding CurrentPO.PONumber}" Margin="5"/>
 
-                             <TextBlock Grid.Column="2" Text="Clause:" FontWeight="Bold" Margin="5" VerticalAlignment="Center"/>
+                             <TextBlock Grid.Column="2" Text="{DynamicResource Clause}" FontWeight="Bold" Margin="5" VerticalAlignment="Center"/>
                              <TextBox Grid.Column="3" Text="{Binding CurrentPO.Clause}" Margin="5"/>
 
                              <StackPanel Grid.Column="4" Orientation="Horizontal" Margin="5">
@@ -487,10 +488,16 @@
                                          <ColumnDefinition Width="Auto"/>
                                          <ColumnDefinition Width="*"/>
                                      </Grid.ColumnDefinitions>
-                                     <TextBlock Text="Vendor Name:" FontWeight="Bold" Margin="0,0,10,0"/>
+                                     <StackPanel Orientation="Horizontal" Margin="0,0,10,0">
+                                         <TextBlock Text="{DynamicResource Vendor}" FontWeight="Bold"/>
+                                         <TextBlock Text=":" FontWeight="Bold"/>
+                                     </StackPanel>
                                      <TextBlock Grid.Column="1" Text="{Binding CurrentPO.VendorName}" FontWeight="Bold" Foreground="DarkBlue"/>
 
-                                     <TextBlock Grid.Column="2" Text="Contact:" FontWeight="Bold" Margin="20,0,10,0"/>
+                                     <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="20,0,10,0">
+                                         <TextBlock Text="{DynamicResource Contact}" FontWeight="Bold"/>
+                                         <TextBlock Text=":" FontWeight="Bold"/>
+                                     </StackPanel>
                                      <TextBlock Grid.Column="3" Text="{Binding CurrentPO.VendorContact}" Foreground="DarkBlue"/>
                                  </Grid>
                              </Border>
@@ -514,22 +521,25 @@
                         <!-- Signatures Area -->
                         <UniformGrid Grid.Row="5" Columns="3" Margin="0,20,0,20">
                             <StackPanel HorizontalAlignment="Center">
-                                <TextBlock Text="Logistics Manager" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{DynamicResource LogisticManager}" FontWeight="Bold" HorizontalAlignment="Center"/>
                                 <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5">
                                     <Image Source="{Binding CurrentPO.LogisticsSignature, Converter={StaticResource ImageBytesConverter}}"/>
                                 </Border>
+                                <TextBlock Text="{Binding CurrentPO.LogisticsName}" FontSize="10" HorizontalAlignment="Center"/>
                             </StackPanel>
                             <StackPanel HorizontalAlignment="Center">
-                                <TextBlock Text="Finance Manager" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{DynamicResource FinanceManager}" FontWeight="Bold" HorizontalAlignment="Center"/>
                                 <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5">
                                     <Image Source="{Binding CurrentPO.FinanceSignature, Converter={StaticResource ImageBytesConverter}}"/>
                                 </Border>
+                                <TextBlock Text="{Binding CurrentPO.FinanceName}" FontSize="10" HorizontalAlignment="Center"/>
                             </StackPanel>
                             <StackPanel HorizontalAlignment="Center">
-                                <TextBlock Text="Head of Association" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{DynamicResource ApprovedBy}" FontWeight="Bold" HorizontalAlignment="Center"/>
                                 <Border BorderBrush="LightGray" BorderThickness="1" Height="50" Width="120" Margin="5">
                                     <Image Source="{Binding CurrentPO.FinalSignature, Converter={StaticResource ImageBytesConverter}}"/>
                                 </Border>
+                                <TextBlock Text="{Binding CurrentPO.FinalName}" FontSize="10" HorizontalAlignment="Center"/>
                             </StackPanel>
                         </UniformGrid>
                     </Grid>
@@ -538,7 +548,7 @@
                 <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
                     <Button Content="{DynamicResource Save}" Command="{Binding SavePOCommand}" Width="120" Margin="0,0,10,0" Background="#27AE60"/>
                     <Button Content="{DynamicResource Approve}" Command="{Binding ApprovePOCommand}" Width="120" Margin="0,0,10,0"/>
-                    <Button Content="🖨️ Direct Print" Command="{Binding DirectPrintCommand}" Width="120" Margin="0,0,10,0" Background="#1B4F72"/>
+                    <Button Content="🖨️" Command="{Binding DirectPrintCommand}" Width="50" Margin="0,0,10,0" Background="#1B4F72" ToolTip="{DynamicResource DirectPrint}"/>
                     <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" CommandParameter="{Binding ElementName=POPrintRoot}" Width="120"/>
                 </StackPanel>
                 </Grid>

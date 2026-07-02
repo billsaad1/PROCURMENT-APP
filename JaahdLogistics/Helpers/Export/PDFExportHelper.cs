@@ -40,6 +40,8 @@ namespace JaahdLogistics.Helpers.Export
             }
         }
 
+        private static string T(string key) => System.Windows.Application.Current.TryFindResource(key)?.ToString() ?? key;
+
         private static void ExportPR(PurchaseRequisitionViewModel vm, string filePath)
         {
             if (vm?.CurrentPR == null) return;
@@ -60,7 +62,7 @@ namespace JaahdLogistics.Helpers.Export
                         row.RelativeItem().Column(col =>
                         {
                             col.Item().Text(settings.AssociationName).FontSize(16).Bold();
-                            col.Item().Text("Logistics Management").FontSize(10);
+                            col.Item().Text(T("LogisticManager")).FontSize(10);
                         });
 
                         if (settings.LogoImage != null)
@@ -71,22 +73,22 @@ namespace JaahdLogistics.Helpers.Export
 
                     page.Content().PaddingVertical(10).Column(col =>
                     {
-                        col.Item().Background("#1B4F72").Padding(5).AlignCenter().Text("Purchase Requisition / طلب شراء").FontSize(14).Bold().FontColor(Colors.White);
+                        col.Item().Background("#1B4F72").Padding(5).AlignCenter().Text(T("PR")).FontSize(14).Bold().FontColor(Colors.White);
 
                         col.Item().PaddingTop(10).Border(1).Row(row =>
                         {
                             row.RelativeItem().Padding(5).Column(c => {
-                                c.Item().Text(t => { t.Span("PR NUMBER: ").Bold(); t.Span(pr.PRNumber); });
-                                c.Item().Text(t => { t.Span("Project: ").Bold(); t.Span(pr.Project?.Name ?? ""); });
+                                c.Item().Text(t => { t.Span(T("PRNumber") + ": ").Bold(); t.Span(pr.PRNumber); });
+                                c.Item().Text(t => { t.Span(T("Project") + ": ").Bold(); t.Span(pr.Project?.Name ?? ""); });
                             });
                             row.RelativeItem().Padding(5).Column(c => {
-                                c.Item().Text(t => { t.Span("DATE: ").Bold(); t.Span(pr.Date.ToShortDateString()); });
-                                c.Item().Text(t => { t.Span("PM: ").Bold(); t.Span(pr.Project?.ProjectManager ?? ""); });
+                                c.Item().Text(t => { t.Span(T("Date") + ": ").Bold(); t.Span(pr.Date.ToShortDateString()); });
+                                c.Item().Text(t => { t.Span(T("ProjectManager") + ": ").Bold(); t.Span(pr.Project?.ProjectManager ?? ""); });
                             });
                         });
 
                         col.Item().PaddingTop(10).Border(1).Column(c => {
-                            c.Item().Background("#922B21").Padding(2).AlignCenter().Text("Justification").FontColor(Colors.White).Bold();
+                            c.Item().Background("#922B21").Padding(2).AlignCenter().Text(T("Justification")).FontColor(Colors.White).Bold();
                             c.Item().Padding(5).Text(pr.Justification).FontSize(9);
                         });
 
@@ -105,11 +107,11 @@ namespace JaahdLogistics.Helpers.Export
                             table.Header(header =>
                             {
                                 header.Cell().Element(CellStyle).Text("NO");
-                                header.Cell().Element(CellStyle).Text("Description");
-                                header.Cell().Element(CellStyle).Text("Unit");
-                                header.Cell().Element(CellStyle).Text("Qty");
-                                header.Cell().Element(CellStyle).Text("Price");
-                                header.Cell().Element(CellStyle).Text("Total");
+                                header.Cell().Element(CellStyle).Text(T("Description"));
+                                header.Cell().Element(CellStyle).Text(T("Unit"));
+                                header.Cell().Element(CellStyle).Text(T("Quantity"));
+                                header.Cell().Element(CellStyle).Text(T("UnitPrice"));
+                                header.Cell().Element(CellStyle).Text(T("Total"));
 
                                 static IContainer CellStyle(IContainer container) => container.DefaultTextStyle(x => x.Bold()).PaddingVertical(5).BorderBottom(1).AlignCenter();
                             });
@@ -129,17 +131,17 @@ namespace JaahdLogistics.Helpers.Export
                         });
 
                         col.Item().AlignRight().PaddingTop(10).Text(t => {
-                            t.Span("GRAND TOTAL: ").Bold();
+                            t.Span(T("GrandTotal") + ": ").Bold();
                             t.Span($"{pr.TotalAmount:N2} {pr.Currency}").FontSize(14).Bold().FontColor("#1B4F72");
                         });
                     });
 
                     page.Footer().PaddingTop(20).Row(row =>
                     {
-                        AddSig(row.RelativeItem(), "Requester", pr.RequesterName);
-                        AddSig(row.RelativeItem(), "Logistics", pr.LogisticsName);
-                        AddSig(row.RelativeItem(), "Finance", pr.FinanceName);
-                        AddSig(row.RelativeItem(), "Approval", pr.FinalName);
+                        AddSig(row.RelativeItem(), T("Requester"), pr.RequesterName);
+                        AddSig(row.RelativeItem(), T("Logistics"), pr.LogisticsName);
+                        AddSig(row.RelativeItem(), T("Finance"), pr.FinanceName);
+                        AddSig(row.RelativeItem(), T("ApprovedBy"), pr.FinalName);
 
                         void AddSig(IContainer c, string label, string? name)
                         {
@@ -174,23 +176,23 @@ namespace JaahdLogistics.Helpers.Export
                         row.RelativeItem().Column(col =>
                         {
                             col.Item().Text(settings.AssociationName).FontSize(16).Bold();
-                            col.Item().Text("Logistics Management").FontSize(10);
+                            col.Item().Text(T("LogisticManager")).FontSize(10);
                         });
                         if (settings.LogoImage != null) row.ConstantItem(60).Image(settings.LogoImage);
                     });
 
                     page.Content().PaddingVertical(10).Column(col =>
                     {
-                        col.Item().Background("#1B4F72").Padding(5).AlignCenter().Text("PURCHASE ORDER / أمر شراء").FontSize(14).Bold().FontColor(Colors.White);
+                        col.Item().Background("#1B4F72").Padding(5).AlignCenter().Text(T("PO")).FontSize(14).Bold().FontColor(Colors.White);
 
                         col.Item().PaddingTop(10).Border(1).Row(row =>
                         {
                             row.RelativeItem().Padding(5).Column(c => {
-                                c.Item().Text(t => { t.Span("PO NUMBER: ").Bold(); t.Span(po.PONumber); });
-                                c.Item().Text(t => { t.Span("Clause: ").Bold(); t.Span(po.Clause ?? ""); });
+                                c.Item().Text(t => { t.Span(T("PONumberHeader") + ": ").Bold(); t.Span(po.PONumber); });
+                                c.Item().Text(t => { t.Span(T("Clause") + ": ").Bold(); t.Span(po.Clause ?? ""); });
                             });
                             row.RelativeItem().Padding(5).Column(c => {
-                                c.Item().Text(t => { t.Span("DATE: ").Bold(); t.Span(po.Date.ToShortDateString()); });
+                                c.Item().Text(t => { t.Span(T("Date") + ": ").Bold(); t.Span(po.Date.ToShortDateString()); });
                             });
                         });
 
@@ -222,11 +224,11 @@ namespace JaahdLogistics.Helpers.Export
 
                             table.Header(header =>
                             {
-                                header.Cell().Element(CellStyle).Text("Description");
-                                header.Cell().Element(CellStyle).Text("Unit");
-                                header.Cell().Element(CellStyle).Text("Qty");
-                                header.Cell().Element(CellStyle).Text("Price");
-                                header.Cell().Element(CellStyle).Text("Total");
+                                header.Cell().Element(CellStyle).Text(T("Description"));
+                                header.Cell().Element(CellStyle).Text(T("Unit"));
+                                header.Cell().Element(CellStyle).Text(T("Quantity"));
+                                header.Cell().Element(CellStyle).Text(T("UnitPrice"));
+                                header.Cell().Element(CellStyle).Text(T("Total"));
                                 static IContainer CellStyle(IContainer container) => container.DefaultTextStyle(x => x.Bold()).PaddingVertical(5).BorderBottom(1).AlignCenter();
                             });
 
@@ -242,21 +244,21 @@ namespace JaahdLogistics.Helpers.Export
                         });
 
                         col.Item().AlignRight().PaddingTop(10).Text(t => {
-                            t.Span("GRAND TOTAL: ").Bold();
+                            t.Span(T("GrandTotal") + ": ").Bold();
                             t.Span($"{po.TotalAmount:N2} {po.Currency}").FontSize(14).Bold().FontColor("#1B4F72");
                         });
 
                         col.Item().PaddingTop(10).Border(1).Column(c => {
-                            c.Item().Background(Colors.Grey.Lighten3).Padding(2).Text("Supply Terms").Bold();
+                            c.Item().Background(Colors.Grey.Lighten3).Padding(2).Text(T("SupplyTerms")).Bold();
                             c.Item().Padding(5).Text(po.Terms).FontSize(9);
                         });
                     });
 
                     page.Footer().PaddingTop(20).Row(row =>
                     {
-                        AddSig(row.RelativeItem(), "Logistics", po.LogisticsName);
-                        AddSig(row.RelativeItem(), "Finance", po.FinanceName);
-                        AddSig(row.RelativeItem(), "Approval", po.FinalName);
+                        AddSig(row.RelativeItem(), T("Logistics"), po.LogisticsName);
+                        AddSig(row.RelativeItem(), T("Finance"), po.FinanceName);
+                        AddSig(row.RelativeItem(), T("ApprovedBy"), po.FinalName);
 
                         void AddSig(IContainer c, string label, string? name)
                         {
@@ -292,22 +294,22 @@ namespace JaahdLogistics.Helpers.Export
                         row.RelativeItem().Column(col =>
                         {
                             col.Item().Text(settings.AssociationName).FontSize(16).Bold();
-                            col.Item().Text("Logistics Management").FontSize(10);
+                            col.Item().Text(T("LogisticManager")).FontSize(10);
                         });
                         if (settings.LogoImage != null) row.ConstantItem(60).Image(settings.LogoImage);
                     });
 
                     page.Content().PaddingVertical(10).Column(col =>
                     {
-                        col.Item().Background("#1B4F72").Padding(5).AlignCenter().Text("Request for Quotation (RFQ) / طلب عرض سعر").FontSize(14).Bold().FontColor(Colors.White);
+                        col.Item().Background("#1B4F72").Padding(5).AlignCenter().Text(T("RFQ")).FontSize(14).Bold().FontColor(Colors.White);
 
                         col.Item().PaddingTop(10).Border(1).Row(row =>
                         {
                             row.RelativeItem().Padding(5).Column(c => {
-                                c.Item().Text(t => { t.Span("RFQ NUMBER: ").Bold(); t.Span(rfq.RFQNumber); });
+                                c.Item().Text(t => { t.Span(T("RFQNumber") + ": ").Bold(); t.Span(rfq.RFQNumber); });
                             });
                             row.RelativeItem().Padding(5).Column(c => {
-                                c.Item().Text(t => { t.Span("Closing Date: ").Bold(); t.Span(rfq.ClosingDate?.ToShortDateString() ?? ""); });
+                                c.Item().Text(t => { t.Span(T("ClosingDate") + ": ").Bold(); t.Span(rfq.ClosingDate?.ToShortDateString() ?? ""); });
                             });
                         });
 
@@ -326,11 +328,11 @@ namespace JaahdLogistics.Helpers.Export
                             table.Header(header =>
                             {
                                 header.Cell().Element(CellStyle).Text("NO");
-                                header.Cell().Element(CellStyle).Text("Item Description");
-                                header.Cell().Element(CellStyle).Text("Unit");
-                                header.Cell().Element(CellStyle).Text("Qty");
-                                header.Cell().Element(CellStyle).Text("Unit Price");
-                                header.Cell().Element(CellStyle).Text("Total");
+                                header.Cell().Element(CellStyle).Text(T("Description"));
+                                header.Cell().Element(CellStyle).Text(T("Unit"));
+                                header.Cell().Element(CellStyle).Text(T("Quantity"));
+                                header.Cell().Element(CellStyle).Text(T("UnitPrice"));
+                                header.Cell().Element(CellStyle).Text(T("Total"));
                                 static IContainer CellStyle(IContainer container) => container.DefaultTextStyle(x => x.Bold()).PaddingVertical(5).BorderBottom(1).AlignCenter();
                             });
 
@@ -351,19 +353,19 @@ namespace JaahdLogistics.Helpers.Export
                         });
 
                         col.Item().PaddingTop(20).Border(1).Column(c => {
-                            c.Item().Background("#922B21").Padding(2).AlignCenter().Text("Terms & Conditions").FontColor(Colors.White).Bold();
+                            c.Item().Background("#922B21").Padding(2).AlignCenter().Text(T("Terms")).FontColor(Colors.White).Bold();
                             c.Item().Padding(5).Text(rfq.Terms).FontSize(9);
                         });
 
                         col.Item().PaddingTop(20).Row(row =>
                         {
                             row.RelativeItem().Border(1).Column(c => {
-                                c.Item().Background("#D5D8DC").Padding(2).AlignCenter().Text("Service Provider Details").Bold();
+                                c.Item().Background("#D5D8DC").Padding(2).AlignCenter().Text("Vendor Details").Bold();
                                 c.Item().Padding(10).Height(60);
                             });
                             row.ConstantItem(10);
                             row.RelativeItem().Border(1).Column(c => {
-                                c.Item().Background("#D5D8DC").Padding(2).AlignCenter().Text("Vendor Signature & Stamp").Bold();
+                                c.Item().Background("#D5D8DC").Padding(2).AlignCenter().Text(T("Signature")).Bold();
                                 c.Item().Padding(10).Height(60);
                             });
                         });
@@ -392,14 +394,14 @@ namespace JaahdLogistics.Helpers.Export
                         row.RelativeItem().Column(col =>
                         {
                             col.Item().Text(settings.AssociationName).FontSize(14).Bold();
-                            col.Item().Text("Logistics Management").FontSize(10);
+                            col.Item().Text(T("LogisticManager")).FontSize(10);
                         });
                         if (settings.LogoImage != null) row.ConstantItem(50).Image(settings.LogoImage);
                     });
 
                     page.Content().PaddingVertical(10).Column(col =>
                     {
-                        col.Item().Background("#1B4F72").Padding(5).AlignCenter().Text("Analysis of RFQs / تحليل العروض").FontSize(12).Bold().FontColor(Colors.White);
+                        col.Item().Background("#1B4F72").Padding(5).AlignCenter().Text(T("BidAnalysis")).FontSize(12).Bold().FontColor(Colors.White);
 
                         col.Item().PaddingTop(5).Table(table =>
                         {
@@ -416,15 +418,15 @@ namespace JaahdLogistics.Helpers.Export
                             table.Header(header =>
                             {
                                 header.Cell().RowSpan(2).Element(HeaderStyle).Text("NO");
-                                header.Cell().RowSpan(2).Element(HeaderStyle).Text("Description");
-                                header.Cell().RowSpan(2).Element(HeaderStyle).Text("Unit");
-                                header.Cell().RowSpan(2).Element(HeaderStyle).Text("QTY");
-                                header.Cell().Element(HeaderStyle).AlignCenter().Text("Estimative Cost");
+                                header.Cell().RowSpan(2).Element(HeaderStyle).Text(T("Description"));
+                                header.Cell().RowSpan(2).Element(HeaderStyle).Text(T("Unit"));
+                                header.Cell().RowSpan(2).Element(HeaderStyle).Text(T("Quantity"));
+                                header.Cell().Element(HeaderStyle).AlignCenter().Text(T("EstimativeCost"));
                                 foreach (var bidder in vm.Bidders) header.Cell().Element(HeaderStyle).AlignCenter().Text(bidder.Name);
 
-                                header.Cell().Row(2).Column(5).Element(SubHeaderStyle).Text("Total");
+                                header.Cell().Row(2).Column(5).Element(SubHeaderStyle).Text(T("Total"));
                                 uint colIdx = 6;
-                                foreach (var bidder in vm.Bidders) header.Cell().Row(2).Column(colIdx++).Element(SubHeaderStyle).Text("Total");
+                                foreach (var bidder in vm.Bidders) header.Cell().Row(2).Column(colIdx++).Element(SubHeaderStyle).Text(T("Total"));
 
                                 static IContainer HeaderStyle(IContainer container) => container.DefaultTextStyle(x => x.Bold()).PaddingVertical(2).Border(1).Background(Colors.Grey.Lighten3).AlignCenter().AlignMiddle();
                                 static IContainer SubHeaderStyle(IContainer container) => container.DefaultTextStyle(x => x.FontSize(8)).PaddingVertical(1).Border(1).AlignCenter();
@@ -445,21 +447,21 @@ namespace JaahdLogistics.Helpers.Export
 
                         col.Item().PaddingTop(10).Border(1).Row(row =>
                         {
-                            row.ConstantItem(150).Background("#D5F5E3").Padding(5).Text("Recommended Award To:").Bold();
+                            row.ConstantItem(150).Background("#D5F5E3").Padding(5).Text(T("RecomAwardTo")).Bold();
                             row.RelativeItem().Padding(5).Text(ba.RecommendedBidderName).Bold().FontSize(12).FontColor(Colors.Blue.Medium);
                         });
 
                         col.Item().PaddingTop(5).Border(1).Column(c => {
-                            c.Item().Background("#FCF3CF").Padding(2).Text("Recommendation Reasons").Bold();
+                            c.Item().Background("#FCF3CF").Padding(2).Text(T("RecommendationReasons")).Bold();
                             c.Item().Padding(5).Text(ba.RecommendationReasons).FontSize(8);
                         });
                     });
 
                     page.Footer().PaddingTop(10).Row(row =>
                     {
-                        AddSig(row.RelativeItem(), "Logistics", vm.LogisticsNameBA);
-                        AddSig(row.RelativeItem(), "Finance", vm.FinanceNameBA);
-                        AddSig(row.RelativeItem(), "Approval", vm.HeadNameBA);
+                        AddSig(row.RelativeItem(), T("Logistics"), vm.LogisticsNameBA);
+                        AddSig(row.RelativeItem(), T("Finance"), vm.FinanceNameBA);
+                        AddSig(row.RelativeItem(), T("ApprovedBy"), vm.HeadNameBA);
 
                         void AddSig(IContainer c, string label, string? name)
                         {
@@ -488,7 +490,7 @@ namespace JaahdLogistics.Helpers.Export
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(9));
 
-                    page.Header().Element(c => AddHeader(c, "GOODS RECEIVING NOTE / مذكرة استلام بضائع", vm.Settings));
+                    page.Header().Element(c => AddHeader(c, T("GRN"), vm.Settings));
 
                     page.Content().PaddingVertical(10).Column(col =>
                     {
@@ -496,12 +498,12 @@ namespace JaahdLogistics.Helpers.Export
                         {
                             row.RelativeItem().Padding(5).Column(c =>
                             {
-                                c.Item().Text("DISTRIBUTION :-").Bold().FontSize(8);
+                                c.Item().Text(T("Project") + ":-").Bold().FontSize(8);
                                 c.Item().Text(vm.SelectedPO?.Project?.Name ?? "").FontSize(10);
                             });
                             row.ConstantItem(100).BorderLeft(1).Padding(5).Column(c =>
                             {
-                                c.Item().Text("GRN NO.").Bold().FontSize(8);
+                                c.Item().Text(T("GRNNumberHeader")).Bold().FontSize(8);
                                 c.Item().Text(grn.GRNNumber).FontSize(10);
                             });
                         });
@@ -510,15 +512,15 @@ namespace JaahdLogistics.Helpers.Export
                         {
                             row.RelativeItem().Padding(5).Column(c =>
                             {
-                                c.Item().Text("VENDOR DETAILS").Bold().FontSize(9).FontColor(Colors.Orange.Medium);
-                                c.Item().Text($"NAME: {vm.SelectedPO?.VendorName}").FontSize(9);
-                                c.Item().Text("SUPPLY TYPE: Materials").FontSize(9);
+                                c.Item().Text("VENDOR DETAILS / تفاصيل المورد").Bold().FontSize(9).FontColor(Colors.Orange.Medium);
+                                c.Item().Text($"{T("Name")}: {vm.SelectedPO?.VendorName}").FontSize(9);
+                                c.Item().Text($"{T("SupplyType")}: {T("Materials")}").FontSize(9);
                             });
                             row.RelativeItem().BorderLeft(1).Padding(5).Column(c =>
                             {
-                                c.Item().Text("PURCHASE ORDER DETAILS").Bold().FontSize(9);
-                                c.Item().Text($"PO. NO. :- {vm.SelectedPO?.PONumber}").FontSize(9);
-                                c.Item().Text($"INVOICE NO. :- {grn.InvoiceNumber}").FontSize(9);
+                                c.Item().Text("PURCHASE ORDER DETAILS / تفاصيل أمر الشراء").Bold().FontSize(9);
+                                c.Item().Text($"{T("PONumberHeader")} :- {vm.SelectedPO?.PONumber}").FontSize(9);
+                                c.Item().Text($"{T("InvoiceNo")} :- {grn.InvoiceNumber}").FontSize(9);
                             });
                         });
 
@@ -537,13 +539,13 @@ namespace JaahdLogistics.Helpers.Export
 
                             table.Header(header =>
                             {
-                                header.Cell().Element(CellStyle).Text("SI NO.");
-                                header.Cell().Element(CellStyle).Text("ITEM DESCRIPTION");
-                                header.Cell().Element(CellStyle).Text("UNIT");
-                                header.Cell().Element(CellStyle).Text("RECEIVED");
-                                header.Cell().Element(CellStyle).Text("ACCEPTED");
-                                header.Cell().Element(CellStyle).Text("REJECTED");
-                                header.Cell().Element(CellStyle).Text("REMARKS");
+                                header.Cell().Element(CellStyle).Text("NO");
+                                header.Cell().Element(CellStyle).Text(T("Description"));
+                                header.Cell().Element(CellStyle).Text(T("Unit"));
+                                header.Cell().Element(CellStyle).Text(T("ReceivedQty"));
+                                header.Cell().Element(CellStyle).Text(T("AcceptedQty"));
+                                header.Cell().Element(CellStyle).Text(T("RejectedQty"));
+                                header.Cell().Element(CellStyle).Text(T("Remarks"));
                                 static IContainer CellStyle(IContainer container) => container.DefaultTextStyle(x => x.Bold().FontSize(8)).PaddingVertical(5).Border(1).AlignCenter().AlignMiddle();
                             });
 
@@ -565,30 +567,30 @@ namespace JaahdLogistics.Helpers.Export
                         {
                             row.RelativeItem().Padding(5).Column(c =>
                             {
-                                c.Item().Background("#1B4F72").Padding(2).Text("REMARKS").Bold().FontColor(Colors.White);
-                                c.Item().Text($"• Quantity Comply to Specs: {(grn.IsQtyComply ? "YES" : "NO")}");
-                                c.Item().Text($"• Quantity Matches Order: {(grn.IsQtyMatch ? "YES" : "NO")}");
-                                c.Item().Text($"• Quantity Intact: {(grn.IsQtyIntact ? "YES" : "NO")}");
+                                c.Item().Background("#1B4F72").Padding(2).Text(T("Remarks")).Bold().FontColor(Colors.White);
+                                c.Item().Text($"• {T("QtyComplySpecs")}: {(grn.IsQtyComply ? "YES" : "NO")}");
+                                c.Item().Text($"• {T("QtyMatchOrder")}: {(grn.IsQtyMatch ? "YES" : "NO")}");
+                                c.Item().Text($"• {T("QtyIntact")}: {(grn.IsQtyIntact ? "YES" : "NO")}");
                             });
                             row.ConstantItem(150).BorderLeft(1).Padding(5).Column(c =>
                             {
-                                c.Item().AlignCenter().Text("CHECKED").Bold();
+                                c.Item().AlignCenter().Text(T("Checked")).Bold();
                                 c.Item().PaddingTop(10).AlignCenter().Text(grn.IsQtyComply && grn.IsQtyMatch && grn.IsQtyIntact ? "[ X ]" : "[   ]");
                             });
                         });
 
                         col.Item().PaddingTop(20).Border(1).Column(c =>
                         {
-                            c.Item().Padding(5).Text("RECEIVER DETAILS").Bold().FontColor(Colors.Red.Medium);
+                            c.Item().Padding(5).Text(T("ReceiverDetails")).Bold().FontColor(Colors.Red.Medium);
                             c.Item().Padding(5).Row(r =>
                             {
-                                r.RelativeItem().Text($"NAME: {vm.ReceiverName}");
-                                r.RelativeItem().Text($"POSITION: {vm.ReceiverPosition}");
+                                r.RelativeItem().Text($"{T("Name")}: {vm.ReceiverName}");
+                                r.RelativeItem().Text($"{T("Position")}: {vm.ReceiverPosition}");
                             });
                             c.Item().Padding(5).Row(r =>
                             {
-                                r.RelativeItem().Text("SIGNATURE: (Signed Electronically)");
-                                r.RelativeItem().Text($"DATE: {grn.Date:yyyy-MM-dd}");
+                                r.RelativeItem().Text($"{T("Signature")}: (Signed Electronically)");
+                                r.RelativeItem().Text($"{T("Date")}: {grn.Date:yyyy-MM-dd}");
                             });
                         });
                     });
@@ -610,22 +612,22 @@ namespace JaahdLogistics.Helpers.Export
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(9));
 
-                    page.Header().Element(c => AddHeader(c, "THREE-WAY MATCH / مطابقة ثلاثية", vm.Settings));
+                    page.Header().Element(c => AddHeader(c, T("ThreeWayMatch"), vm.Settings));
 
                     page.Content().PaddingVertical(10).Column(col =>
                     {
                         col.Item().Border(1).Row(row =>
                         {
-                            row.RelativeItem().Padding(5).Text($"PO NO: {vm.SelectedPO?.PONumber}").Bold();
-                            row.RelativeItem().BorderLeft(1).Padding(5).Text($"GRN NO: {vm.GrnNumber}").Bold();
-                            row.RelativeItem().BorderLeft(1).Padding(5).Text($"DATE: {match.Date:yyyy-MM-dd}");
+                            row.RelativeItem().Padding(5).Text($"{T("PONumberHeader")}: {vm.SelectedPO?.PONumber}").Bold();
+                            row.RelativeItem().BorderLeft(1).Padding(5).Text($"{T("GRNNumberHeader")}: {vm.GrnNumber}").Bold();
+                            row.RelativeItem().BorderLeft(1).Padding(5).Text($"{T("Date")}: {match.Date:yyyy-MM-dd}");
                         });
 
                         col.Item().PaddingTop(5).Border(1).Row(row =>
                         {
-                            row.ConstantItem(80).Padding(5).Text("INVOICE:").Bold();
+                            row.ConstantItem(80).Padding(5).Text($"{T("InvoiceHeader")}:").Bold();
                             row.RelativeItem().Padding(5).Text(match.InvoiceNumber);
-                            row.ConstantItem(80).BorderLeft(1).Padding(5).Text("DETAILS:").Bold();
+                            row.ConstantItem(80).BorderLeft(1).Padding(5).Text($"{T("Details")}:").Bold();
                             row.RelativeItem().Padding(5).Text(match.InvoiceDetails);
                         });
 
@@ -643,12 +645,12 @@ namespace JaahdLogistics.Helpers.Export
 
                             table.Header(header =>
                             {
-                                header.Cell().Element(CellStyle).Text("Item");
-                                header.Cell().Element(CellStyle).Text("Unit");
-                                header.Cell().Element(CellStyle).Text("PO CONTRACT");
-                                header.Cell().Element(CellStyle).Text("INVOICE");
-                                header.Cell().Element(CellStyle).Text("GRN DETAIL");
-                                header.Cell().Element(CellStyle).Text("Notes");
+                                header.Cell().Element(CellStyle).Text(T("ItemHeader"));
+                                header.Cell().Element(CellStyle).Text(T("Unit"));
+                                header.Cell().Element(CellStyle).Text(T("POContractHeader"));
+                                header.Cell().Element(CellStyle).Text(T("InvoiceHeader"));
+                                header.Cell().Element(CellStyle).Text(T("GRNDetailHeader"));
+                                header.Cell().Element(CellStyle).Text(T("Remarks"));
                                 static IContainer CellStyle(IContainer container) => container.DefaultTextStyle(x => x.Bold().FontSize(8)).PaddingVertical(5).Border(1).AlignCenter().AlignMiddle().Background(Colors.Grey.Lighten3);
                             });
 
@@ -666,11 +668,11 @@ namespace JaahdLogistics.Helpers.Export
 
                         col.Item().PaddingTop(30).Row(row =>
                         {
-                            AddSig(row.RelativeItem(), "Checked by", vm.LogisticsNameTWM, vm.LogisticsTitleTWM);
+                            AddSig(row.RelativeItem(), T("CheckedBy"), vm.LogisticsNameTWM, vm.LogisticsTitleTWM);
                             row.ConstantItem(20);
-                            AddSig(row.RelativeItem(), "Reviewed by", vm.FinanceNameTWM, vm.FinanceTitleTWM);
+                            AddSig(row.RelativeItem(), T("ReviewedBy"), vm.FinanceNameTWM, vm.FinanceTitleTWM);
                             row.ConstantItem(20);
-                            AddSig(row.RelativeItem(), "Approved by", vm.HeadNameTWM, vm.HeadTitleTWM);
+                            AddSig(row.RelativeItem(), T("ApprovedBy"), vm.HeadNameTWM, vm.HeadTitleTWM);
 
                             void AddSig(IContainer c, string role, string? name, string? title)
                             {

@@ -13,80 +13,94 @@
         </Grid.RowDefinitions>
 
         <Grid Margin="0,0,0,20">
-            <TextBlock Text="Logistics Reports &amp; Analytics" FontSize="26" FontWeight="Bold" Foreground="#1B4F72"/>
-            <Button Content="Refresh Reports" Command="{Binding LoadReportsCommand}" HorizontalAlignment="Right" Padding="15,7" Background="#1B4F72"/>
+            <TextBlock Text="{DynamicResource Reports}" FontSize="26" FontWeight="Bold" Foreground="#1B4F72"/>
+            <Button Content="{DynamicResource List}" Command="{Binding LoadReportsCommand}" HorizontalAlignment="Right" Padding="15,7" Background="#1B4F72"/>
         </Grid>
 
         <TabControl Grid.Row="1" SelectedIndex="{Binding SelectedTabIndex}" Background="White">
-            <TabItem Header="Project Spending">
+            <TabItem Header="{DynamicResource ProjectSpendingReport}">
                 <Grid Margin="15">
                     <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                     <DataGrid x:Name="SpendingGrid" ItemsSource="{Binding SpendingReport}" AutoGenerateColumns="False" IsReadOnly="True">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Project Name" Binding="{Binding Name}" Width="*"/>
-                            <DataGridTextColumn Header="Total Spent (USD)" Binding="{Binding TotalSpent, StringFormat=N2}" Width="200"/>
+                            <DataGridTextColumn Header="{DynamicResource Project}" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTextColumn Binding="{Binding TotalSpent, StringFormat=N2}" Width="200">
+                                <DataGridTextColumn.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{DynamicResource Total}"/>
+                                        <TextBlock Text=" (USD)"/>
+                                    </StackPanel>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                     <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
-                        <Button Content="🖨️ Direct Print" Command="{Binding DirectPrintReportCommand}" CommandParameter="{Binding ElementName=SpendingGrid}"
-                                Padding="15,10" Background="#1B4F72" Margin="0,0,10,0"/>
-                        <Button Content="Print Preview" Command="{Binding PrintReportCommand}" CommandParameter="{Binding ElementName=SpendingGrid}"
+                        <Button Content="🖨️" Command="{Binding DirectPrintReportCommand}" CommandParameter="{Binding ElementName=SpendingGrid}"
+                                Padding="15,10" Background="#1B4F72" Margin="0,0,10,0" ToolTip="{DynamicResource DirectPrint}"/>
+                        <Button Content="{DynamicResource Print}" Command="{Binding PrintReportCommand}" CommandParameter="{Binding ElementName=SpendingGrid}"
                                 Padding="15,10" Background="#27AE60"/>
                     </StackPanel>
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Inventory Status">
+            <TabItem Header="{DynamicResource InventoryStatusReport}">
                 <Grid Margin="15">
                     <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                     <DataGrid x:Name="InventoryGrid" ItemsSource="{Binding InventoryReport}" AutoGenerateColumns="False" IsReadOnly="True">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Item Description" Binding="{Binding ItemDescription}" Width="*"/>
-                            <DataGridTextColumn Header="Project" Binding="{Binding ProjectName}" Width="200"/>
-                            <DataGridTextColumn Header="Current Quantity" Binding="{Binding CurrentQuantity}" Width="150"/>
+                            <DataGridTextColumn Header="{DynamicResource Description}" Binding="{Binding ItemDescription}" Width="*"/>
+                            <DataGridTextColumn Header="{DynamicResource Project}" Binding="{Binding ProjectName}" Width="200"/>
+                            <DataGridTextColumn Header="{DynamicResource CurrentQty}" Binding="{Binding CurrentQuantity}" Width="150"/>
                         </DataGrid.Columns>
                     </DataGrid>
                     <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
-                        <Button Content="🖨️ Direct Print" Command="{Binding DirectPrintReportCommand}" CommandParameter="{Binding ElementName=InventoryGrid}"
-                                Padding="15,10" Background="#1B4F72" Margin="0,0,10,0"/>
-                        <Button Content="Print Preview" Command="{Binding PrintReportCommand}" CommandParameter="{Binding ElementName=InventoryGrid}"
+                        <Button Content="🖨️" Command="{Binding DirectPrintReportCommand}" CommandParameter="{Binding ElementName=InventoryGrid}"
+                                Padding="15,10" Background="#1B4F72" Margin="0,0,10,0" ToolTip="{DynamicResource DirectPrint}"/>
+                        <Button Content="{DynamicResource Print}" Command="{Binding PrintReportCommand}" CommandParameter="{Binding ElementName=InventoryGrid}"
                                 Padding="15,10" Background="#27AE60"/>
                     </StackPanel>
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Vendor Performance">
+            <TabItem Header="{DynamicResource VendorHistoryReport}">
                 <Grid Margin="15">
                     <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                     <DataGrid x:Name="VendorGrid" ItemsSource="{Binding VendorReport}" AutoGenerateColumns="False" IsReadOnly="True">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Vendor Name" Binding="{Binding VendorName}" Width="*"/>
-                            <DataGridTextColumn Header="Approved Orders" Binding="{Binding OrderCount}" Width="150"/>
-                            <DataGridTextColumn Header="Total Volume (USD)" Binding="{Binding TotalValue, StringFormat=N2}" Width="200"/>
+                            <DataGridTextColumn Header="{DynamicResource Vendor}" Binding="{Binding VendorName}" Width="*"/>
+                            <DataGridTextColumn Header="{DynamicResource OrderCount}" Binding="{Binding OrderCount}" Width="150"/>
+                            <DataGridTextColumn Binding="{Binding TotalValue, StringFormat=N2}" Width="200">
+                                <DataGridTextColumn.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{DynamicResource TotalValue}"/>
+                                        <TextBlock Text=" (USD)"/>
+                                    </StackPanel>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                     <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
-                        <Button Content="🖨️ Direct Print" Command="{Binding DirectPrintReportCommand}" CommandParameter="{Binding ElementName=VendorGrid}"
-                                Padding="15,10" Background="#1B4F72" Margin="0,0,10,0"/>
-                        <Button Content="Print Preview" Command="{Binding PrintReportCommand}" CommandParameter="{Binding ElementName=VendorGrid}"
+                        <Button Content="🖨️" Command="{Binding DirectPrintReportCommand}" CommandParameter="{Binding ElementName=VendorGrid}"
+                                Padding="15,10" Background="#1B4F72" Margin="0,0,10,0" ToolTip="{DynamicResource DirectPrint}"/>
+                        <Button Content="{DynamicResource Print}" Command="{Binding PrintReportCommand}" CommandParameter="{Binding ElementName=VendorGrid}"
                                 Padding="15,10" Background="#27AE60"/>
                     </StackPanel>
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Procurement Pipeline">
+            <TabItem Header="{DynamicResource ProcurementVolume}">
                 <Grid Margin="15">
                     <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                     <DataGrid x:Name="PipelineGrid" ItemsSource="{Binding PipelineReport}" AutoGenerateColumns="False" IsReadOnly="True">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Stage" Binding="{Binding Stage}" Width="*"/>
-                            <DataGridTextColumn Header="Document Count" Binding="{Binding Count}" Width="200"/>
+                            <DataGridTextColumn Header="{DynamicResource Stage}" Binding="{Binding Stage}" Width="*"/>
+                            <DataGridTextColumn Header="{DynamicResource OrderCount}" Binding="{Binding Count}" Width="200"/>
                         </DataGrid.Columns>
                     </DataGrid>
                     <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
-                        <Button Content="🖨️ Direct Print" Command="{Binding DirectPrintReportCommand}" CommandParameter="{Binding ElementName=PipelineGrid}"
-                                Padding="15,10" Background="#1B4F72" Margin="0,0,10,0"/>
-                        <Button Content="Print Preview" Command="{Binding PrintReportCommand}" CommandParameter="{Binding ElementName=PipelineGrid}"
+                        <Button Content="🖨️" Command="{Binding DirectPrintReportCommand}" CommandParameter="{Binding ElementName=PipelineGrid}"
+                                Padding="15,10" Background="#1B4F72" Margin="0,0,10,0" ToolTip="{DynamicResource DirectPrint}"/>
+                        <Button Content="{DynamicResource Print}" Command="{Binding PrintReportCommand}" CommandParameter="{Binding ElementName=PipelineGrid}"
                                 Padding="15,10" Background="#27AE60"/>
                     </StackPanel>
                 </Grid>

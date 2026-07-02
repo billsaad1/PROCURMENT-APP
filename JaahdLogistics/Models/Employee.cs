@@ -23,5 +23,8 @@ namespace JaahdLogistics.Models
         private byte[]? _signatureImage;
 
         public string DisplayName => $"{NameEN} / {NameAR}";
+
+        public string GetLocalizedName(string lang) => lang == "ar" ? NameAR : NameEN;
+        public string? GetLocalizedPosition(string lang) => lang == "ar" ? PositionAR : PositionEN;
     }
 }

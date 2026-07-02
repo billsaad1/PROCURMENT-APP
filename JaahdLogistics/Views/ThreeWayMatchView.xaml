@@ -68,18 +68,27 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Invoice Number:" VerticalAlignment="Center" Margin="5"/>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="5">
+                        <TextBlock Text="{DynamicResource InvoiceNo}"/>
+                        <TextBlock Text=":"/>
+                    </StackPanel>
                     <TextBox Grid.Column="1" Text="{Binding CurrentMatch.InvoiceNumber}" Margin="5"/>
-                    <Button Grid.Column="2" Content="Upload Scan" Command="{Binding UploadInvoiceScanCommand}" Margin="10,0,0,0"/>
+                    <Button Grid.Column="2" Content="{DynamicResource UploadSignature}" Command="{Binding UploadInvoiceScanCommand}" Margin="10,0,0,0"/>
                 </Grid>
 
                 <DataGrid Grid.Row="2" ItemsSource="{Binding CurrentMatch.Items}" AutoGenerateColumns="False" CanUserAddRows="False">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Item" Binding="{Binding Description}" Width="*" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="60" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="{DynamicResource ItemHeader}" Binding="{Binding Description}" Width="*" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="{DynamicResource Unit}" Binding="{Binding Unit}" Width="60" IsReadOnly="True"/>
                         
                         <!-- PO Columns -->
-                        <DataGridTextColumn Header="PO Price" Binding="{Binding POPrice, StringFormat=N2}" Width="80" IsReadOnly="True">
+                        <DataGridTextColumn Binding="{Binding POPrice, StringFormat=N2}" Width="80" IsReadOnly="True">
+                            <DataGridTextColumn.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{DynamicResource UnitPrice}"/>
+                                    <TextBlock Text=" (PO)"/>
+                                </StackPanel>
+                            </DataGridTextColumn.Header>
                             <DataGridTextColumn.CellStyle>
                                 <Style TargetType="DataGridCell">
                                     <Setter Property="Background" Value="#F0F8FF"/>
@@ -115,7 +124,7 @@
                         </DataGridTextColumn>
 
                         <!-- Diff -->
-                        <DataGridTextColumn Header="Diff?" Binding="{Binding DiffNote}" Width="50" IsReadOnly="True">
+                        <DataGridTextColumn Header="{DynamicResource Difference}" Binding="{Binding DiffNote}" Width="50" IsReadOnly="True">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -128,14 +137,14 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Header="Clarify Diff" Binding="{Binding ClarifyDiff}" Width="*"/>
+                        <DataGridTextColumn Header="{DynamicResource Clarify}" Binding="{Binding ClarifyDiff}" Width="*"/>
                     </DataGrid.Columns>
                 </DataGrid>
 
                 <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
-                    <Button Content="🖨️ Direct Print" Command="{Binding DirectPrintCommand}" Width="120" Height="35" Margin="0,0,10,0" Background="#1B4F72"/>
+                    <Button Content="🖨️" Command="{Binding DirectPrintCommand}" Width="50" Height="35" Margin="0,0,10,0" Background="#1B4F72" ToolTip="{DynamicResource DirectPrint}"/>
                     <Button Content="{DynamicResource Print}" Command="{Binding PrintCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
-                    <Button Content="Save Match" Command="{Binding SaveCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
+                    <Button Content="{DynamicResource Save}" Command="{Binding SaveCommand}" Width="120" Height="35" Margin="0,0,10,0"/>
                 </StackPanel>
             </Grid>
         </Grid>

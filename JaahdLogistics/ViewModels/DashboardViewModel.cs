@@ -65,6 +65,8 @@ namespace JaahdLogistics.ViewModels
             _ = RefreshDashboard();
         }
 
+        private string T(string key) => Application.Current.TryFindResource(key)?.ToString() ?? key;
+
         [RelayCommand]
         public async Task RefreshDashboard()
         {
@@ -150,11 +152,11 @@ namespace JaahdLogistics.ViewModels
                         foreach (var s in projectSummaries) ProjectSpending.Add(s);
 
                         PipelineDistribution.Clear();
-                        PipelineDistribution.Add(new PipelineSummary { Stage = "PR", Count = allPRs.Count, Color = "#3498DB" });
-                        PipelineDistribution.Add(new PipelineSummary { Stage = "RFQ", Count = allRFQs.Count, Color = "#9B59B6" });
-                        PipelineDistribution.Add(new PipelineSummary { Stage = "BA", Count = allBAs.Count, Color = "#F1C40F" });
-                        PipelineDistribution.Add(new PipelineSummary { Stage = "PO", Count = allPOs.Count, Color = "#27AE60" });
-                        PipelineDistribution.Add(new PipelineSummary { Stage = "GRN", Count = allGRNs.Count, Color = "#E67E22" });
+                        PipelineDistribution.Add(new PipelineSummary { Stage = T("PR"), Count = allPRs.Count, Color = "#3498DB" });
+                        PipelineDistribution.Add(new PipelineSummary { Stage = T("RFQ"), Count = allRFQs.Count, Color = "#9B59B6" });
+                        PipelineDistribution.Add(new PipelineSummary { Stage = T("BidAnalysis"), Count = allBAs.Count, Color = "#F1C40F" });
+                        PipelineDistribution.Add(new PipelineSummary { Stage = T("PO"), Count = allPOs.Count, Color = "#27AE60" });
+                        PipelineDistribution.Add(new PipelineSummary { Stage = T("GRN"), Count = allGRNs.Count, Color = "#E67E22" });
 
                         SpendingSeries = pieSeries;
                         Labels = labelsList;
@@ -162,7 +164,7 @@ namespace JaahdLogistics.ViewModels
                         {
                             new LineSeries
                             {
-                                Title = "Orders Issued",
+                                Title = T("OrdersIssued"),
                                 Values = trendValues,
                                 StrokeThickness = 3,
                                 PointGeometrySize = 10,
@@ -182,17 +184,17 @@ namespace JaahdLogistics.ViewModels
         private async Task SyncNow()
         {
             IsSyncing = true;
-            SyncStatus = "Syncing...";
+            SyncStatus = T("Syncing");
             try
             {
                 await _syncService.SyncWithCloud();
-                SyncStatus = $"Last sync: {System.DateTime.Now:HH:mm:ss}";
+                SyncStatus = $"{T("LastSync")}: {System.DateTime.Now:HH:mm:ss}";
                 await RefreshDashboard();
             }
             catch (System.Exception ex)
             {
-                SyncStatus = "Sync failed";
-                System.Windows.MessageBox.Show($"Sync error: {ex.Message}");
+                SyncStatus = T("SyncFailed");
+                System.Windows.MessageBox.Show($"{T("SyncFailed")}: {ex.Message}");
             }
             finally
             {

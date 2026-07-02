@@ -60,6 +60,36 @@ namespace JaahdLogistics.ViewModels
         {
             _languageService.SetLanguage(lang);
             CurrentFlowDirection = lang == "ar" ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
+
+            // Trigger refresh of current view if it supports it
+            if (CurrentViewModel != null)
+            {
+                // Force a reload of signatory info for the active view
+                if (CurrentViewModel is PurchaseRequisitionViewModel prVM)
+                {
+                    // Private methods in other ViewModels can't be called directly easily without exposure
+                    // but we can trigger a property change or a public Refresh
+                    var current = prVM.CurrentPR;
+                    prVM.CurrentPR = null!;
+                    prVM.CurrentPR = current;
+                }
+                else if (CurrentViewModel is ProcurementViewModel pVM)
+                {
+                    var ba = pVM.CurrentBidAnalysis;
+                    pVM.CurrentBidAnalysis = null!;
+                    pVM.CurrentBidAnalysis = ba;
+
+                    var po = pVM.CurrentPO;
+                    pVM.CurrentPO = null!;
+                    pVM.CurrentPO = po;
+                }
+                else if (CurrentViewModel is ThreeWayMatchViewModel twmVM)
+                {
+                    var m = twmVM.CurrentMatch;
+                    twmVM.CurrentMatch = null!;
+                    twmVM.CurrentMatch = m;
+                }
+            }
         }
 
         [RelayCommand]
