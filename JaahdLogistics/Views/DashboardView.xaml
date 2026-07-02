@@ -198,7 +198,10 @@
                                                 <TextBlock Text="{Binding PRNumber}" FontWeight="Bold"/>
                                                 <TextBlock Text="{Binding Status}" FontSize="10" Foreground="Orange"/>
                                             </StackPanel>
-                                            <TextBlock Grid.Column="1" Text="Review →" VerticalAlignment="Center" Foreground="#3498DB" Cursor="Hand" FontSize="11"/>
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="{DynamicResource Review}" Foreground="#3498DB" Cursor="Hand" FontSize="11"/>
+                                                <TextBlock Text=" →" Foreground="#3498DB" FontSize="11"/>
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>

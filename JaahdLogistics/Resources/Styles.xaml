@@ -134,7 +134,7 @@
                     <Image Source="{Binding Data.Settings.LogoImage, Source={StaticResource Proxy}, Converter={StaticResource ImageBytesConverter}}" Height="60" Width="60" Stretch="Uniform"/>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
                         <TextBlock Text="{Binding Data.Settings.AssociationName, Source={StaticResource Proxy}}" FontSize="18" FontWeight="Bold" TextDecorations="Underline"/>
-                        <TextBlock Text="{DynamicResource LogisticManager}" FontSize="14" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{DynamicResource LogisticsDepartment}" FontSize="14" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
 
@@ -1309,7 +1309,7 @@
                     <Image Source="{Binding Settings.LogoImage, Converter={StaticResource ImageBytesConverter}}" Height="60" Width="60" Stretch="Uniform"/>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
                         <TextBlock Text="{DynamicResource GRN}" FontSize="18" FontWeight="Bold" Foreground="{StaticResource JaahdBlueBrush}" HorizontalAlignment="Center"/>
-                        <TextBlock Text="{DynamicResource LogisticManager}" FontSize="12" Foreground="{StaticResource JaahdBlueBrush}" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{DynamicResource LogisticsDepartment}" FontSize="12" Foreground="{StaticResource JaahdBlueBrush}" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
 

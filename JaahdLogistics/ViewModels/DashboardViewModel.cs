@@ -152,11 +152,11 @@ namespace JaahdLogistics.ViewModels
                         foreach (var s in projectSummaries) ProjectSpending.Add(s);
 
                         PipelineDistribution.Clear();
-                        PipelineDistribution.Add(new PipelineSummary { Stage = T("PR"), Count = allPRs.Count, Color = "#3498DB" });
-                        PipelineDistribution.Add(new PipelineSummary { Stage = T("RFQ"), Count = allRFQs.Count, Color = "#9B59B6" });
-                        PipelineDistribution.Add(new PipelineSummary { Stage = T("BidAnalysis"), Count = allBAs.Count, Color = "#F1C40F" });
-                        PipelineDistribution.Add(new PipelineSummary { Stage = T("PO"), Count = allPOs.Count, Color = "#27AE60" });
-                        PipelineDistribution.Add(new PipelineSummary { Stage = T("GRN"), Count = allGRNs.Count, Color = "#E67E22" });
+                        PipelineDistribution.Add(new PipelineSummary { Stage = "PR", Count = allPRs.Count, Color = "#3498DB" });
+                        PipelineDistribution.Add(new PipelineSummary { Stage = "RFQ", Count = allRFQs.Count, Color = "#9B59B6" });
+                        PipelineDistribution.Add(new PipelineSummary { Stage = "BA", Count = allBAs.Count, Color = "#F1C40F" });
+                        PipelineDistribution.Add(new PipelineSummary { Stage = "PO", Count = allPOs.Count, Color = "#27AE60" });
+                        PipelineDistribution.Add(new PipelineSummary { Stage = "GRN", Count = allGRNs.Count, Color = "#E67E22" });
 
                         SpendingSeries = pieSeries;
                         Labels = labelsList;

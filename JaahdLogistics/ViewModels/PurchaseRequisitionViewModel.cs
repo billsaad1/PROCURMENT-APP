@@ -18,12 +18,6 @@ namespace JaahdLogistics.ViewModels
         private PurchaseRequisition _currentPR = new();
 
         [ObservableProperty]
-        private bool _isAddTypePopupOpen;
-
-        [ObservableProperty]
-        private string _newTypeName = "";
-
-        [ObservableProperty]
         private ObservableCollection<PurchaseRequisition> _purchaseRequisitions = new();
 
         [ObservableProperty]
@@ -375,22 +369,15 @@ namespace JaahdLogistics.ViewModels
         [RelayCommand]
         private void AddCustomType()
         {
-            IsAddTypePopupOpen = true;
-        }
-
-        [RelayCommand]
-        private void ConfirmAddType()
-        {
-            if (!string.IsNullOrWhiteSpace(NewTypeName))
+            var newType = Microsoft.VisualBasic.Interaction.InputBox("Enter Custom PR Type:", "Add Type", "");
+            if (!string.IsNullOrWhiteSpace(newType))
             {
-                if (!PRTypes.Contains(NewTypeName))
+                if (!PRTypes.Contains(newType))
                 {
-                    PRTypes.Add(NewTypeName);
+                    PRTypes.Add(newType);
                 }
-                CurrentPR.PRType = NewTypeName;
-                NewTypeName = "";
+                CurrentPR.PRType = newType;
             }
-            IsAddTypePopupOpen = false;
         }
 
         [RelayCommand]

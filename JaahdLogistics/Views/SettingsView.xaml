@@ -119,6 +119,13 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="{DynamicResource Username}" Binding="{Binding Username}" Width="100"/>
                             <DataGridTextColumn Header="{DynamicResource Name}" Binding="{Binding FullName}" Width="*"/>
+                            <DataGridTextColumn Header="{DynamicResource Password}" Binding="{Binding PasswordHash}" Width="100">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="*******"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
                             <DataGridTemplateColumn Header="{DynamicResource Position}" Width="150">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>

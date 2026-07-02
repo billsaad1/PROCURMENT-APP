@@ -5,11 +5,9 @@
     <s:String x:Key="Username">اسم المستخدم</s:String>
     <s:String x:Key="Password">كلمة المرور</s:String>
     <s:String x:Key="PR">طلب شراء</s:String>
-    <s:String x:Key="Stage">المرحلة</s:String>
     <s:String x:Key="RFQ">طلب عروض أسعار</s:String>
     <s:String x:Key="PO">أمر شراء</s:String>
     <s:String x:Key="Project">المشروع</s:String>
-    <s:String x:Key="PRType">نوع الطلب</s:String>
     <s:String x:Key="Budget">الميزانية</s:String>
     <s:String x:Key="Settings">الإعدادات</s:String>
     <s:String x:Key="FlowDirection">RightToLeft</s:String>
@@ -31,8 +29,8 @@
     <s:String x:Key="UnitPrice">سعر الوحدة</s:String>
     <s:String x:Key="Total">الإجمالي</s:String>
     <s:String x:Key="AddItem">إضافة صنف</s:String>
-    <s:String x:Key="AddCustomType">إضافة نوع مخصص</s:String>
     <s:String x:Key="Save">حفظ</s:String>
+    <s:String x:Key="Review">مراجعة</s:String>
     <s:String x:Key="Print">طباعة</s:String>
     <s:String x:Key="Approve">اعتماد</s:String>
     <s:String x:Key="BidAnalysis">تحليل العروض</s:String>
@@ -98,6 +96,7 @@
     <s:String x:Key="ApprovedBy">تم الاعتماد بواسطة</s:String>
     <s:String x:Key="Position">المنصب</s:String>
     <s:String x:Key="LogisticManager">مدير الخدمات اللوجستية</s:String>
+    <s:String x:Key="LogisticsDepartment">إدارة الخدمات اللوجستية</s:String>
     <s:String x:Key="FinanceManager">المدير المالي</s:String>
     <s:String x:Key="ProjectManager">مدير المشروع</s:String>
     <s:String x:Key="Signature">التوقيع</s:String>
