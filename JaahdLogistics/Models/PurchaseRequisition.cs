@@ -30,6 +30,9 @@ namespace JaahdLogistics.Models
         private decimal _exchangeRate = 1.0m;
         public decimal ExchangeRate { get => _exchangeRate; set => SetProperty(ref _exchangeRate, value); }
 
+        private string? _prType = "Services";
+        public string? PRType { get => _prType; set => SetProperty(ref _prType, value); }
+
         private string _status = "Pending";
         public string Status { get => _status; set => SetProperty(ref _status, value); }
         
@@ -62,6 +65,35 @@ namespace JaahdLogistics.Models
 
         private string? _finalName;
         public string? FinalName { get => _finalName; set => SetProperty(ref _finalName, value); }
+
+        private string? _logisticsTitle = "Logistics Manager";
+        public string? LogisticsTitle { get => _logisticsTitle; set => SetProperty(ref _logisticsTitle, value); }
+
+        private string? _financeTitle = "Finance Manager";
+        public string? FinanceTitle { get => _financeTitle; set => SetProperty(ref _financeTitle, value); }
+
+        private string? _pmTitle = "Project Manager";
+        public string? PMTitle { get => _pmTitle; set => SetProperty(ref _pmTitle, value); }
+
+        private string? _finalTitle = "Head of Association";
+        public string? FinalTitle { get => _finalTitle; set => SetProperty(ref _finalTitle, value); }
+
+        private int? _requesterEmployeeId;
+        public int? RequesterEmployeeId { get => _requesterEmployeeId; set => SetProperty(ref _requesterEmployeeId, value); }
+
+        private string? _requesterTitle = "Project Officer";
+        public string? RequesterTitle { get => _requesterTitle; set => SetProperty(ref _requesterTitle, value); }
+
+        private int? _logisticsEmployeeId;
+        public int? LogisticsEmployeeId { get => _logisticsEmployeeId; set => SetProperty(ref _logisticsEmployeeId, value); }
+
+        private int? _financeEmployeeId;
+        public int? FinanceEmployeeId { get => _financeEmployeeId; set => SetProperty(ref _financeEmployeeId, value); }
+
+        private int? _headEmployeeId;
+        public int? HeadEmployeeId { get => _headEmployeeId; set => SetProperty(ref _headEmployeeId, value); }
+
+        public Project? Project { get; set; }
 
         public ObservableCollection<PRItem> Items { get; set; } = new();
 

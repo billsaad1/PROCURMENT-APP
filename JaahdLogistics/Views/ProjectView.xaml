@@ -17,7 +17,7 @@
             <TextBlock Text="{DynamicResource Projects}" DockPanel.Dock="Top" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
             <UniformGrid DockPanel.Dock="Bottom" Columns="2" Margin="0,10,0,0">
                 <Button Content="{DynamicResource AddProject}" Command="{Binding AddProjectCommand}" Margin="0,0,5,0"/>
-                <Button Content="Delete Project" Command="{Binding DeleteProjectCommand}" Background="#C0392B"/>
+                <Button Content="{DynamicResource Delete}" Command="{Binding DeleteProjectCommand}" Background="#C0392B"/>
             </UniformGrid>
             <ListBox ItemsSource="{Binding Projects}" SelectedItem="{Binding SelectedProject}">
                 <ListBox.ItemTemplate>
@@ -43,6 +43,8 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     
                     <TextBlock Text="{DynamicResource Name}" Margin="5"/>
@@ -53,6 +55,12 @@
                     
                     <TextBlock Grid.Row="2" Text="{DynamicResource Year}" Margin="5"/>
                     <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SelectedProject.Year, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+
+                    <TextBlock Grid.Row="3" Text="{DynamicResource ProjectManager}" Margin="5"/>
+                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding SelectedProject.ProjectManager, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+
+                    <TextBlock Grid.Row="4" Text="Project Officer" Margin="5"/>
+                    <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding SelectedProject.ProjectOfficer, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
                 </Grid>
             </StackPanel>
 
@@ -70,8 +78,8 @@
                     <DataGridTextColumn Header="{DynamicResource Quantity}" Binding="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" Width="Auto"/>
                     <DataGridTextColumn Header="{DynamicResource UnitPrice}" Binding="{Binding UnitPrice, UpdateSourceTrigger=PropertyChanged}" Width="Auto"/>
                     <DataGridTextColumn Header="{DynamicResource Amount}" Binding="{Binding TotalAmount, Mode=OneWay}" IsReadOnly="True" Width="Auto"/>
-                    <DataGridTextColumn Header="Spent" Binding="{Binding Spent, Mode=OneWay, StringFormat=N2}" IsReadOnly="True" Width="Auto"/>
-                    <DataGridTextColumn Header="Remaining" Binding="{Binding Remaining, Mode=OneWay, StringFormat=N2}" IsReadOnly="True" Width="Auto"/>
+                    <DataGridTextColumn Header="{DynamicResource TotalSpending}" Binding="{Binding Spent, Mode=OneWay, StringFormat=N2}" IsReadOnly="True" Width="Auto"/>
+                    <DataGridTextColumn Header="{DynamicResource Budget}" Binding="{Binding Remaining, Mode=OneWay, StringFormat=N2}" IsReadOnly="True" Width="Auto"/>
                     <DataGridComboBoxColumn Header="{DynamicResource Currency}" SelectedItemBinding="{Binding Currency}" Width="Auto">
                         <DataGridComboBoxColumn.ElementStyle>
                             <Style TargetType="ComboBox">
@@ -101,7 +109,7 @@
                     <DataGridTemplateColumn Width="Auto">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Content="Delete" Command="{Binding DataContext.DeleteBudgetLineCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                <Button Content="{DynamicResource Delete}" Command="{Binding DataContext.DeleteBudgetLineCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                         CommandParameter="{Binding}" Background="#C0392B" Padding="5,2"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>

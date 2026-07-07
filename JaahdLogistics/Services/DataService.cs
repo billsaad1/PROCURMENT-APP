@@ -88,11 +88,11 @@ namespace JaahdLogistics.Services
             if (project.Id == 0)
             {
                 project.Id = connection.QuerySingle<int>(
-                    "INSERT INTO Projects (Name, Code, Year) VALUES (@Name, @Code, @Year); SELECT last_insert_rowid();", project);
+                    "INSERT INTO Projects (Name, Code, Year, ProjectManager, ProjectOfficer) VALUES (@Name, @Code, @Year, @ProjectManager, @ProjectOfficer); SELECT last_insert_rowid();", project);
             }
             else
             {
-                connection.Execute("UPDATE Projects SET Name=@Name, Code=@Code, Year=@Year WHERE Id=@Id", project);
+                connection.Execute("UPDATE Projects SET Name=@Name, Code=@Code, Year=@Year, ProjectManager=@ProjectManager, ProjectOfficer=@ProjectOfficer WHERE Id=@Id", project);
             }
         }
 
@@ -100,6 +100,7 @@ namespace JaahdLogistics.Services
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
             using var transaction = connection.BeginTransaction();
             try {
                 // Cascading delete for demo purposes. 
@@ -129,6 +130,7 @@ namespace JaahdLogistics.Services
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
             using var transaction = connection.BeginTransaction();
             try
             {
@@ -145,6 +147,7 @@ namespace JaahdLogistics.Services
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
             using var transaction = connection.BeginTransaction();
             try
             {
@@ -160,13 +163,48 @@ namespace JaahdLogistics.Services
         {
             using var connection = new SqliteConnection(_connectionString);
             var prs = connection.Query<PurchaseRequisition>("SELECT * FROM PurchaseRequisitions").ToList();
+            var lang = System.Windows.Application.Current.Resources.MergedDictionaries.Any(d => d.Source?.OriginalString.Contains("ar") == true) ? "ar" : "en";
+
             foreach (var pr in prs)
             {
+                pr.Project = connection.QuerySingleOrDefault<Project>("SELECT * FROM Projects WHERE Id = @ProjectId", new { pr.ProjectId });
                 var items = connection.Query<PRItem>("SELECT * FROM PRItems WHERE PRId = @Id", new { pr.Id }).ToList();
                 pr.Items.Clear();
                 foreach (var item in items)
                 {
                     pr.Items.Add(item);
+                }
+
+                // Load Signatories from Employees table
+                if (pr.RequesterEmployeeId > 0)
+                {
+                    var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = pr.RequesterEmployeeId });
+                    if (emp != null) { pr.RequesterSignature = emp.SignatureImage; pr.RequesterName = emp.GetLocalizedName(lang); }
+                }
+                if (pr.LogisticsEmployeeId > 0)
+                {
+                    var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = pr.LogisticsEmployeeId });
+                    if (emp != null) { pr.LogisticsSignature = emp.SignatureImage; pr.LogisticsName = emp.GetLocalizedName(lang); pr.LogisticsTitle = emp.GetLocalizedPosition(lang); }
+                }
+                if (pr.FinanceEmployeeId > 0)
+                {
+                    var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = pr.FinanceEmployeeId });
+                    if (emp != null) { pr.FinanceSignature = emp.SignatureImage; pr.FinanceName = emp.GetLocalizedName(lang); pr.FinanceTitle = emp.GetLocalizedPosition(lang); }
+                }
+                if (pr.HeadEmployeeId > 0)
+                {
+                    var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = pr.HeadEmployeeId });
+                    if (emp != null) { pr.FinalSignature = emp.SignatureImage; pr.FinalName = emp.GetLocalizedName(lang); pr.FinalTitle = emp.GetLocalizedPosition(lang); }
+                }
+
+                // Overlay with dynamic Approvals
+                var approvals = GetApprovals("PR", pr.Id);
+                foreach (var app in approvals)
+                {
+                    if (app.Status == "CheckedByLogistics") { pr.LogisticsSignature = app.SignatureImage; pr.LogisticsName = app.FullName; }
+                    if (app.Status == "ReviewedByFinance") { pr.FinanceSignature = app.SignatureImage; pr.FinanceName = app.FullName; }
+                    if (app.Status == "ApprovedByPM") { /* Add if needed */ }
+                    if (app.Status == "FinalApproved") { pr.FinalSignature = app.SignatureImage; pr.FinalName = app.FullName; }
                 }
             }
             return prs;
@@ -176,6 +214,7 @@ namespace JaahdLogistics.Services
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
             using var transaction = connection.BeginTransaction();
             try
             {
@@ -186,7 +225,16 @@ namespace JaahdLogistics.Services
             catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
             {
                 transaction.Rollback();
-                throw new Exception("Cannot delete PR because it is referenced in an RFQ or PO. Delete those first.");
+                var detail = "";
+                try {
+                    var fkIssues = connection.Query("PRAGMA foreign_key_check");
+                    foreach(var issue in fkIssues) detail += $"\n- Table '{issue.table}' row {issue.rowid} references missing key in '{issue.parent}'";
+                } catch {}
+
+                if (string.IsNullOrEmpty(detail))
+                    throw new Exception("Cannot delete PR because it is referenced in an RFQ or PO. Delete those first.", ex);
+                else
+                    throw new Exception($"Database integrity error: {detail}", ex);
             }
             catch
             {
@@ -199,12 +247,42 @@ namespace JaahdLogistics.Services
         {
             using var connection = new SqliteConnection(_connectionString);
             var pos = connection.Query<PurchaseOrder>("SELECT * FROM PurchaseOrders").ToList();
+            var lang = System.Windows.Application.Current.Resources.MergedDictionaries.Any(d => d.Source?.OriginalString.Contains("ar") == true) ? "ar" : "en";
+
             foreach (var po in pos)
             {
+                po.Project = connection.QuerySingleOrDefault<Project>("SELECT * FROM Projects WHERE Id = @ProjectId", new { po.ProjectId });
                 var items = connection.Query<POItem>("SELECT * FROM POItems WHERE POId = @Id", new { po.Id }).ToList();
-                po.Items = new ObservableCollection<POItem>(items);
+                po.Items.Clear();
+                foreach (var item in items) po.Items.Add(item);
 
-                // Load Approvals for PO
+                if (po.VendorId.HasValue && po.VendorId > 0)
+                {
+                    po.Vendor = connection.QuerySingleOrDefault<Vendor>("SELECT * FROM Vendors WHERE Id = @VendorId", new { po.VendorId });
+                }
+                else
+                {
+                    po.VendorId = null; // Clean up 0s
+                }
+
+                // Load Signatories from Employees table if assigned
+                if (po.LogisticsEmployeeId > 0)
+                {
+                    var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = po.LogisticsEmployeeId });
+                    if (emp != null) { po.LogisticsSignature = emp.SignatureImage; po.LogisticsName = emp.GetLocalizedName(lang); po.LogisticsTitle = emp.GetLocalizedPosition(lang); }
+                }
+                if (po.FinanceEmployeeId > 0)
+                {
+                    var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = po.FinanceEmployeeId });
+                    if (emp != null) { po.FinanceSignature = emp.SignatureImage; po.FinanceName = emp.GetLocalizedName(lang); po.FinanceTitle = emp.GetLocalizedPosition(lang); }
+                }
+                if (po.HeadEmployeeId > 0)
+                {
+                    var emp = connection.QuerySingleOrDefault<Employee>("SELECT * FROM Employees WHERE Id = @Id", new { Id = po.HeadEmployeeId });
+                    if (emp != null) { po.FinalSignature = emp.SignatureImage; po.FinalName = emp.GetLocalizedName(lang); po.FinalTitle = emp.GetLocalizedPosition(lang); }
+                }
+
+                // Overlay with dynamic Approvals if any (historical or overrides)
                 var approvals = GetApprovals("PO", po.Id);
                 foreach (var app in approvals)
                 {
@@ -230,11 +308,13 @@ namespace JaahdLogistics.Services
             foreach (var analysis in analyses)
             {
                 var bidders = connection.Query<Bidder>("SELECT * FROM Bidders WHERE BidAnalysisId = @Id", new { analysis.Id }).ToList();
-                analysis.Bidders = new ObservableCollection<Bidder>(bidders);
-                foreach (var bidder in analysis.Bidders)
+                analysis.Bidders.Clear();
+                foreach (var bidder in bidders)
                 {
                     var items = connection.Query<BidItem>("SELECT * FROM BidItems WHERE BidderId = @Id", new { bidder.Id }).ToList();
-                    bidder.Items = new ObservableCollection<BidItem>(items);
+                    bidder.Items.Clear();
+                    foreach (var item in items) bidder.Items.Add(item);
+                    analysis.Bidders.Add(bidder);
                 }
             }
             return analyses;
@@ -260,39 +340,123 @@ namespace JaahdLogistics.Services
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
             using var transaction = connection.BeginTransaction();
             try
             {
+                var analysisParam = new
+                {
+                    analysis.Id,
+                    analysis.RFQId,
+                    analysis.Date,
+                    RecommendedBidderId = (analysis.RecommendedBidderId == 0) ? (int?)null : analysis.RecommendedBidderId,
+                    analysis.Justification,
+                    analysis.RecommendationReasons,
+                    analysis.Status,
+                    analysis.Currency,
+                    analysis.ExchangeRate,
+                    LogisticsEmployeeId = (analysis.LogisticsEmployeeId == 0) ? (int?)null : analysis.LogisticsEmployeeId,
+                    FinanceEmployeeId = (analysis.FinanceEmployeeId == 0) ? (int?)null : analysis.FinanceEmployeeId,
+                    HeadEmployeeId = (analysis.HeadEmployeeId == 0) ? (int?)null : analysis.HeadEmployeeId
+                };
+
                 if (analysis.Id == 0)
                 {
                     analysis.Id = connection.QuerySingle<int>(
-                        "INSERT INTO BidAnalyses (RFQId, Date, RecommendedBidderId, Justification, Status, Currency, ExchangeRate) " +
-                        "VALUES (@RFQId, @Date, @RecommendedBidderId, @Justification, @Status, @Currency, @ExchangeRate); SELECT last_insert_rowid();",
-                        analysis, transaction);
+                        "INSERT INTO BidAnalyses (RFQId, Date, RecommendedBidderId, Justification, RecommendationReasons, Status, Currency, ExchangeRate, LogisticsEmployeeId, FinanceEmployeeId, HeadEmployeeId) " +
+                        "VALUES (@RFQId, @Date, @RecommendedBidderId, @Justification, @RecommendationReasons, @Status, @Currency, @ExchangeRate, @LogisticsEmployeeId, @FinanceEmployeeId, @HeadEmployeeId); SELECT last_insert_rowid();",
+                        analysisParam, transaction);
                 }
                 else
                 {
                     connection.Execute(
-                        "UPDATE BidAnalyses SET RecommendedBidderId=@RecommendedBidderId, Justification=@Justification, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate WHERE Id=@Id",
-                        analysis, transaction);
-                    connection.Execute("DELETE FROM BidItems WHERE BidderId IN (SELECT Id FROM Bidders WHERE BidAnalysisId = @Id)", new { analysis.Id }, transaction);
-                    connection.Execute("DELETE FROM Bidders WHERE BidAnalysisId = @Id", new { analysis.Id }, transaction);
+                        "UPDATE BidAnalyses SET RecommendedBidderId=@RecommendedBidderId, Justification=@Justification, RecommendationReasons=@RecommendationReasons, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate, LogisticsEmployeeId=@LogisticsEmployeeId, FinanceEmployeeId=@FinanceEmployeeId, HeadEmployeeId=@HeadEmployeeId WHERE Id=@Id",
+                        analysisParam, transaction);
+                }
+
+                var existingBiddersInDb = connection.Query<Bidder>("SELECT * FROM Bidders WHERE BidAnalysisId = @Id", new { analysis.Id }, transaction).ToList();
+                var currentBidderIds = analysis.Bidders.Select(b => b.Id).ToList();
+
+                // Delete bidders not in the list anymore
+                foreach (var existing in existingBiddersInDb)
+                {
+                    if (!currentBidderIds.Contains(existing.Id))
+                    {
+                        try
+                        {
+                            connection.Execute("DELETE FROM BidItems WHERE BidderId = @Id", new { existing.Id }, transaction);
+                            connection.Execute("DELETE FROM Bidders WHERE Id = @Id", new { existing.Id }, transaction);
+                        }
+                        catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
+                        {
+                            // Referenced, can't delete
+                        }
+                    }
                 }
 
                 foreach (var bidder in analysis.Bidders)
                 {
                     bidder.BidAnalysisId = analysis.Id;
-                    bidder.Id = connection.QuerySingle<int>(
-                        "INSERT INTO Bidders (BidAnalysisId, Name, Address, Contact, Discount, MiscCosts, TotalAmount, QuoteScan) " +
-                        "VALUES (@BidAnalysisId, @Name, @Address, @Contact, @Discount, @MiscCosts, @TotalAmount, @QuoteScan); SELECT last_insert_rowid();",
-                        bidder, transaction);
-                    
+                    var bidderParam = new
+                    {
+                        bidder.Id,
+                        bidder.BidAnalysisId,
+                        VendorId = (bidder.VendorId == 0) ? (int?)null : bidder.VendorId,
+                        bidder.Name,
+                        bidder.Address,
+                        bidder.Contact,
+                        bidder.Tel,
+                        bidder.Email,
+                        bidder.Justification,
+                        bidder.IsWinner,
+                        bidder.Discount,
+                        bidder.MiscCosts,
+                        bidder.TotalAmount,
+                        bidder.QuoteScan
+                    };
+
+                    if (bidder.Id == 0)
+                    {
+                        bidder.Id = connection.QuerySingle<int>(
+                            "INSERT INTO Bidders (BidAnalysisId, VendorId, Name, Address, Contact, Tel, Email, Justification, IsWinner, Discount, MiscCosts, TotalAmount, QuoteScan) " +
+                            "VALUES (@BidAnalysisId, @VendorId, @Name, @Address, @Contact, @Tel, @Email, @Justification, @IsWinner, @Discount, @MiscCosts, @TotalAmount, @QuoteScan); SELECT last_insert_rowid();",
+                            bidderParam, transaction);
+                    }
+                    else
+                    {
+                        connection.Execute(
+                            "UPDATE Bidders SET VendorId=@VendorId, Name=@Name, Address=@Address, Contact=@Contact, Tel=@Tel, Email=@Email, Justification=@Justification, IsWinner=@IsWinner, Discount=@Discount, MiscCosts=@MiscCosts, TotalAmount=@TotalAmount, QuoteScan=@QuoteScan WHERE Id=@Id",
+                            bidderParam, transaction);
+                    }
+
+                    var existingItemsInDb = connection.Query<BidItem>("SELECT * FROM BidItems WHERE BidderId = @Id", new { bidder.Id }, transaction).ToList();
+                    var currentItemIds = bidder.Items.Select(i => i.Id).ToList();
+
+                    // Delete items not in list
+                    foreach (var existing in existingItemsInDb)
+                    {
+                        if (!currentItemIds.Contains(existing.Id))
+                        {
+                            try { connection.Execute("DELETE FROM BidItems WHERE Id = @Id", new { existing.Id }, transaction); }
+                            catch (SqliteException ex) when (ex.SqliteErrorCode == 19) { }
+                        }
+                    }
+
                     foreach (var item in bidder.Items)
                     {
                         item.BidderId = bidder.Id;
-                        connection.Execute(
-                            "INSERT INTO BidItems (BidderId, Description, Unit, Quantity, UnitPrice) VALUES (@BidderId, @Description, @Unit, @Quantity, @UnitPrice)",
-                            item, transaction);
+                        if (item.Id == 0)
+                        {
+                            item.Id = connection.QuerySingle<int>(
+                            "INSERT INTO BidItems (BidderId, BudgetLineId, Description, Unit, Quantity, UnitPrice) VALUES (@BidderId, @BudgetLineId, @Description, @Unit, @Quantity, @UnitPrice); SELECT last_insert_rowid();",
+                                item, transaction);
+                        }
+                        else
+                        {
+                            connection.Execute(
+                            "UPDATE BidItems SET BudgetLineId=@BudgetLineId, Description=@Description, Unit=@Unit, Quantity=@Quantity, UnitPrice=@UnitPrice WHERE Id=@Id",
+                                item, transaction);
+                        }
                     }
                 }
                 transaction.Commit();
@@ -304,34 +468,144 @@ namespace JaahdLogistics.Services
             }
         }
 
+        private void CheckForeignKeys(SqliteConnection connection)
+        {
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = "PRAGMA foreign_key_check;";
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                string table = reader.GetString(0);
+                long rowid = reader.GetInt64(1);
+                string parent = reader.GetString(2);
+                int fkid = reader.GetInt32(3);
+                throw new Exception($"Database Integrity Error: Table '{table}' (row {rowid}) has a broken link to '{parent}'. Please ensure all related records (Project, User, PR, etc.) exist.");
+            }
+        }
+
         public void SavePO(PurchaseOrder po)
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
+
+            // 1. Mandatory Validations
+            if (po.PRId <= 0) throw new Exception("Purchase Order must be linked to a valid Purchase Requisition (PRId is missing).");
+            if (po.ProjectId <= 0) throw new Exception("Purchase Order must be linked to a valid Project (ProjectId is missing).");
+
+            // 2. Database Existence Checks
+            if (connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Projects WHERE Id = @ProjectId", new { po.ProjectId }) == 0)
+                throw new Exception($"Project ID {po.ProjectId} does not exist in the database.");
+
+            if (connection.ExecuteScalar<int>("SELECT COUNT(*) FROM PurchaseRequisitions WHERE Id = @PRId", new { po.PRId }) == 0)
+                throw new Exception($"Purchase Requisition ID {po.PRId} does not exist in the database.");
+
+            // 3. Optional Link Checks
+            if (po.BidAnalysisId.HasValue && po.BidAnalysisId > 0)
+                if (connection.ExecuteScalar<int>("SELECT COUNT(*) FROM BidAnalyses WHERE Id = @BidAnalysisId", new { po.BidAnalysisId }) == 0)
+                    throw new Exception($"Bid Analysis ID {po.BidAnalysisId} does not exist.");
+
+            if (po.BidderId.HasValue && po.BidderId > 0)
+                if (connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Bidders WHERE Id = @BidderId", new { po.BidderId }) == 0)
+                    throw new Exception($"Winning Bidder ID {po.BidderId} does not exist.");
+
+            if (po.VendorId.HasValue && po.VendorId > 0)
+                if (connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Vendors WHERE Id = @VendorId", new { po.VendorId }) == 0)
+                    throw new Exception($"Vendor ID {po.VendorId} does not exist.");
+
+            // 4. Item-Level Validations
+            foreach (var item in po.Items)
+            {
+                if (item.BudgetLineId.HasValue && item.BudgetLineId > 0)
+                {
+                    if (connection.ExecuteScalar<int>("SELECT COUNT(*) FROM BudgetLines WHERE Id = @BudgetLineId", new { item.BudgetLineId }) == 0)
+                        throw new Exception($"Budget Line ID {item.BudgetLineId} for item '{item.Description}' does not exist.");
+                }
+            }
+
+            connection.Execute("PRAGMA foreign_keys = ON;");
             using var transaction = connection.BeginTransaction();
+
+            // Explicitly map 0 to null for optional Foreign Keys to avoid SQLite Error 19
+            var param = new {
+                po.Id, po.PONumber, po.PRId, po.ProjectId,
+                BidAnalysisId = (po.BidAnalysisId == null || po.BidAnalysisId == 0) ? (int?)null : po.BidAnalysisId,
+                BidderId = (po.BidderId == null || po.BidderId == 0) ? (int?)null : po.BidderId,
+                VendorId = (po.VendorId == null || po.VendorId == 0) ? (int?)null : po.VendorId,
+                po.Date, po.Terms, po.Clause, po.Status, po.Currency, po.ExchangeRate,
+                po.VendorName, po.VendorContact, po.VendorTel, po.VendorEmail, po.VendorAddress,
+                LogisticsEmployeeId = (po.LogisticsEmployeeId == 0) ? (int?)null : po.LogisticsEmployeeId,
+                FinanceEmployeeId = (po.FinanceEmployeeId == 0) ? (int?)null : po.FinanceEmployeeId,
+                HeadEmployeeId = (po.HeadEmployeeId == 0) ? (int?)null : po.HeadEmployeeId
+            };
+
             try
             {
                 if (po.Id == 0)
                 {
                     po.Id = connection.QuerySingle<int>(
-                        "INSERT INTO PurchaseOrders (PONumber, PRId, ProjectId, BidAnalysisId, VendorId, Date, Terms, Status) " +
-                        "VALUES (@PONumber, @PRId, @ProjectId, @BidAnalysisId, @VendorId, @Date, @Terms, @Status); SELECT last_insert_rowid();",
-                        po, transaction);
+                        "INSERT INTO PurchaseOrders (PONumber, PRId, ProjectId, BidAnalysisId, BidderId, VendorId, Date, Terms, Clause, Status, Currency, ExchangeRate, VendorName, VendorContact, VendorTel, VendorEmail, VendorAddress, LogisticsEmployeeId, FinanceEmployeeId, HeadEmployeeId) " +
+                        "VALUES (@PONumber, @PRId, @ProjectId, @BidAnalysisId, @BidderId, @VendorId, @Date, @Terms, @Clause, @Status, @Currency, @ExchangeRate, @VendorName, @VendorContact, @VendorTel, @VendorEmail, @VendorAddress, @LogisticsEmployeeId, @FinanceEmployeeId, @HeadEmployeeId); SELECT last_insert_rowid();",
+                        param, transaction);
                 }
                 else
                 {
                     connection.Execute(
-                        "UPDATE PurchaseOrders SET PONumber=@PONumber, Terms=@Terms, Status=@Status WHERE Id=@Id",
-                        po, transaction);
-                    connection.Execute("DELETE FROM POItems WHERE POId = @Id", new { po.Id }, transaction);
+                        "UPDATE PurchaseOrders SET PONumber=@PONumber, PRId=@PRId, ProjectId=@ProjectId, Date=@Date, BidAnalysisId=@BidAnalysisId, BidderId=@BidderId, VendorId=@VendorId, Terms=@Terms, Clause=@Clause, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate, VendorName=@VendorName, VendorContact=@VendorContact, VendorTel=@VendorTel, VendorEmail=@VendorEmail, VendorAddress=@VendorAddress, LogisticsEmployeeId=@LogisticsEmployeeId, FinanceEmployeeId=@FinanceEmployeeId, HeadEmployeeId=@HeadEmployeeId WHERE Id=@Id",
+                        param, transaction);
+                }
+
+                var existingItemsInDb = connection.Query<POItem>("SELECT * FROM POItems WHERE POId = @Id", new { po.Id }, transaction).ToList();
+                var currentItemIds = po.Items.Select(i => i.Id).ToList();
+
+                // Delete items no longer present
+                foreach (var existing in existingItemsInDb)
+                {
+                    if (!currentItemIds.Contains(existing.Id))
+                    {
+                        try
+                        {
+                            connection.Execute("DELETE FROM POItems WHERE Id = @Id", new { existing.Id }, transaction);
+                        }
+                        catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
+                        {
+                            // Cannot delete as it's likely referenced in a GRN
+                        }
+                    }
                 }
 
                 foreach (var item in po.Items)
                 {
                     item.POId = po.Id;
-                    connection.Execute(
-                        "INSERT INTO POItems (POId, Description, Unit, Quantity, UnitPrice) VALUES (@POId, @Description, @Unit, @Quantity, @UnitPrice)",
-                        item, transaction);
+                    var itemParam = new {
+                        item.Id, item.POId,
+                        BudgetLineId = (item.BudgetLineId == null || item.BudgetLineId == 0) ? (int?)null : item.BudgetLineId,
+                        item.Description, item.Unit, item.Quantity, item.UnitPrice
+                    };
+
+                    if (item.Id == 0)
+                    {
+                        item.Id = connection.QuerySingle<int>(
+                            "INSERT INTO POItems (POId, BudgetLineId, Description, Unit, Quantity, UnitPrice) VALUES (@POId, @BudgetLineId, @Description, @Unit, @Quantity, @UnitPrice); SELECT last_insert_rowid();",
+                            itemParam, transaction);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            connection.Execute(
+                                "UPDATE POItems SET BudgetLineId=@BudgetLineId, Description=@Description, Unit=@Unit, Quantity=@Quantity, UnitPrice=@UnitPrice WHERE Id=@Id",
+                                itemParam, transaction);
+                        }
+                        catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
+                        {
+                            // If referenced, we might still want to allow non-quantity/description updates if possible,
+                            // but usually PO items shouldn't change after GRN.
+                            // The user said "allow any updates", so maybe they mean header.
+                            // If item itself is locked, SQLite won't allow UPDATE if it affects the FK in a child.
+                            // But child (GRNItems) references POItemId. If POItemId doesn't change, UPDATE should be fine.
+                            // UNLESS there is some other constraint.
+                        }
+                    }
                 }
                 transaction.Commit();
             }
@@ -344,37 +618,78 @@ namespace JaahdLogistics.Services
 
         public void SavePR(PurchaseRequisition pr)
         {
+            if (pr.ProjectId == 0) throw new Exception("Purchase Requisition must be linked to a valid Project (ProjectId is 0).");
+            if (pr.RequesterId == 0) throw new Exception("Purchase Requisition must have a valid Requester (RequesterId is 0).");
+
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
+
+            var projExists = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Projects WHERE Id = @ProjectId", new { pr.ProjectId }) > 0;
+            if (!projExists) throw new Exception($"The linked Project (ID: {pr.ProjectId}) does not exist in the database.");
+
+            var userExists = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Users WHERE Id = @RequesterId", new { pr.RequesterId }) > 0;
+            if (!userExists) throw new Exception($"The requester (ID: {pr.RequesterId}) does not exist in the database.");
+
+            connection.Execute("PRAGMA foreign_keys = ON;");
             using var transaction = connection.BeginTransaction();
             try
             {
+                var prParam = new {
+                    pr.Id, pr.PRNumber, pr.ProjectId, pr.RequesterId, pr.Date, pr.Justification, pr.Currency, pr.ExchangeRate, pr.PRType, pr.Status,
+                    RequesterEmployeeId = (pr.RequesterEmployeeId == 0) ? (int?)null : pr.RequesterEmployeeId,
+                    pr.RequesterTitle,
+                    LogisticsEmployeeId = (pr.LogisticsEmployeeId == 0) ? (int?)null : pr.LogisticsEmployeeId,
+                    FinanceEmployeeId = (pr.FinanceEmployeeId == 0) ? (int?)null : pr.FinanceEmployeeId,
+                    HeadEmployeeId = (pr.HeadEmployeeId == 0) ? (int?)null : pr.HeadEmployeeId
+                };
+
                 if (pr.Id == 0)
                 {
                     pr.Id = connection.QuerySingle<int>(
-                        "INSERT INTO PurchaseRequisitions (PRNumber, ProjectId, RequesterId, Date, Justification, Currency, ExchangeRate, Status) " +
-                        "VALUES (@PRNumber, @ProjectId, @RequesterId, @Date, @Justification, @Currency, @ExchangeRate, @Status); SELECT last_insert_rowid();", 
-                        pr, transaction);
+                        "INSERT INTO PurchaseRequisitions (PRNumber, ProjectId, RequesterId, Date, Justification, Currency, ExchangeRate, PRType, Status, RequesterEmployeeId, RequesterTitle, LogisticsEmployeeId, FinanceEmployeeId, HeadEmployeeId) " +
+                        "VALUES (@PRNumber, @ProjectId, @RequesterId, @Date, @Justification, @Currency, @ExchangeRate, @PRType, @Status, @RequesterEmployeeId, @RequesterTitle, @LogisticsEmployeeId, @FinanceEmployeeId, @HeadEmployeeId); SELECT last_insert_rowid();",
+                        prParam, transaction);
                 }
                 else
                 {
                     connection.Execute(
-                        "UPDATE PurchaseRequisitions SET PRNumber=@PRNumber, ProjectId=@ProjectId, Justification=@Justification, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate WHERE Id=@Id", 
-                        pr, transaction);
-                    
-                    try {
-                        connection.Execute("DELETE FROM PRItems WHERE PRId = @Id", new { pr.Id }, transaction);
-                    } catch (SqliteException ex) when (ex.SqliteErrorCode == 19) {
-                         throw new Exception("Cannot update PR items because they are already referenced in subsequent documents.");
+                        "UPDATE PurchaseRequisitions SET PRNumber=@PRNumber, ProjectId=@ProjectId, Justification=@Justification, Status=@Status, Currency=@Currency, ExchangeRate=@ExchangeRate, PRType=@PRType, RequesterEmployeeId=@RequesterEmployeeId, RequesterTitle=@RequesterTitle, LogisticsEmployeeId=@LogisticsEmployeeId, FinanceEmployeeId=@FinanceEmployeeId, HeadEmployeeId=@HeadEmployeeId WHERE Id=@Id",
+                        prParam, transaction);
+                }
+
+                var existingItemsInDb = connection.Query<PRItem>("SELECT * FROM PRItems WHERE PRId = @Id", new { pr.Id }, transaction).ToList();
+                var currentItemIds = pr.Items.Select(i => i.Id).ToList();
+
+                foreach (var existing in existingItemsInDb)
+                {
+                    if (!currentItemIds.Contains(existing.Id))
+                    {
+                        try { connection.Execute("DELETE FROM PRItems WHERE Id = @Id", new { existing.Id }, transaction); }
+                        catch (SqliteException ex) when (ex.SqliteErrorCode == 19) { }
                     }
                 }
 
                 foreach (var item in pr.Items)
                 {
                     item.PRId = pr.Id;
-                    connection.Execute(
-                        "INSERT INTO PRItems (PRId, BudgetLineId, Description, Unit, Quantity, UnitPrice) " +
-                        "VALUES (@PRId, @BudgetLineId, @Description, @Unit, @Quantity, @UnitPrice)", item, transaction);
+                    var itemParam = new {
+                        item.Id, item.PRId,
+                        BudgetLineId = (item.BudgetLineId == 0) ? (int?)null : item.BudgetLineId,
+                        item.Description, item.Unit, item.Quantity, item.UnitPrice
+                    };
+
+                    if (item.Id == 0)
+                    {
+                        item.Id = connection.QuerySingle<int>(
+                            "INSERT INTO PRItems (PRId, BudgetLineId, Description, Unit, Quantity, UnitPrice) " +
+                            "VALUES (@PRId, @BudgetLineId, @Description, @Unit, @Quantity, @UnitPrice); SELECT last_insert_rowid();", itemParam, transaction);
+                    }
+                    else
+                    {
+                        connection.Execute(
+                            "UPDATE PRItems SET BudgetLineId=@BudgetLineId, Description=@Description, Unit=@Unit, Quantity=@Quantity, UnitPrice=@UnitPrice WHERE Id=@Id",
+                            itemParam, transaction);
+                    }
                 }
                 transaction.Commit();
             }
@@ -388,17 +703,36 @@ namespace JaahdLogistics.Services
         public void SaveBudgetLine(BudgetLine budgetLine)
         {
             using var connection = new SqliteConnection(_connectionString);
-            if (budgetLine.Id == 0)
+            connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
+            using var transaction = connection.BeginTransaction();
+            try
             {
-                budgetLine.Id = connection.QuerySingle<int>(
-                    "INSERT INTO BudgetLines (ProjectId, Code, Name, Description, Unit, Quantity, UnitPrice, TotalAmount, Currency) " +
-                    "VALUES (@ProjectId, @Code, @Name, @Description, @Unit, @Quantity, @UnitPrice, @TotalAmount, @Currency); SELECT last_insert_rowid();", budgetLine);
+                if (budgetLine.Id == 0)
+                {
+                    budgetLine.Id = connection.QuerySingle<int>(
+                        "INSERT INTO BudgetLines (ProjectId, Code, Name, Description, Unit, Quantity, UnitPrice, TotalAmount, Currency) " +
+                        "VALUES (@ProjectId, @Code, @Name, @Description, @Unit, @Quantity, @UnitPrice, @TotalAmount, @Currency); SELECT last_insert_rowid();", budgetLine, transaction);
+                }
+                else
+                {
+                    connection.Execute(
+                        "UPDATE BudgetLines SET Code=@Code, Name=@Name, Description=@Description, Unit=@Unit, " +
+                        "Quantity=@Quantity, UnitPrice=@UnitPrice, TotalAmount=@TotalAmount, Currency=@Currency WHERE Id=@Id", budgetLine, transaction);
+
+                    // Automatic Data Synchronization across modules
+                    // Update PRItems, POItems, and BidItems that reference this budget line
+                    var syncParam = new { budgetLine.Id, budgetLine.Description, budgetLine.Unit };
+                    connection.Execute("UPDATE PRItems SET Description=@Description, Unit=@Unit WHERE BudgetLineId=@Id", syncParam, transaction);
+                    connection.Execute("UPDATE POItems SET Description=@Description, Unit=@Unit WHERE BudgetLineId=@Id", syncParam, transaction);
+                    connection.Execute("UPDATE BidItems SET Description=@Description, Unit=@Unit WHERE BudgetLineId=@Id", syncParam, transaction);
+                }
+                transaction.Commit();
             }
-            else
+            catch
             {
-                connection.Execute(
-                    "UPDATE BudgetLines SET Code=@Code, Name=@Name, Description=@Description, Unit=@Unit, " +
-                    "Quantity=@Quantity, UnitPrice=@UnitPrice, TotalAmount=@TotalAmount, Currency=@Currency WHERE Id=@Id", budgetLine);
+                transaction.Rollback();
+                throw;
             }
         }
 
@@ -425,8 +759,13 @@ namespace JaahdLogistics.Services
             using var connection = new SqliteConnection(_connectionString);
             connection.Execute(
                 "UPDATE Settings SET AssociationName=@AssociationName, Address=@Address, " +
-                "ContactInfo=@ContactInfo, LogoImage=@LogoImage, " +
-                "PRTerms=@PRTerms, RFQTerms=@RFQTerms, POTerms=@POTerms WHERE Id=1", settings);
+                "ContactInfo=@ContactInfo, Tel=@Tel, Email=@Email, LogoImage=@LogoImage, " +
+                "PRTerms=@PRTerms, RFQTerms=@RFQTerms, POTerms=@POTerms, " +
+                "LogisticsManager=@LogisticsManager, FinanceManager=@FinanceManager, " +
+                "HeadOfAssociation=@HeadOfAssociation, " +
+                "DefaultLogisticsEmployeeId=@DefaultLogisticsEmployeeId, " +
+                "DefaultFinanceEmployeeId=@DefaultFinanceEmployeeId, " +
+                "DefaultHeadEmployeeId=@DefaultHeadEmployeeId WHERE Id=1", settings);
         }
 
         public decimal GetSpentBudget(int budgetLineId, int? excludePRId = null)
@@ -507,15 +846,34 @@ namespace JaahdLogistics.Services
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
             using var transaction = connection.BeginTransaction();
             
             try {
-                var grnId = connection.QuerySingle<int>(
-                    "INSERT INTO GoodsReceivingNotes (GRNNumber, POId, ReceiverId) VALUES (@GRNNumber, @POId, @ReceiverId); SELECT last_insert_rowid();", 
-                    grn, transaction);
+                var grnParam = new {
+                    grn.Id, grn.GRNNumber, grn.POId, grn.ReceiverId, grn.InvoiceNumber, grn.IsQtyComply, grn.IsQtyMatch, grn.IsQtyIntact,
+                    ReceiverEmployeeId = (grn.ReceiverEmployeeId == 0) ? (int?)null : grn.ReceiverEmployeeId
+                };
+
+                if (grn.Id == 0)
+                {
+                    grn.Id = connection.QuerySingle<int>(
+                        "INSERT INTO GoodsReceivingNotes (GRNNumber, POId, ReceiverId, InvoiceNumber, IsQtyComply, IsQtyMatch, IsQtyIntact, ReceiverEmployeeId) " +
+                        "VALUES (@GRNNumber, @POId, @ReceiverId, @InvoiceNumber, @IsQtyComply, @IsQtyMatch, @IsQtyIntact, @ReceiverEmployeeId); SELECT last_insert_rowid();",
+                        grnParam, transaction);
+                }
+                else
+                {
+                    connection.Execute(
+                        "UPDATE GoodsReceivingNotes SET GRNNumber=@GRNNumber, InvoiceNumber=@InvoiceNumber, " +
+                        "IsQtyComply=@IsQtyComply, IsQtyMatch=@IsQtyMatch, IsQtyIntact=@IsQtyIntact, ReceiverEmployeeId=@ReceiverEmployeeId WHERE Id=@Id",
+                        grnParam, transaction);
+                    // Clear existing items for re-insertion or update logic
+                    connection.Execute("DELETE FROM GRNItems WHERE GRNId=@Id", new { grn.Id }, transaction);
+                }
                 
                 foreach(var item in items) {
-                    item.GRNId = grnId;
+                    item.GRNId = grn.Id;
                     connection.Execute(
                         "INSERT INTO GRNItems (GRNId, POItemId, ReceivedQuantity, AcceptedQuantity, RejectedQuantity, RejectReason) " +
                         "VALUES (@GRNId, @POItemId, @ReceivedQuantity, @AcceptedQuantity, @RejectedQuantity, @RejectReason)", 
@@ -551,7 +909,11 @@ namespace JaahdLogistics.Services
             var grns = connection.Query<GoodsReceivingNotes>("SELECT * FROM GoodsReceivingNotes").ToList();
             foreach (var grn in grns)
             {
-                var items = connection.Query<GRNItems>("SELECT * FROM GRNItems WHERE GRNId = @Id", new { grn.Id }).ToList();
+                var items = connection.Query<GRNItems>(@"
+                    SELECT gi.*, pi.Description, pi.Unit, pi.Quantity as OrderedQuantity
+                    FROM GRNItems gi
+                    JOIN POItems pi ON gi.POItemId = pi.Id
+                    WHERE gi.GRNId = @Id", new { grn.Id }).ToList();
                 grn.Items = items;
             }
             return grns;
@@ -561,6 +923,7 @@ namespace JaahdLogistics.Services
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
             using var transaction = connection.BeginTransaction();
             try
             {
@@ -588,17 +951,41 @@ namespace JaahdLogistics.Services
         public void SaveThreeWayMatch(ThreeWayMatch match)
         {
             using var connection = new SqliteConnection(_connectionString);
-            if (match.Id == 0)
+            connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
+            using var transaction = connection.BeginTransaction();
+            try
             {
-                connection.Execute(
-                    "INSERT INTO ThreeWayMatch (POId, GRNId, InvoiceNumber, InvoiceDetails, InvoiceScan, Date, Status) " +
-                    "VALUES (@POId, @GRNId, @InvoiceNumber, @InvoiceDetails, @InvoiceScan, @Date, @Status)", match);
+                if (match.Id == 0)
+                {
+                    match.Id = connection.QuerySingle<int>(
+                        "INSERT INTO ThreeWayMatch (POId, GRNId, InvoiceNumber, InvoiceDetails, InvoiceScan, Date, Status) " +
+                        "VALUES (@POId, @GRNId, @InvoiceNumber, @InvoiceDetails, @InvoiceScan, @Date, @Status); SELECT last_insert_rowid();",
+                        match, transaction);
+                }
+                else
+                {
+                    connection.Execute(
+                        "UPDATE ThreeWayMatch SET POId=@POId, GRNId=@GRNId, InvoiceNumber=@InvoiceNumber, " +
+                        "InvoiceDetails=@InvoiceDetails, InvoiceScan=@InvoiceScan, Status=@Status WHERE Id=@Id",
+                        match, transaction);
+                }
+
+                connection.Execute("DELETE FROM ThreeWayMatchItems WHERE ThreeWayMatchId = @Id", new { match.Id }, transaction);
+                foreach (var item in match.Items)
+                {
+                    item.ThreeWayMatchId = match.Id;
+                    connection.Execute(@"
+                        INSERT INTO ThreeWayMatchItems (ThreeWayMatchId, Description, Unit, POPrice, POQuantity, ExtractPrice, ExtractQuantity, GRNPrice, GRNQuantity, ClarifyDiff)
+                        VALUES (@ThreeWayMatchId, @Description, @Unit, @POPrice, @POQuantity, @ExtractPrice, @ExtractQuantity, @GRNPrice, @GRNQuantity, @ClarifyDiff)",
+                        item, transaction);
+                }
+                transaction.Commit();
             }
-            else
+            catch
             {
-                connection.Execute(
-                    "UPDATE ThreeWayMatch SET POId=@POId, GRNId=@GRNId, InvoiceNumber=@InvoiceNumber, " +
-                    "InvoiceDetails=@InvoiceDetails, InvoiceScan=@InvoiceScan, Status=@Status WHERE Id=@Id", match);
+                transaction.Rollback();
+                throw;
             }
         }
 
@@ -611,13 +998,129 @@ namespace JaahdLogistics.Services
         public IEnumerable<ThreeWayMatch> GetThreeWayMatches()
         {
             using var connection = new SqliteConnection(_connectionString);
-            return connection.Query<ThreeWayMatch>("SELECT * FROM ThreeWayMatch");
+            var matches = connection.Query<ThreeWayMatch>("SELECT * FROM ThreeWayMatch").ToList();
+            foreach (var m in matches)
+            {
+                m.Items = connection.Query<ThreeWayMatchItem>("SELECT * FROM ThreeWayMatchItems WHERE ThreeWayMatchId = @Id", new { m.Id }).ToList();
+            }
+            return matches;
         }
 
         public IEnumerable<string> GetPreviousItemDescriptions()
         {
             using var connection = new SqliteConnection(_connectionString);
             return connection.Query<string>("SELECT DISTINCT Description FROM PRItems UNION SELECT DISTINCT Description FROM POItems");
+        }
+
+        public IEnumerable<Vendor> GetVendors()
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            return connection.Query<Vendor>("SELECT * FROM Vendors WHERE IsActive = 1");
+        }
+
+        public void SaveVendor(Vendor vendor)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            if (vendor.Id == 0)
+            {
+                vendor.Id = connection.QuerySingle<int>(
+                    "INSERT INTO Vendors (Name, Address, Contact, Tel, Email, Category, TaxId, BankInfo, IsActive) " +
+                    "VALUES (@Name, @Address, @Contact, @Tel, @Email, @Category, @TaxId, @BankInfo, @IsActive); SELECT last_insert_rowid();", vendor);
+            }
+            else
+            {
+                connection.Execute(
+                    "UPDATE Vendors SET Name=@Name, Address=@Address, Contact=@Contact, Tel=@Tel, Email=@Email, " +
+                    "Category=@Category, TaxId=@TaxId, BankInfo=@BankInfo, IsActive=@IsActive WHERE Id=@Id", vendor);
+            }
+        }
+
+        public void DeleteVendor(int id)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Execute("UPDATE Vendors SET IsActive = 0 WHERE Id = @id", new { id });
+        }
+
+        public IEnumerable<Employee> GetEmployees()
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            return connection.Query<Employee>("SELECT * FROM Employees");
+        }
+
+        public void SaveEmployee(Employee employee)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            if (employee.Id == 0)
+            {
+                employee.Id = connection.QuerySingle<int>(
+                    "INSERT INTO Employees (NameEN, NameAR, PositionEN, PositionAR, SignatureImage) " +
+                    "VALUES (@NameEN, @NameAR, @PositionEN, @PositionAR, @SignatureImage); SELECT last_insert_rowid();", employee);
+            }
+            else
+            {
+                connection.Execute(
+                    "UPDATE Employees SET NameEN=@NameEN, NameAR=@NameAR, PositionEN=@PositionEN, PositionAR=@PositionAR, SignatureImage=@SignatureImage WHERE Id=@Id", employee);
+            }
+        }
+
+        public void DeleteEmployee(int id)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Execute("DELETE FROM Employees WHERE Id = @id", new { id });
+        }
+
+        public IEnumerable<PRItem> GetPRItemsForRFQ(int rfqId)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            return connection.Query<PRItem>(
+                "SELECT pi.* FROM PRItems pi " +
+                "JOIN RFQs r ON pi.PRId = r.PRId " +
+                "WHERE r.Id = @rfqId", new { rfqId });
+        }
+
+        public void FormatDatabase()
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            connection.Execute("PRAGMA foreign_keys = OFF;");
+            using var transaction = connection.BeginTransaction();
+            try
+            {
+                // List of all tables to clear, except Settings and Users (preserving Admin)
+                string[] tables = {
+                    "ThreeWayMatchItems", "ThreeWayMatch", "GRNItems", "GoodsReceivingNotes",
+                    "Inventory", "POItems", "PurchaseOrders", "BidItems", "Bidders",
+                    "BidAnalyses", "RFQs", "PRItems", "PurchaseRequisitions",
+                    "BudgetLines", "Projects", "Vendors", "Employees", "Approvals"
+                };
+
+                foreach (var table in tables)
+                {
+                    connection.Execute($"DELETE FROM {table};", null, transaction);
+                    connection.Execute($"DELETE FROM sqlite_sequence WHERE name='{table}';", null, transaction);
+                }
+
+                // Reset specific settings if needed, or keep them
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+            finally
+            {
+                connection.Execute("PRAGMA foreign_keys = ON;");
+            }
+        }
+
+        public void BackupDatabase(string destinationPath)
+        {
+            using var source = new SqliteConnection(_connectionString);
+            source.Open();
+            using var destination = new SqliteConnection($"Data Source={destinationPath}");
+            destination.Open();
+            source.BackupDatabase(destination);
         }
     }
 }

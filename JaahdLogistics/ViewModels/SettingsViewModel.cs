@@ -19,6 +19,9 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private ObservableCollection<User> _users;
 
+        [ObservableProperty]
+        private ObservableCollection<Employee> _employees;
+
         public string[] Roles { get; } = { "Admin", "ProjectManager", "ProcurementManager", "FinanceManager", "Storekeeper", "HeadOfAssociation" };
 
         public SettingsViewModel(IDataService dataService)
@@ -27,6 +30,7 @@ namespace JaahdLogistics.ViewModels
             _settings = _dataService.GetSettings();
             CurrentUserSignature = AuthService.CurrentUser?.SignatureImage;
             _users = new ObservableCollection<User>(_dataService.GetUsers());
+            _employees = new ObservableCollection<Employee>(_dataService.GetEmployees());
         }
 
         [RelayCommand]
@@ -97,6 +101,58 @@ namespace JaahdLogistics.ViewModels
             if (openFileDialog.ShowDialog() == true)
             {
                 CurrentUserSignature = System.IO.File.ReadAllBytes(openFileDialog.FileName);
+            }
+        }
+
+        [RelayCommand]
+        private void FormatDatabase()
+        {
+            var result = System.Windows.MessageBox.Show(
+                "WARNING: This will delete ALL transactional data (PRs, POs, Projects, etc.) and reset the database to a clean state. Users and global settings will be preserved.\n\nAre you sure you want to proceed?",
+                "Format Database",
+                System.Windows.MessageBoxButton.YesNo,
+                System.Windows.MessageBoxImage.Warning);
+
+            if (result == System.Windows.MessageBoxResult.Yes)
+            {
+                try
+                {
+                    _dataService.FormatDatabase();
+                    System.Windows.MessageBox.Show("Database formatted successfully. The system is now clean.", "Success");
+
+                    // Optionally reload everything if necessary, or just inform the user to restart
+                    if (System.Windows.Application.Current.MainWindow.DataContext is MainViewModel mainVM)
+                    {
+                        mainVM.ReloadSettings();
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    System.Windows.MessageBox.Show($"Error formatting database: {ex.Message}", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                }
+            }
+        }
+
+        [RelayCommand]
+        private void BackupDatabase()
+        {
+            var saveFile = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "SQLite Database (*.db)|*.db",
+                FileName = $"Jaahd_Backup_{System.DateTime.Now:yyyyMMdd_HHmm}.db"
+            };
+
+            if (saveFile.ShowDialog() == true)
+            {
+                try
+                {
+                    _dataService.BackupDatabase(saveFile.FileName);
+                    System.Windows.MessageBox.Show("Database backup created successfully.", "Success");
+                }
+                catch (System.Exception ex)
+                {
+                    System.Windows.MessageBox.Show($"Backup failed: {ex.Message}", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                }
             }
         }
     }

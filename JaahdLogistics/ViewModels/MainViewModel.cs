@@ -60,6 +60,36 @@ namespace JaahdLogistics.ViewModels
         {
             _languageService.SetLanguage(lang);
             CurrentFlowDirection = lang == "ar" ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
+
+            // Trigger refresh of current view if it supports it
+            if (CurrentViewModel != null)
+            {
+                // Force a reload of signatory info for the active view
+                if (CurrentViewModel is PurchaseRequisitionViewModel prVM)
+                {
+                    // Private methods in other ViewModels can't be called directly easily without exposure
+                    // but we can trigger a property change or a public Refresh
+                    var current = prVM.CurrentPR;
+                    prVM.CurrentPR = null!;
+                    prVM.CurrentPR = current;
+                }
+                else if (CurrentViewModel is ProcurementViewModel pVM)
+                {
+                    var ba = pVM.CurrentBidAnalysis;
+                    pVM.CurrentBidAnalysis = null!;
+                    pVM.CurrentBidAnalysis = ba;
+
+                    var po = pVM.CurrentPO;
+                    pVM.CurrentPO = null!;
+                    pVM.CurrentPO = po;
+                }
+                else if (CurrentViewModel is ThreeWayMatchViewModel twmVM)
+                {
+                    var m = twmVM.CurrentMatch;
+                    twmVM.CurrentMatch = null!;
+                    twmVM.CurrentMatch = m;
+                }
+            }
         }
 
         [RelayCommand]
@@ -85,11 +115,17 @@ namespace JaahdLogistics.ViewModels
                 case "Match":
                     CurrentViewModel = new ThreeWayMatchViewModel(_dataService);
                     break;
+                case "Vendors":
+                    CurrentViewModel = new VendorViewModel(_dataService);
+                    break;
+                case "Employees":
+                    CurrentViewModel = new EmployeeViewModel(_dataService);
+                    break;
                 case "Settings":
                     CurrentViewModel = new SettingsViewModel(_dataService);
                     break;
                 case "Reports":
-                    CurrentViewModel = new ReportViewModel(new ReportService(ConnectionString));
+                    CurrentViewModel = new ReportViewModel(new ReportService(ConnectionString), _dataService);
                     break;
             }
         }

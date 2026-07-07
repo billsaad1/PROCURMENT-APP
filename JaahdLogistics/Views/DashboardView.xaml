@@ -3,44 +3,222 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/> <!-- Header -->
+            <RowDefinition Height="Auto"/> <!-- Cards -->
+            <RowDefinition Height="*"/>    <!-- Content -->
         </Grid.RowDefinitions>
 
+        <!-- 1. Header Area -->
         <Grid Margin="0,0,0,20">
-            <TextBlock Text="{DynamicResource Dashboard}" FontSize="24" FontWeight="Bold"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{DynamicResource LogisticsDashboard}" FontSize="26" FontWeight="Bold" Foreground="#1B4F72"/>
+                <Button Command="{Binding RefreshDashboardCommand}" Margin="15,0,0,0" Background="Transparent" BorderThickness="0" Cursor="Hand">
+                    <TextBlock Text="🔄" FontSize="18" VerticalAlignment="Center"/>
+                </Button>
+            </StackPanel>
+
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                <TextBlock Text="{Binding SyncStatus}" VerticalAlignment="Center" Margin="0,0,10,0" Opacity="0.7"/>
-                <Button Content="Sync Now" Command="{Binding SyncNowCommand}" IsEnabled="{Binding IsSyncing, Converter={StaticResource InverseBooleanConverter}}" Padding="10,5"/>
+                <Border Background="#EBF5FB" CornerRadius="15" Padding="15,5" Margin="0,0,10,0">
+                    <StackPanel Orientation="Horizontal">
+                         <Ellipse Width="8" Height="8" Fill="{Binding IsSyncing, Converter={StaticResource BoolToColorConverter}}" Margin="0,0,8,0"/>
+                         <TextBlock Text="{Binding SyncStatus}" FontSize="12" VerticalAlignment="Center" Foreground="#2E86C1"/>
+                    </StackPanel>
+                </Border>
+                <Button Content="{DynamicResource ForceSync}" Command="{Binding SyncNowCommand}"
+                        IsEnabled="{Binding IsSyncing, Converter={StaticResource InverseBooleanConverter}}"
+                        Background="#1B4F72" Foreground="White" BorderThickness="0" Padding="15,7"/>
             </StackPanel>
         </Grid>
 
-        <GroupBox Grid.Row="1" Header="{DynamicResource MyPRStatus}">
-            <DataGrid ItemsSource="{Binding UserPRs}" AutoGenerateColumns="False" IsReadOnly="True">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="{DynamicResource PRNumber}" Binding="{Binding PRNumber}" Width="150"/>
-                    <DataGridTextColumn Header="{DynamicResource Date}" Binding="{Binding Date, StringFormat=d}" Width="120"/>
-                    <DataGridTextColumn Header="{DynamicResource Status}" Binding="{Binding Status}" Width="*">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Status}" Value="FinalApproved">
-                                        <Setter Property="Foreground" Value="Green"/>
-                                        <Setter Property="FontWeight" Value="Bold"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Status}" Value="Pending">
-                                        <Setter Property="Foreground" Value="Orange"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-                </DataGrid.Columns>
-            </DataGrid>
-        </GroupBox>
+        <!-- 2. Summary Cards -->
+        <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,20">
+            <!-- Projects Card -->
+            <Border Margin="5" Background="White" CornerRadius="8" Padding="15">
+                <Border.Effect><DropShadowEffect BlurRadius="10" Opacity="0.1" ShadowDepth="2"/></Border.Effect>
+                <StackPanel>
+                    <TextBlock Text="{DynamicResource TotalProjects}" Foreground="Gray" FontSize="12"/>
+                    <TextBlock Text="{Binding TotalProjects}" FontSize="24" FontWeight="Bold" Margin="0,5"/>
+                    <TextBlock Text="{DynamicResource Projects}" FontSize="10" Foreground="#27AE60"/>
+                </StackPanel>
+            </Border>
+
+            <!-- PR Card -->
+            <Border Margin="5" Background="White" CornerRadius="8" Padding="15">
+                <Border.Effect><DropShadowEffect BlurRadius="10" Opacity="0.1" ShadowDepth="2"/></Border.Effect>
+                <StackPanel>
+                    <TextBlock Text="{DynamicResource PendingPRs}" Foreground="Gray" FontSize="12"/>
+                    <TextBlock Text="{Binding PendingPRs}" FontSize="24" FontWeight="Bold" Margin="0,5" Foreground="#D35400"/>
+                    <TextBlock Text="{DynamicResource PRStatus}" FontSize="10" Foreground="#E67E22"/>
+                </StackPanel>
+            </Border>
+
+            <!-- PO Card -->
+            <Border Margin="5" Background="White" CornerRadius="8" Padding="15">
+                <Border.Effect><DropShadowEffect BlurRadius="10" Opacity="0.1" ShadowDepth="2"/></Border.Effect>
+                <StackPanel>
+                    <TextBlock Text="{DynamicResource ApprovedPOs}" Foreground="Gray" FontSize="12"/>
+                    <TextBlock Text="{Binding ApprovedPOs}" FontSize="24" FontWeight="Bold" Margin="0,5" Foreground="#27AE60"/>
+                    <TextBlock Text="{DynamicResource FinalApproved}" FontSize="10" Foreground="#2ECC71"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Spending Card -->
+            <Border Margin="5" Background="White" CornerRadius="8" Padding="15">
+                <Border.Effect><DropShadowEffect BlurRadius="10" Opacity="0.1" ShadowDepth="2"/></Border.Effect>
+                <StackPanel>
+                    <TextBlock Text="{DynamicResource TotalSpending}" Foreground="Gray" FontSize="12"/>
+                    <TextBlock Text="{Binding TotalSpending, StringFormat=N0}" FontSize="24" FontWeight="Bold" Margin="0,5"/>
+                    <TextBlock Text="{DynamicResource ProjectBudgets}" FontSize="10" Foreground="Gray"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!-- 3. Lists and Visuals -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="350"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: Main Tables -->
+            <TabControl Background="Transparent" BorderThickness="0" Margin="0,0,10,0">
+                <TabItem Header="{DynamicResource MyPRStatus}">
+                    <Border Background="White" CornerRadius="8" Padding="10">
+                        <DataGrid ItemsSource="{Binding UserPRs}" AutoGenerateColumns="False" IsReadOnly="True" BorderThickness="0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="{DynamicResource PRNumber}" Binding="{Binding PRNumber}" Width="120"/>
+                                <DataGridTextColumn Header="{DynamicResource Date}" Binding="{Binding Date, StringFormat=d}" Width="100"/>
+                                <DataGridTextColumn Header="{DynamicResource Project}" Binding="{Binding Project.Code}" Width="80"/>
+                                <DataGridTextColumn Header="{DynamicResource PRStatus}" Binding="{Binding Status}" Width="*">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Padding" Value="5,2"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Status}" Value="FinalApproved"><Setter Property="Foreground" Value="Green"/><Setter Property="FontWeight" Value="Bold"/></DataTrigger>
+                                                <DataTrigger Binding="{Binding Status}" Value="Pending"><Setter Property="Foreground" Value="Orange"/></DataTrigger>
+                                                <DataTrigger Binding="{Binding Status}" Value="Rejected"><Setter Property="Foreground" Value="Red"/></DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </TabItem>
+
+                <TabItem Header="{DynamicResource ProjectSpendingReport}">
+                    <Grid Background="White">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <lvc:PieChart Series="{Binding SpendingSeries}" LegendLocation="Bottom" InnerRadius="40" Margin="10"/>
+                        <Border Grid.Column="1" Padding="15">
+                            <ScrollViewer>
+                                <ItemsControl ItemsSource="{Binding ProjectSpending}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Margin="0,0,0,12">
+                                                <Grid Margin="0,0,0,2">
+                                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="11"/>
+                                                    <TextBlock HorizontalAlignment="Right" Foreground="Gray" FontSize="10">
+                                                        <Run Text="{Binding Spent, StringFormat=N0}"/> / <Run Text="{Binding Budget, StringFormat=N0}"/>
+                                                    </TextBlock>
+                                                </Grid>
+                                                <ProgressBar Value="{Binding PercentSpent, Mode=OneWay}" Minimum="0" Maximum="100" Height="6">
+                                                    <ProgressBar.Style>
+                                                        <Style TargetType="ProgressBar">
+                                                            <Setter Property="Foreground" Value="#2ECC71"/><Setter Property="Background" Value="#F2F3F4"/><Setter Property="BorderThickness" Value="0"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding ProgressColor}" Value="Orange"><Setter Property="Foreground" Value="#F1C40F"/></DataTrigger>
+                                                                <DataTrigger Binding="{Binding ProgressColor}" Value="Red"><Setter Property="Foreground" Value="#E74C3C"/></DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </ProgressBar.Style>
+                                                </ProgressBar>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Border>
+                    </Grid>
+                </TabItem>
+
+                <TabItem Header="{DynamicResource Reports}">
+                    <Border Background="White" Padding="15">
+                         <lvc:CartesianChart Series="{Binding MonthlyTrendSeries}" LegendLocation="None">
+                            <lvc:CartesianChart.AxisX>
+                                <lvc:Axis Title="{DynamicResource Date}" Labels="{Binding Labels}"/>
+                            </lvc:CartesianChart.AxisX>
+                            <lvc:CartesianChart.AxisY>
+                                <lvc:Axis Title="{DynamicResource PO}" LabelFormatter="{Binding Formatter}"/>
+                            </lvc:CartesianChart.AxisY>
+                        </lvc:CartesianChart>
+                    </Border>
+                </TabItem>
+            </TabControl>
+
+            <!-- Right: Action Center -->
+            <StackPanel Grid.Column="1">
+                <!-- Pipeline Visual -->
+                <Border Background="White" CornerRadius="8" Padding="15" Margin="0,0,0,20">
+                    <Border.Effect><DropShadowEffect BlurRadius="10" Opacity="0.1" ShadowDepth="2"/></Border.Effect>
+                    <StackPanel>
+                        <TextBlock Text="{DynamicResource ProcurementVolume}" FontSize="14" FontWeight="Bold" Margin="0,0,0,15" Foreground="#1B4F72"/>
+                        <ItemsControl ItemsSource="{Binding PipelineDistribution}">
+                            <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="5"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <Border Width="40" Height="40" CornerRadius="20" Background="{Binding Color}">
+                                            <TextBlock Text="{Binding Count}" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
+                                        </Border>
+                                        <TextBlock Text="{Binding Stage}" FontSize="10" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <TextBlock Text="{DynamicResource ActionRequired}" FontSize="18" FontWeight="Bold" Margin="0,0,0,15" Foreground="#1B4F72"/>
+                <Border Background="White" CornerRadius="8" Padding="10">
+                    <Border.Effect><DropShadowEffect BlurRadius="10" Opacity="0.1" ShadowDepth="2"/></Border.Effect>
+                    <StackPanel>
+                        <ItemsControl ItemsSource="{Binding ActionItems}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="#F2F3F4" BorderThickness="0,0,0,1" Padding="10">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding PRNumber}" FontWeight="Bold"/>
+                                                <TextBlock Text="{Binding Status}" FontSize="10" Foreground="Orange"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="{DynamicResource Review}" Foreground="#3498DB" Cursor="Hand" FontSize="11"/>
+                                                <TextBlock Text=" →" Foreground="#3498DB" FontSize="11"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="{DynamicResource NoPendingApprovals}" HorizontalAlignment="Center" Margin="20" Foreground="LightGray">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers><DataTrigger Binding="{Binding ActionItems.Count}" Value="0"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

@@ -37,6 +37,12 @@
         <DataTemplate DataType="{x:Type vm:ThreeWayMatchViewModel}">
             <views:ThreeWayMatchView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:VendorViewModel}">
+            <views:VendorView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:EmployeeViewModel}">
+            <views:EmployeeView/>
+        </DataTemplate>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -58,6 +64,8 @@
                     <Button Content="{DynamicResource RFQ}" Command="{Binding ShowViewCommand}" CommandParameter="Procurement" Margin="5" Background="Transparent" FontWeight="SemiBold"/>
                     <Button Content="{DynamicResource GRN}" Command="{Binding ShowViewCommand}" CommandParameter="Warehouse" Margin="5" Background="Transparent" FontWeight="SemiBold"/>
                     <Button Content="{DynamicResource ThreeWayMatch}" Command="{Binding ShowViewCommand}" CommandParameter="Match" Margin="5" Background="Transparent" FontWeight="SemiBold"/>
+                    <Button Content="{DynamicResource Vendors}" Command="{Binding ShowViewCommand}" CommandParameter="Vendors" Margin="5" Background="Transparent" FontWeight="SemiBold"/>
+                    <Button Content="{DynamicResource Employees}" Command="{Binding ShowViewCommand}" CommandParameter="Employees" Margin="5" Background="Transparent" FontWeight="SemiBold"/>
                     <Button Content="{DynamicResource Settings}" Command="{Binding ShowViewCommand}" CommandParameter="Settings" Margin="5" Background="Transparent" FontWeight="SemiBold"/>
                     <Button Content="{DynamicResource Reports}" Command="{Binding ShowViewCommand}" CommandParameter="Reports" Margin="5" Background="Transparent" FontWeight="SemiBold"/>
                 </StackPanel>

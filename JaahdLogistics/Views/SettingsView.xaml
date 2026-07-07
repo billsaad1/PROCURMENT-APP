@@ -24,19 +24,78 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     
                     <TextBlock Text="{DynamicResource AssociationName}" VerticalAlignment="Center" Margin="5"/>
                     <TextBox Grid.Column="1" Text="{Binding Settings.AssociationName}" Margin="5"/>
 
-                    <TextBlock Grid.Row="1" Text="Address" VerticalAlignment="Center" Margin="5"/>
+                    <TextBlock Grid.Row="1" Text="{DynamicResource Address}" VerticalAlignment="Center" Margin="5"/>
                     <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Settings.Address}" Margin="5"/>
 
-                    <TextBlock Grid.Row="2" Text="Contact Info" VerticalAlignment="Center" Margin="5"/>
+                    <TextBlock Grid.Row="2" Text="{DynamicResource Contact}" VerticalAlignment="Center" Margin="5"/>
                     <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Settings.ContactInfo}" Margin="5"/>
+
+                    <TextBlock Grid.Row="3" Text="{DynamicResource Tel}" VerticalAlignment="Center" Margin="5"/>
+                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Settings.Tel}" Margin="5"/>
+
+                    <TextBlock Grid.Row="4" Text="{DynamicResource Email}" VerticalAlignment="Center" Margin="5"/>
+                    <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Settings.Email}" Margin="5"/>
+
+                    <TextBlock Grid.Row="5" Text="{DynamicResource LogisticManager}" VerticalAlignment="Center" Margin="5"/>
+                    <Grid Grid.Row="5" Grid.Column="1">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="5,0">
+                            <TextBlock Text="{DynamicResource Position}"/>
+                            <TextBlock Text=":"/>
+                        </StackPanel>
+                        <TextBox Grid.Column="1" Text="{Binding Settings.LogisticsTitle}" Margin="5" Tag="Title fallback"/>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="5,0">
+                            <TextBlock Text="{DynamicResource Name}"/>
+                            <TextBlock Text=":"/>
+                        </StackPanel>
+                        <TextBox Grid.Column="3" Text="{Binding Settings.LogisticsManager}" Margin="5"/>
+                    </Grid>
+                    <ComboBox Grid.Row="5" Grid.Column="1" ItemsSource="{Binding Employees}" SelectedValue="{Binding Settings.DefaultLogisticsEmployeeId}" SelectedValuePath="Id" DisplayMemberPath="DisplayName" Margin="5" HorizontalAlignment="Right" Width="150" Opacity="0.7"/>
+
+                    <TextBlock Grid.Row="6" Text="{DynamicResource FinanceManager}" VerticalAlignment="Center" Margin="5"/>
+                    <Grid Grid.Row="6" Grid.Column="1">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="5,0">
+                            <TextBlock Text="{DynamicResource Position}"/>
+                            <TextBlock Text=":"/>
+                        </StackPanel>
+                        <TextBox Grid.Column="1" Text="{Binding Settings.FinanceTitle}" Margin="5"/>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="5,0">
+                            <TextBlock Text="{DynamicResource Name}"/>
+                            <TextBlock Text=":"/>
+                        </StackPanel>
+                        <TextBox Grid.Column="3" Text="{Binding Settings.FinanceManager}" Margin="5"/>
+                    </Grid>
+                    <ComboBox Grid.Row="6" Grid.Column="1" ItemsSource="{Binding Employees}" SelectedValue="{Binding Settings.DefaultFinanceEmployeeId}" SelectedValuePath="Id" DisplayMemberPath="DisplayName" Margin="5" HorizontalAlignment="Right" Width="150" Opacity="0.7"/>
+
+                    <TextBlock Grid.Row="7" Text="{DynamicResource ApprovedBy}" VerticalAlignment="Center" Margin="5"/>
+                    <Grid Grid.Row="7" Grid.Column="1">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="5,0">
+                            <TextBlock Text="{DynamicResource Position}"/>
+                            <TextBlock Text=":"/>
+                        </StackPanel>
+                        <TextBox Grid.Column="1" Text="{Binding Settings.HeadTitle}" Margin="5"/>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="5,0">
+                            <TextBlock Text="{DynamicResource Name}"/>
+                            <TextBlock Text=":"/>
+                        </StackPanel>
+                        <TextBox Grid.Column="3" Text="{Binding Settings.HeadOfAssociation}" Margin="5"/>
+                    </Grid>
+                    <ComboBox Grid.Row="7" Grid.Column="1" ItemsSource="{Binding Employees}" SelectedValue="{Binding Settings.DefaultHeadEmployeeId}" SelectedValuePath="Id" DisplayMemberPath="DisplayName" Margin="5" HorizontalAlignment="Right" Width="150" Opacity="0.7"/>
                     
-                    <TextBlock Grid.Row="3" Text="{DynamicResource Logo}" VerticalAlignment="Center" Margin="5"/>
-                    <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock Grid.Row="8" Text="{DynamicResource Logo}" VerticalAlignment="Center" Margin="5"/>
+                    <StackPanel Grid.Row="8" Grid.Column="1" Orientation="Horizontal">
                         <Border Width="100" Height="100" BorderBrush="Gray" BorderThickness="1" Margin="5">
                              <Image Source="{Binding Settings.LogoImage, Converter={StaticResource ImageBytesConverter}}" Stretch="Uniform"/>
                         </Border>
@@ -54,13 +113,20 @@
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="User Management" Margin="0,0,0,20" Padding="10">
+            <GroupBox Header="{DynamicResource Login}" Margin="0,0,0,20" Padding="10">
                 <StackPanel>
                     <DataGrid ItemsSource="{Binding Users}" AutoGenerateColumns="False" CanUserAddRows="False" Height="200" Margin="0,0,0,10">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Username" Binding="{Binding Username}" Width="100"/>
-                            <DataGridTextColumn Header="Full Name" Binding="{Binding FullName}" Width="*"/>
-                            <DataGridTemplateColumn Header="Role" Width="150">
+                            <DataGridTextColumn Header="{DynamicResource Username}" Binding="{Binding Username}" Width="100"/>
+                            <DataGridTextColumn Header="{DynamicResource Name}" Binding="{Binding FullName}" Width="*"/>
+                            <DataGridTextColumn Header="{DynamicResource Password}" Binding="{Binding PasswordHash}" Width="100">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="*******"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTemplateColumn Header="{DynamicResource Position}" Width="150">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <ComboBox ItemsSource="{Binding Source={StaticResource ViewProxy}, Path=Data.Roles}" 
@@ -77,11 +143,11 @@
                             </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Button Content="Add User" Command="{Binding AddUserCommand}" HorizontalAlignment="Left" Width="100"/>
+                    <Button Content="{DynamicResource CreateNew}" Command="{Binding AddUserCommand}" HorizontalAlignment="Left" Width="100"/>
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="{DynamicResource TermsConditions}" Padding="10">
+            <GroupBox Header="{DynamicResource TermsConditions}" Margin="0,0,0,20" Padding="10">
                 <StackPanel>
                     <TextBlock Text="{DynamicResource PRTerms}" FontWeight="Bold" Margin="0,10,0,5"/>
                     <TextBox Text="{Binding Settings.PRTerms}" TextWrapping="Wrap" AcceptsReturn="True" Height="80" Margin="0,0,0,10"/>
@@ -91,6 +157,13 @@
 
                     <TextBlock Text="{DynamicResource POTerms}" FontWeight="Bold" Margin="0,10,0,5"/>
                     <TextBox Text="{Binding Settings.POTerms}" TextWrapping="Wrap" AcceptsReturn="True" Height="80" Margin="0,0,0,10"/>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="{DynamicResource DatabaseManagement}" Padding="10">
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="{DynamicResource BackupDatabase}" Command="{Binding BackupDatabaseCommand}" Width="150" Height="35" Margin="5" Background="#2E86C1"/>
+                    <Button Content="{DynamicResource FormatDatabase}" Command="{Binding FormatDatabaseCommand}" Width="250" Height="35" Margin="5" Background="#C0392B"/>
                 </StackPanel>
             </GroupBox>
 

@@ -12,6 +12,8 @@
         <Border Background="#323639" Padding="10">
             <StackPanel Orientation="Horizontal">
                 <Button Content="Print" Click="Print_Click" Width="80" Margin="5"/>
+                <Button Content="Save as PDF" Click="SavePDF_Click" Width="100" Margin="5" Background="#E74C3C"/>
+                <Button Content="Save as Excel" Click="SaveExcel_Click" Width="100" Margin="5" Background="#27AE60"/>
                 <TextBlock Text="Zoom:" Foreground="White" VerticalAlignment="Center" Margin="20,0,5,0"/>
                 <Slider x:Name="ZoomSlider" Width="150" Minimum="0.5" Maximum="2.0" Value="1.0" VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding ElementName=ZoomSlider, Path=Value, StringFormat={}{0:P0}}" Foreground="White" VerticalAlignment="Center" Margin="5,0"/>

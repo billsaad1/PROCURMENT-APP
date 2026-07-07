@@ -34,36 +34,79 @@ namespace JaahdLogistics.ViewModels
                         var rate = _dataService.GetLastExchangeRate(value.Currency);
                         if (rate > 0) value.ExchangeRate = rate;
                     }
+                    if (e.PropertyName == nameof(PurchaseRequisition.RequesterEmployeeId))
+                    {
+                        UpdateRequesterSignature();
+                    }
                 };
                 LoadApprovals();
             }
         }
 
+        private void UpdateRequesterSignature()
+        {
+            if (CurrentPR.RequesterEmployeeId.HasValue && CurrentPR.RequesterEmployeeId > 0)
+            {
+                var emp = Employees.FirstOrDefault(e => e.Id == CurrentPR.RequesterEmployeeId);
+                if (emp != null)
+                {
+                    var lang = Application.Current.Resources.MergedDictionaries.Any(d => d.Source?.OriginalString.Contains("ar") == true) ? "ar" : "en";
+                    CurrentPR.RequesterSignature = emp.SignatureImage;
+                    CurrentPR.RequesterName = emp.GetLocalizedName(lang);
+                    if (!string.IsNullOrWhiteSpace(emp.GetLocalizedPosition(lang))) CurrentPR.RequesterTitle = emp.GetLocalizedPosition(lang);
+                }
+            }
+        }
+
         private void LoadApprovals()
         {
-            if (CurrentPR.Id == 0) return;
+            if (CurrentPR == null) return;
+
+            // 0. Ensure settings are fresh
+            Settings = _dataService.GetSettings();
+            var lang = Application.Current.Resources.MergedDictionaries.Any(d => d.Source?.OriginalString.Contains("ar") == true) ? "ar" : "en";
+
+            // 1. Initial Defaults (Names/Titles/Signatures from Employee records or Settings)
+            if (CurrentPR.RequesterEmployeeId.HasValue) UpdateRequesterSignature();
+
+            var logEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPR.LogisticsEmployeeId ?? Settings.DefaultLogisticsEmployeeId));
+            CurrentPR.LogisticsName = logEmp?.GetLocalizedName(lang) ?? Settings.LogisticsManager;
+            CurrentPR.LogisticsSignature = logEmp?.SignatureImage;
+            CurrentPR.LogisticsTitle = logEmp?.GetLocalizedPosition(lang) ?? Settings.LogisticsTitle;
+
+            var finEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPR.FinanceEmployeeId ?? Settings.DefaultFinanceEmployeeId));
+            CurrentPR.FinanceName = finEmp?.GetLocalizedName(lang) ?? Settings.FinanceManager;
+            CurrentPR.FinanceSignature = finEmp?.SignatureImage;
+            CurrentPR.FinanceTitle = finEmp?.GetLocalizedPosition(lang) ?? Settings.FinanceTitle;
+
+            CurrentPR.PMName = CurrentPR.Project?.ProjectManager ?? "";
+            CurrentPR.PMTitle = "Project Manager";
+            CurrentPR.PMSignature = null;
+
+            var headEmp = Employees.FirstOrDefault(e => e.Id == (CurrentPR.HeadEmployeeId ?? Settings.DefaultHeadEmployeeId));
+            CurrentPR.FinalName = headEmp?.GetLocalizedName(lang) ?? Settings.HeadOfAssociation;
+            CurrentPR.FinalSignature = headEmp?.SignatureImage;
+            CurrentPR.FinalTitle = headEmp?.GetLocalizedPosition(lang) ?? Settings.HeadTitle;
+
+            if (CurrentPR.Id == 0)
+            {
+                OnPropertyChanged(nameof(CurrentPR));
+                return;
+            }
+
+            // 2. Override with formal approval records if they exist (contains real approval timestamped signatures)
             var approvals = _dataService.GetApprovals("PR", CurrentPR.Id);
             foreach (var app in approvals)
             {
                 string status = (string)app.Status;
                 byte[]? sig = (byte[]?)app.SignatureImage;
                 string? name = (string?)app.FullName;
+                string? title = (string?)app.Position;
 
-                if (status == "CheckedByLogistics") { CurrentPR.LogisticsSignature = sig; CurrentPR.LogisticsName = name; }
-                else if (status == "ReviewedByFinance") { CurrentPR.FinanceSignature = sig; CurrentPR.FinanceName = name; }
-                else if (status == "ApprovedByPM") { CurrentPR.PMSignature = sig; CurrentPR.PMName = name; }
-                else if (status == "FinalApproved") { CurrentPR.FinalSignature = sig; CurrentPR.FinalName = name; }
-            }
-            // Set requester signature from current user if new PR
-            if (CurrentPR.RequesterId != 0)
-            {
-                var users = _dataService.GetUsers();
-                var req = users.FirstOrDefault(u => u.Id == CurrentPR.RequesterId);
-                if (req != null)
-                {
-                    CurrentPR.RequesterSignature = req.SignatureImage;
-                    CurrentPR.RequesterName = req.FullName;
-                }
+                if (status == "CheckedByLogistics") { CurrentPR.LogisticsSignature = sig; }
+                else if (status == "ReviewedByFinance") { CurrentPR.FinanceSignature = sig; }
+                else if (status == "ApprovedByPM") { CurrentPR.PMSignature = sig; }
+                else if (status == "FinalApproved") { CurrentPR.FinalSignature = sig; }
             }
             OnPropertyChanged(nameof(CurrentPR));
         }
@@ -86,6 +129,12 @@ namespace JaahdLogistics.ViewModels
         [ObservableProperty]
         private ObservableCollection<string> _previousDescriptions;
 
+        [ObservableProperty]
+        private ObservableCollection<string> _pRTypes = new() { "Services", "Goods" };
+
+        [ObservableProperty]
+        private ObservableCollection<Employee> _employees = new();
+
         public string[] Currencies { get; } = { "USD", "YER" };
 
         public PurchaseRequisitionViewModel(IDataService dataService)
@@ -94,7 +143,14 @@ namespace JaahdLogistics.ViewModels
             _projects = new ObservableCollection<Project>(_dataService.GetProjects());
             _settings = _dataService.GetSettings();
             _previousDescriptions = new ObservableCollection<string>(_dataService.GetPreviousItemDescriptions());
+            LoadEmployees();
             LoadPRs();
+        }
+
+        private void LoadEmployees()
+        {
+            Employees.Clear();
+            foreach (var emp in _dataService.GetEmployees()) Employees.Add(emp);
         }
 
         private void LoadPRs()
@@ -216,7 +272,12 @@ namespace JaahdLogistics.ViewModels
         [RelayCommand]
         private void NewPR()
         {
-            CurrentPR = new PurchaseRequisition();
+            CurrentPR = new PurchaseRequisition
+            {
+                LogisticsEmployeeId = Settings.DefaultLogisticsEmployeeId,
+                FinanceEmployeeId = Settings.DefaultFinanceEmployeeId,
+                HeadEmployeeId = Settings.DefaultHeadEmployeeId
+            };
             SelectedProject = null;
             SelectedTabIndex = 1; // Switch to Edit tab
         }
@@ -233,6 +294,7 @@ namespace JaahdLogistics.ViewModels
             }
 
             CurrentPR = pr;
+            CurrentPR.Project = Projects.FirstOrDefault(p => p.Id == pr.ProjectId);
             SelectedProject = Projects.FirstOrDefault(p => p.Id == pr.ProjectId);
             SelectedTabIndex = 1; // Switch to Edit tab
         }
@@ -305,9 +367,29 @@ namespace JaahdLogistics.ViewModels
         }
 
         [RelayCommand]
+        private void AddCustomType()
+        {
+            var newType = Microsoft.VisualBasic.Interaction.InputBox("Enter Custom PR Type:", "Add Type", "");
+            if (!string.IsNullOrWhiteSpace(newType))
+            {
+                if (!PRTypes.Contains(newType))
+                {
+                    PRTypes.Add(newType);
+                }
+                CurrentPR.PRType = newType;
+            }
+        }
+
+        [RelayCommand]
         private void Print()
         {
             new PrintService().ShowPreview(this, "PRPrintTemplate");
+        }
+
+        [RelayCommand]
+        private void DirectPrint()
+        {
+            new PrintService().DirectPrint(this, "PRPrintTemplate");
         }
     }
 }

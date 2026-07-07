@@ -18,6 +18,8 @@ namespace JaahdLogistics.Data
         public void Setup()
         {
             using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            connection.Execute("PRAGMA foreign_keys = ON;");
             
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string schemaPath = Path.Combine(baseDir, "schema.sql");
@@ -31,6 +33,8 @@ namespace JaahdLogistics.Data
                 AddColumnIfMissing(connection, "Projects", "Name", "TEXT NOT NULL DEFAULT ''");
                 AddColumnIfMissing(connection, "Projects", "Code", "TEXT NOT NULL DEFAULT ''");
                 AddColumnIfMissing(connection, "Projects", "Year", "INTEGER NOT NULL DEFAULT 0");
+                AddColumnIfMissing(connection, "Projects", "ProjectManager", "TEXT");
+                AddColumnIfMissing(connection, "Projects", "ProjectOfficer", "TEXT");
 
                 // Repair BudgetLines table
                 AddColumnIfMissing(connection, "BudgetLines", "Name", "TEXT NOT NULL DEFAULT ''");
@@ -42,20 +46,67 @@ namespace JaahdLogistics.Data
                 // Repair PurchaseRequisitions table
                 AddColumnIfMissing(connection, "PurchaseRequisitions", "Currency", "TEXT NOT NULL DEFAULT 'USD'");
                 AddColumnIfMissing(connection, "PurchaseRequisitions", "ExchangeRate", "DECIMAL(18, 4) DEFAULT 1.0");
+                AddColumnIfMissing(connection, "PurchaseRequisitions", "PRType", "TEXT");
                 
                 // Repair Settings table
                 AddColumnIfMissing(connection, "Settings", "Address", "TEXT");
                 AddColumnIfMissing(connection, "Settings", "ContactInfo", "TEXT");
+                AddColumnIfMissing(connection, "Settings", "Tel", "TEXT");
+                AddColumnIfMissing(connection, "Settings", "Email", "TEXT");
                 AddColumnIfMissing(connection, "Settings", "PRTerms", "TEXT");
                 AddColumnIfMissing(connection, "Settings", "RFQTerms", "TEXT");
                 AddColumnIfMissing(connection, "Settings", "POTerms", "TEXT");
+                AddColumnIfMissing(connection, "Settings", "LogisticsManager", "TEXT");
+                AddColumnIfMissing(connection, "Settings", "FinanceManager", "TEXT");
+                AddColumnIfMissing(connection, "Settings", "HeadOfAssociation", "TEXT");
+                AddColumnIfMissing(connection, "Settings", "LogisticsTitle", "TEXT");
+                AddColumnIfMissing(connection, "Settings", "FinanceTitle", "TEXT");
+                AddColumnIfMissing(connection, "Settings", "HeadTitle", "TEXT");
 
                 // Repair Users
                 AddColumnIfMissing(connection, "Users", "SignatureImage", "BLOB");
 
+                // Ensure Vendors table exists
+                connection.Execute(@"
+                    CREATE TABLE IF NOT EXISTS Vendors (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        Name TEXT NOT NULL,
+                        Address TEXT,
+                        Contact TEXT,
+                        Tel TEXT,
+                        Email TEXT,
+                        Category TEXT,
+                        TaxId TEXT,
+                        BankInfo TEXT,
+                        IsActive INTEGER DEFAULT 1
+                    )");
+
+                // Repair GoodsReceivingNotes table
+                AddColumnIfMissing(connection, "GoodsReceivingNotes", "InvoiceNumber", "TEXT");
+                AddColumnIfMissing(connection, "GoodsReceivingNotes", "IsQtyComply", "INTEGER DEFAULT 0");
+                AddColumnIfMissing(connection, "GoodsReceivingNotes", "IsQtyMatch", "INTEGER DEFAULT 0");
+                AddColumnIfMissing(connection, "GoodsReceivingNotes", "IsQtyIntact", "INTEGER DEFAULT 0");
+
                 // Repair ThreeWayMatch table
                 AddColumnIfMissing(connection, "ThreeWayMatch", "InvoiceDetails", "TEXT");
                 AddColumnIfMissing(connection, "ThreeWayMatch", "InvoiceScan", "BLOB");
+
+                // Ensure ThreeWayMatchItems table exists
+                connection.Execute(@"
+                    CREATE TABLE IF NOT EXISTS ThreeWayMatchItems (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        ThreeWayMatchId INTEGER NOT NULL,
+                        Description TEXT NOT NULL,
+                        Unit TEXT,
+                        POPrice DECIMAL(18, 2),
+                        POQuantity DECIMAL(18, 2),
+                        ExtractPrice DECIMAL(18, 2),
+                        ExtractQuantity DECIMAL(18, 2),
+                        GRNPrice DECIMAL(18, 2),
+                        GRNQuantity DECIMAL(18, 2),
+                        ClarifyDiff TEXT,
+                        FOREIGN KEY (ThreeWayMatchId) REFERENCES ThreeWayMatch(Id)
+                    )");
 
                 // Repair PurchaseOrders table
                 AddColumnIfMissing(connection, "PurchaseOrders", "ProjectId", "INTEGER NOT NULL DEFAULT 0");
@@ -63,12 +114,69 @@ namespace JaahdLogistics.Data
                 // Repair BidAnalyses table
                 AddColumnIfMissing(connection, "BidAnalyses", "Currency", "TEXT");
                 AddColumnIfMissing(connection, "BidAnalyses", "ExchangeRate", "DECIMAL(18, 4)");
+                AddColumnIfMissing(connection, "BidAnalyses", "RecommendationReasons", "TEXT");
+
+                // Repair BidItems table
+                AddColumnIfMissing(connection, "BidItems", "BudgetLineId", "INTEGER");
 
                 // Repair Bidders table
+                AddColumnIfMissing(connection, "Bidders", "VendorId", "INTEGER");
+                AddColumnIfMissing(connection, "Bidders", "Tel", "TEXT");
+                AddColumnIfMissing(connection, "Bidders", "Email", "TEXT");
+                AddColumnIfMissing(connection, "Bidders", "Justification", "TEXT");
+                AddColumnIfMissing(connection, "Bidders", "IsWinner", "INTEGER DEFAULT 0");
                 AddColumnIfMissing(connection, "Bidders", "Discount", "DECIMAL(18, 2) DEFAULT 0");
                 AddColumnIfMissing(connection, "Bidders", "MiscCosts", "DECIMAL(18, 2) DEFAULT 0");
                 AddColumnIfMissing(connection, "Bidders", "TotalAmount", "DECIMAL(18, 2) DEFAULT 0");
                 AddColumnIfMissing(connection, "Bidders", "QuoteScan", "BLOB");
+
+                // Repair PurchaseOrders table
+                AddColumnIfMissing(connection, "PurchaseOrders", "ProjectId", "INTEGER NOT NULL DEFAULT 0");
+                AddColumnIfMissing(connection, "PurchaseOrders", "BidderId", "INTEGER");
+                AddColumnIfMissing(connection, "PurchaseOrders", "VendorId", "INTEGER");
+                AddColumnIfMissing(connection, "PurchaseOrders", "Clause", "TEXT");
+                AddColumnIfMissing(connection, "PurchaseOrders", "Currency", "TEXT");
+                AddColumnIfMissing(connection, "PurchaseOrders", "ExchangeRate", "DECIMAL(18, 4)");
+                AddColumnIfMissing(connection, "PurchaseOrders", "VendorName", "TEXT");
+                AddColumnIfMissing(connection, "PurchaseOrders", "VendorContact", "TEXT");
+                AddColumnIfMissing(connection, "PurchaseOrders", "VendorTel", "TEXT");
+                AddColumnIfMissing(connection, "PurchaseOrders", "VendorEmail", "TEXT");
+                AddColumnIfMissing(connection, "PurchaseOrders", "VendorAddress", "TEXT");
+
+                // Repair POItems table
+                AddColumnIfMissing(connection, "POItems", "BudgetLineId", "INTEGER");
+
+                // Ensure Employees table exists
+                connection.Execute(@"
+                    CREATE TABLE IF NOT EXISTS Employees (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        NameEN TEXT NOT NULL,
+                        NameAR TEXT NOT NULL,
+                        PositionEN TEXT,
+                        PositionAR TEXT,
+                        SignatureImage BLOB
+                    )");
+
+                // Add Employee reference columns to documents
+                AddColumnIfMissing(connection, "PurchaseRequisitions", "RequesterEmployeeId", "INTEGER");
+                AddColumnIfMissing(connection, "PurchaseRequisitions", "RequesterTitle", "TEXT");
+                AddColumnIfMissing(connection, "PurchaseRequisitions", "LogisticsEmployeeId", "INTEGER");
+                AddColumnIfMissing(connection, "PurchaseRequisitions", "FinanceEmployeeId", "INTEGER");
+                AddColumnIfMissing(connection, "PurchaseRequisitions", "HeadEmployeeId", "INTEGER");
+
+                AddColumnIfMissing(connection, "PurchaseOrders", "LogisticsEmployeeId", "INTEGER");
+                AddColumnIfMissing(connection, "PurchaseOrders", "FinanceEmployeeId", "INTEGER");
+                AddColumnIfMissing(connection, "PurchaseOrders", "HeadEmployeeId", "INTEGER");
+
+                AddColumnIfMissing(connection, "GoodsReceivingNotes", "ReceiverEmployeeId", "INTEGER");
+
+                AddColumnIfMissing(connection, "BidAnalyses", "LogisticsEmployeeId", "INTEGER");
+                AddColumnIfMissing(connection, "BidAnalyses", "FinanceEmployeeId", "INTEGER");
+                AddColumnIfMissing(connection, "BidAnalyses", "HeadEmployeeId", "INTEGER");
+
+                AddColumnIfMissing(connection, "Settings", "DefaultLogisticsEmployeeId", "INTEGER");
+                AddColumnIfMissing(connection, "Settings", "DefaultFinanceEmployeeId", "INTEGER");
+                AddColumnIfMissing(connection, "Settings", "DefaultHeadEmployeeId", "INTEGER");
             }
             
             var userCount = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Users");
@@ -98,6 +206,62 @@ namespace JaahdLogistics.Data
             if (settingsCount == 0)
             {
                 connection.Execute("INSERT INTO Settings (Id, AssociationName) VALUES (1, 'Jaahd Association')");
+            }
+
+            // Cleanup invalid Foreign Keys that might cause crashes in existing data
+            CleanupInvalidForeignKeys(connection);
+        }
+
+        private void CleanupInvalidForeignKeys(SqliteConnection connection)
+        {
+            try
+            {
+                // Find a default Project and User for repair
+                var defaultProjectId = connection.ExecuteScalar<int?>("SELECT Id FROM Projects LIMIT 1");
+                var defaultUserId = connection.ExecuteScalar<int?>("SELECT Id FROM Users LIMIT 1");
+
+                if (defaultProjectId.HasValue)
+                {
+                    connection.Execute("UPDATE PurchaseRequisitions SET ProjectId = @pid WHERE ProjectId = 0 OR ProjectId NOT IN (SELECT Id FROM Projects)", new { pid = defaultProjectId.Value });
+                    connection.Execute("UPDATE PurchaseOrders SET ProjectId = @pid WHERE ProjectId = 0 OR ProjectId NOT IN (SELECT Id FROM Projects)", new { pid = defaultProjectId.Value });
+                }
+
+                if (defaultUserId.HasValue)
+                {
+                    connection.Execute("UPDATE PurchaseRequisitions SET RequesterId = @uid WHERE RequesterId = 0 OR RequesterId NOT IN (SELECT Id FROM Users)", new { uid = defaultUserId.Value });
+                }
+
+                // Repair RFQs (linked to PRs)
+                connection.Execute("UPDATE RFQs SET PRId = (SELECT Id FROM PurchaseRequisitions LIMIT 1) WHERE PRId = 0 OR PRId NOT IN (SELECT Id FROM PurchaseRequisitions)");
+
+                // Repair BidAnalyses (linked to RFQs)
+                connection.Execute("UPDATE BidAnalyses SET RFQId = (SELECT Id FROM RFQs LIMIT 1) WHERE RFQId = 0 OR RFQId NOT IN (SELECT Id FROM RFQs)");
+
+                // Set invalid BidAnalysisId to NULL
+                connection.Execute("UPDATE PurchaseOrders SET BidAnalysisId = NULL WHERE BidAnalysisId IS NOT NULL AND (BidAnalysisId = 0 OR BidAnalysisId NOT IN (SELECT Id FROM BidAnalyses))");
+                // Set invalid BidderId to NULL
+                connection.Execute("UPDATE PurchaseOrders SET BidderId = NULL WHERE BidderId IS NOT NULL AND (BidderId = 0 OR BidderId NOT IN (SELECT Id FROM Bidders))");
+                // Set invalid VendorId to NULL
+                connection.Execute("UPDATE PurchaseOrders SET VendorId = NULL WHERE VendorId IS NOT NULL AND (VendorId = 0 OR VendorId NOT IN (SELECT Id FROM Vendors))");
+
+                // Repair items
+                connection.Execute("UPDATE PRItems SET BudgetLineId = NULL WHERE BudgetLineId IS NOT NULL AND (BudgetLineId = 0 OR BudgetLineId NOT IN (SELECT Id FROM BudgetLines))");
+                connection.Execute("UPDATE POItems SET BudgetLineId = NULL WHERE BudgetLineId IS NOT NULL AND (BudgetLineId = 0 OR BudgetLineId NOT IN (SELECT Id FROM BudgetLines))");
+                connection.Execute("UPDATE BidItems SET BudgetLineId = NULL WHERE BudgetLineId IS NOT NULL AND (BudgetLineId = 0 OR BudgetLineId NOT IN (SELECT Id FROM BudgetLines))");
+
+                // Proactively repair ID 0 in all foreign keys (ONLY for nullable columns)
+                connection.Execute("UPDATE PRItems SET BudgetLineId = NULL WHERE BudgetLineId = 0");
+                connection.Execute("UPDATE PurchaseOrders SET BidAnalysisId = NULL WHERE BidAnalysisId = 0");
+                connection.Execute("UPDATE PurchaseOrders SET BidderId = NULL WHERE BidderId = 0");
+                connection.Execute("UPDATE PurchaseOrders SET VendorId = NULL WHERE VendorId = 0");
+                connection.Execute("UPDATE POItems SET BudgetLineId = NULL WHERE BudgetLineId = 0");
+                connection.Execute("UPDATE BidAnalyses SET RecommendedBidderId = NULL WHERE RecommendedBidderId = 0");
+                connection.Execute("UPDATE Bidders SET VendorId = NULL WHERE VendorId = 0");
+                connection.Execute("UPDATE BidItems SET BudgetLineId = NULL WHERE BudgetLineId = 0");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error cleaning up FKs: {ex.Message}");
             }
         }
 

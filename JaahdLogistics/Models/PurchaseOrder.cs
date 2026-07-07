@@ -3,59 +3,120 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
+using CommunityToolkit.Mvvm.ComponentModel;
+
 namespace JaahdLogistics.Models
 {
-    public class PurchaseOrder : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
+    public partial class PurchaseOrder : ObservableObject
     {
         public int Id { get; set; }
         
-        private string _poNumber = string.Empty;
-        public string PONumber { get => _poNumber; set => SetProperty(ref _poNumber, value); }
+        [ObservableProperty]
+        private string _pONumber = string.Empty;
         
-        public int PRId { get; set; }
-        public int ProjectId { get; set; } 
-        public int? BidAnalysisId { get; set; }
-        public int? VendorId { get; set; }
+        [ObservableProperty]
+        private int _pRId;
+
+        [ObservableProperty]
+        private int _projectId;
+
+        [ObservableProperty]
+        private int? _bidAnalysisId;
+
+        [ObservableProperty]
+        private int? _bidderId;
+
+        [ObservableProperty]
+        private int? _vendorId;
         
+        [ObservableProperty]
         private DateTime _date;
-        public DateTime Date { get => _date; set => SetProperty(ref _date, value); }
         
+        [ObservableProperty]
         private string? _terms;
-        public string? Terms { get => _terms; set => SetProperty(ref _terms, value); }
+
+        [ObservableProperty]
+        private string? _clause;
         
+        [ObservableProperty]
+        private Vendor? _vendor;
+
+        [ObservableProperty]
         private string _status = "Pending";
-        public string Status { get => _status; set => SetProperty(ref _status, value); }
+
+        [ObservableProperty]
+        private string? _currency;
+
+        [ObservableProperty]
+        private decimal _exchangeRate = 1.0m;
+
+        [ObservableProperty]
+        private string? _vendorName;
+
+        [ObservableProperty]
+        private string? _vendorContact;
+
+        [ObservableProperty]
+        private string? _vendorTel;
+
+        [ObservableProperty]
+        private string? _vendorEmail;
+
+        [ObservableProperty]
+        private string? _vendorAddress;
         
+        public Project? Project { get; set; }
+
         public ObservableCollection<POItem> Items { get; set; } = new();
 
+        [ObservableProperty]
         private byte[]? _logisticsSignature;
-        public byte[]? LogisticsSignature { get => _logisticsSignature; set => SetProperty(ref _logisticsSignature, value); }
 
+        [ObservableProperty]
         private byte[]? _financeSignature;
-        public byte[]? FinanceSignature { get => _financeSignature; set => SetProperty(ref _financeSignature, value); }
 
-        private byte[]? _pmSignature;
-        public byte[]? PMSignature { get => _pmSignature; set => SetProperty(ref _pmSignature, value); }
+        [ObservableProperty]
+        private byte[]? _pMSignature;
 
+        [ObservableProperty]
         private byte[]? _finalSignature;
-        public byte[]? FinalSignature { get => _finalSignature; set => SetProperty(ref _finalSignature, value); }
 
+        [ObservableProperty]
         private string? _logisticsName;
-        public string? LogisticsName { get => _logisticsName; set => SetProperty(ref _logisticsName, value); }
 
+        [ObservableProperty]
         private string? _financeName;
-        public string? FinanceName { get => _financeName; set => SetProperty(ref _financeName, value); }
 
-        private string? _pmName;
-        public string? PMName { get => _pmName; set => SetProperty(ref _pmName, value); }
+        [ObservableProperty]
+        private string? _pMName;
 
+        [ObservableProperty]
         private string? _finalName;
-        public string? FinalName { get => _finalName; set => SetProperty(ref _finalName, value); }
+
+        [ObservableProperty]
+        private string? _logisticsTitle = "Logistics Manager";
+
+        [ObservableProperty]
+        private string? _financeTitle = "Finance Manager";
+
+        [ObservableProperty]
+        private string? _finalTitle = "Head of Association";
+
+        [ObservableProperty]
+        private int? _logisticsEmployeeId;
+
+        [ObservableProperty]
+        private int? _financeEmployeeId;
+
+        [ObservableProperty]
+        private int? _headEmployeeId;
 
         public decimal TotalAmount => Items.Sum(i => i.TotalPrice);
 
         public PurchaseOrder()
         {
+            Date = DateTime.Now;
+            Status = "Pending";
             Items.CollectionChanged += (s, e) => {
                 OnPropertyChanged(nameof(TotalAmount));
                 if (e.NewItems != null) {
@@ -69,6 +130,7 @@ namespace JaahdLogistics.Models
     {
         public int Id { get; set; }
         public int POId { get; set; }
+        public int? BudgetLineId { get; set; }
         
         private string _description = string.Empty;
         public string Description { get => _description; set => SetProperty(ref _description, value); }

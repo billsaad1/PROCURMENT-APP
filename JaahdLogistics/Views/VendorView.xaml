@@ -1,0 +1,70 @@
+<UserControl x:Class="JaahdLogistics.Views.VendorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:JaahdLogistics.Views"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="800">
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0" Margin="0,0,10,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock Text="{DynamicResource Vendors}" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
+                <Button Content="{DynamicResource New}" Command="{Binding NewVendorCommand}" Margin="10,0,0,0"/>
+            </StackPanel>
+            <DataGrid Grid.Row="1" ItemsSource="{Binding Vendors}" SelectedItem="{Binding SelectedVendor}" AutoGenerateColumns="False" IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="{DynamicResource Name}" Binding="{Binding Name}" Width="*"/>
+                    <DataGridTemplateColumn Width="Auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="X" Command="{Binding DataContext.DeleteVendorCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#C0392B"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <ScrollViewer Grid.Column="1">
+            <StackPanel Margin="10">
+                <TextBlock Text="Vendor Details" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+
+                <TextBlock Text="{DynamicResource Name}" Margin="0,5"/>
+                <TextBox Text="{Binding CurrentVendor.Name}" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Address" Margin="0,5"/>
+                <TextBox Text="{Binding CurrentVendor.Address}" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Contact Person" Margin="0,5"/>
+                <TextBox Text="{Binding CurrentVendor.Contact}" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Tel" Margin="0,5"/>
+                <TextBox Text="{Binding CurrentVendor.Tel}" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Email" Margin="0,5"/>
+                <TextBox Text="{Binding CurrentVendor.Email}" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Category" Margin="0,5"/>
+                <TextBox Text="{Binding CurrentVendor.Category}" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Tax ID" Margin="0,5"/>
+                <TextBox Text="{Binding CurrentVendor.TaxId}" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Bank Account Info" Margin="0,5"/>
+                <TextBox Text="{Binding CurrentVendor.BankInfo}" TextWrapping="Wrap" AcceptsReturn="True" Height="60" Margin="0,0,0,10"/>
+
+                <Button Content="{DynamicResource Save}" Command="{Binding SaveVendorCommand}" Width="120" Height="35" HorizontalAlignment="Right" Margin="0,10,0,0" Background="#27AE60"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
